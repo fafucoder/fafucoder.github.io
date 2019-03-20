@@ -1,4 +1,4 @@
-baseURL = "http://example.org/"
+baseURL = "https://fafucoder.github.io/blog"
 languageCode = "en-us"
 title = "Dawn"
 theme = "wave"
