@@ -149,6 +149,103 @@
     <ul class="post-list">
     
         <li class="post-list-item fade">
+            <article id="post-kubernetes-dns"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2020-07-08 16:44:29" datetime="2020-07-08T08:44:29.000Z"  itemprop="datePublished">2020-07-08</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2020/07/08/kubernetes-dns/">kubernetes dns解析</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        DNS概念
+DNS协议的作用是将域名解析成ip地址， 域名只是ip地址的代号
+为了将域名解析成ip地址，需要建立一个域名到ip地址之间的映射关系，提供将域名动态解析成ip地址的服务器就叫做DNS服务器， 由于当前故障的原因，DNS无法设计成集中式，因此出现了分层解析架构，分为根服务器，二级域名...
+    
+
+        <a href="/2020/07/08/kubernetes-dns/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-golang-escape-analysis"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2020-07-07 23:47:40" datetime="2020-07-07T15:47:40.000Z"  itemprop="datePublished">2020-07-07</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2020/07/07/golang-escape-analysis/">go逃逸分析</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        堆与栈的概念即使是现代操作系统中，内存依然是计算机中很宝贵的资源，为了充分利用和管理系统内存资源，Linux采用虚拟内存管理技术，利用虚拟内存技术让每个进程都有4GB 互不干涉的虚拟地址空间。
+进程初始化分配和操作的都是基于这个「虚拟地址」，只有当进程需要实际访问内存资源的时候才会建立虚拟地址...
+    
+
+        <a href="/2020/07/07/golang-escape-analysis/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
             <article id="post-golang-build"
   class="article-card article-type-post" itemprop="blogPost">
 
@@ -529,100 +626,6 @@ NodeSelector: 早期的简单控制方式，直接通过键—值对将 Pod 调�
     <div class="post-footer">
         
 	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-kubernetes-taint"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2020-05-17 10:35:32" datetime="2020-05-17T02:35:32.000Z"  itemprop="datePublished">2020-05-17</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2020/05/17/kubernetes-taint/">kubernetes taint(污点)跟toleration(容忍)</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        taint命令添加taint123456kubectl taint node [node] key&#x3D;value:[ NoSchedule | PreferNoSchedule | NoExecute ]例如:➜  ~ kubectl taint node central key1&#...
-    
-
-        <a href="/2020/05/17/kubernetes-taint/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-linux-nsenter"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2020-05-09 22:24:35" datetime="2020-05-09T14:24:35.000Z"  itemprop="datePublished">2020-05-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2020/05/09/linux-nsenter/">linux nsenter命令</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        问题概述要显示某个pod获取容器的IP地址(或者执行ping操作)， docker进入到容器里面，使用的命令包括docker exec或者docker attach。kubernetes进入到pod里面，使用的命令包括 kubectl exec。 进入到容器里面在ifconfig 或者ip a...
-    
-
-        <a href="/2020/05/09/linux-nsenter/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
 
     </div>
     
