@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>好记忆不如烂笔头</title>
+  
+  <subtitle>问题记录，学习笔记</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://github.com/fafucoder/"/>
+  <updated>2020-10-09T12:36:55.435Z</updated>
+  <id>https://github.com/fafucoder/</id>
+  
+  <author>
+    <name>Dawn</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>arp地址解析协议</title>
+    <link href="https://github.com/fafucoder/2020/10/09/linux-arp/"/>
+    <id>https://github.com/fafucoder/2020/10/09/linux-arp/</id>
+    <published>2020-10-09T11:45:22.000Z</published>
+    <updated>2020-10-09T12:36:55.435Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>ARP(Address Resolution Protocol) 即地址解析协议，用于实现从IP地址到MAC地址映射。</p><h3 id="ARP工作流程"><a href="#ARP工作流程" class="headerlink" title="ARP工作流程"></a>ARP工作流程</h3><h4 id="相同网段"><a href="#相同网段" class="headerlink" title="相同网段"></a>相同网段</h4><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/835745/201908/835745-20190812161206253-1584652320.png" alt="同网段ARP" title="">                </div>                <div class="image-caption">同网段ARP</div>            </figure><ol><li><p>PC1 要和PC3 通行，首先查看自己的ARP表，查看其中是否包含PC3的MAC地址信息，如果找到对应关系，直接利用ARP表中的MAC地址对IP数据包进行封装。并将数据包发送给PC3。</p></li><li><p>如果PC1在ARP表中未找到PC3对应的MAC地址，则先缓存数据报文，然后利用广播方式（目标MAC地址FF:FF:FF:FF:FF:FF)发送一个ARP报文请求，ARP请求中的发送端MAC地址分别是PC1的IP地址和MAC地址，接收端的IP地址为PC3的IP地址，MAC地址全为0，因为ARP请求报文是以广播方式发送，所以该网段上的所有主机都可以接收到该请求包，但只有其IP地址与目的IP地址一致的PC3才会对该请求进行处理。</p></li><li><p>PC3将ARP请求报文中的发送端（即PC1）的IP地址和MAC地址存入自己的ARP表中。然后以单播方式向PC1发送一个ARP相应报文，应答报文中就包含了自己的MAC地址，也就是原来在请求报文中要请求的目的MAC地址。</p></li><li><p>PC1收到来自PC3的ARP响应报文之后，将PC3的MAC地址加入到自己的ARP表中以用于后续报文的转发，同时将原来缓存的IP数据包再次修改（在目的MAC地址字段填上PC3的MAC地址）后发送出去。</p></li></ol><h4 id="跨网段"><a href="#跨网段" class="headerlink" title="跨网段"></a>跨网段</h4><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img-blog.csdn.net/20160923110942379?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt="跨网段ARP" title="">                </div>                <div class="image-caption">跨网段ARP</div>            </figure><ol><li><p>如果主机A不知道网关的MAC地址（也就是主机A的ARP表中没有网关对应的MAC地址表项），则主机A先在本网段中发出一个ARP请求广播，ARP请求报文中的目的IP地址为网关的IP地址,代表其目的就是想获得网关的MAC地址。如果主机A已经知道网关的MAC地址，则略过此步。</p></li><li><p>网关收到ARP广播包后同样会向主机A发回一个ARP应答包。当主机A收到的应答包中获得网关的MAC地址后，在主机A向主机B发送的原报文的目的MAC地址字段填上网关的MAC地址后发给网关。(目的IP还是主机B)</p></li><li><p>如果网关的ARP表中已有主机B对应的MAC地址，则网关直接将在来自主机A的报文中的目的MAC地址字段填上主机B的MAC地址后转发给B。</p></li><li><p>如果网关ARP表中没有主机B的MAC地址，网关会再次向主机B所在的网段发送ARP广播请求，此时目的IP地址为主机B的IP地址，当网关从收到来自主机B的应答报文中获得主机B的MAC地址后，就可以将主机A发来的报文重新再目的MAC地址字段填上主机B的MAC地址后发送给主机B。</p></li></ol><h3 id="ARP协议格式"><a href="#ARP协议格式" class="headerlink" title="ARP协议格式"></a>ARP协议格式</h3><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/835745/201908/835745-20190812173139966-429857585.png" alt="ARP协议" title="">                </div>                <div class="image-caption">ARP协议</div>            </figure><ul><li>以太网目的地址: 目的主机的硬件地址。目的地址全为1表示广播地址</li><li>以太网源地址：源主机的硬件地址</li><li>帧类型：ARP：0x0806、　RARP：0x8035</li><li>协议类型：IP类型：0x0800</li><li>硬件地址长度：对于以太网II来说，MAC地址作为硬件地址，因此该字段值为十六进制06</li><li>协议地址长度：对于IPv4来，IP地址长度位32个字节，因此该字段值为十六进制04</li><li>操作类型：ARP定义了两种操作：0x0001(请求)、0x0002(应答)</li><li>发送端以太网地址：对于以太网II来说，MAC地址作为硬件地址</li><li>发送端IP地址：对于IPv4来， 值为IPv4地址</li><li>目的以太网地址：对于以太网II来说，MAC地址作为硬件地址</li><li>目的IP地址：对于IPv4来， 值为IPv4地址</li></ul><h3 id="常见命令"><a href="#常见命令" class="headerlink" title="常见命令"></a>常见命令</h3><h4 id="arp"><a href="#arp" class="headerlink" title="arp"></a>arp</h4><p>arp 命令用于显示和修改 IP 到 MAC 转换表</p><p>使用方法如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-a : 显示 arp 缓冲区的所有条目</span><br></pre></td></tr></table></figure><h4 id="arping"><a href="#arping" class="headerlink" title="arping"></a>arping</h4><p>arping用来向局域网内的其它主机发送ARP请求，它可以用来测试局域网内的某个IP是否已被使用。</p><p>使用方法如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Usage: arping [-fqbDUAV] [-c count] [-w timeout] [-I device] [-s source] destination</span><br><span class="line">  -f : quit on first reply （收到第一个响应包后退出)</span><br><span class="line">  -q : be quiet（静默模式）</span><br><span class="line">  -b : keep broadcasting, don&#39;t go unicast （发送以太网广播帧，arping在开始时使用广播地址，在收到回复后使用unicast单播地址）</span><br><span class="line">  -D : duplicate address detection mode (重复地址探测模式，用来检测有没有IP地址冲突，如果没有IP冲突则返回0)</span><br><span class="line">  -U : Unsolicited ARP mode, update your neighbours (无理由的&#x2F;强制的 ARP模式去更新别的主机上的ARP CACHE列表中的本机的信息，不需要响应。)</span><br><span class="line">  -A : ARP answer mode, update your neighbours (与-U参数类似，但是使用的是ARP REPLY包而非ARP REQUEST包)</span><br><span class="line">  -V : print version and exit （打印版本并退出)</span><br><span class="line">  -c count : how many packets to send (指定数量)</span><br><span class="line">  -w timeout : how long to wait for a reply （等待时间）</span><br><span class="line">  -I device : which ethernet device to use （指定网卡）</span><br><span class="line">  -s source : source ip address （源IP）</span><br><span class="line">  destination : ask for what ip address</span><br></pre></td></tr></table></figure><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/onlycat/p/11340872.html#/cnblog/works/article/11340872" target="_blank" rel="noopener">https://www.cnblogs.com/onlycat/p/11340872.html#/cnblog/works/article/11340872</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;概念&quot;&gt;&lt;a href=&quot;#概念&quot; class=&quot;headerlink&quot; title=&quot;概念&quot;&gt;&lt;/a&gt;概念&lt;/h3&gt;&lt;p&gt;ARP(Address Resolution Protocol) 即地址解析协议，用于实现从IP地址到MAC地址映射。&lt;/p&gt;
+&lt;h3 id
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>socket套接字</title>
+    <link href="https://github.com/fafucoder/2020/10/09/linux-socket/"/>
+    <id>https://github.com/fafucoder/2020/10/09/linux-socket/</id>
+    <published>2020-10-09T11:45:13.000Z</published>
+    <updated>2020-10-09T13:00:01.807Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.debuginn.cn/5917.html" target="_blank" rel="noopener">https://www.debuginn.cn/5917.html</a></li><li><a href="https://cloud.tencent.com/developer/article/1162927" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1162927</a></li><li><a href="https://cloud.tencent.com/developer/article/1162934" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1162934</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.debuginn.cn/5917.html&quot; target=&quot;_bla
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux awk, grep, sed命令</title>
+    <link href="https://github.com/fafucoder/2020/09/20/linux-awk/"/>
+    <id>https://github.com/fafucoder/2020/09/20/linux-awk/</id>
+    <published>2020-09-20T13:40:22.000Z</published>
+    <updated>2020-10-10T11:58:05.079Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>awk、grep、sed 是 linux 操作文本的三大利器， 三者的功能都是处理文本，但侧重点各不相同。</p><p>grep适合单纯的查找或匹配文本，sed适合编辑匹配到的文本，awk适合格式化文本，对文本进行较复杂格式处理。</p><p>简单概述为：</p><ul><li>grep：数据查找定位</li><li>awk：数据切片</li><li>sed：数据修改</li></ul><h3 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h3><p>grep(全局正则表达式打印)–命令用于查找文件里符合条件的字符串。 从文件的第一行开始，grep 将一行复制到 buffer 中，将其与搜索字符串进行比较，如果比较通过，则将该行打印到屏幕上。grep将重复这个过程，直到文件搜索所有行。</p><p>常见参数：</p><ol><li>-n   –line-number         #在显示符合样式的那一行之前，标示出该行的列数编号。 <code>grep -n license package.json</code></li><li>-v   –revert-match        #显示不包含匹配文本的所有行。 </li><li>-c   –count               #计算符合样式的列数。</li><li>-l   –file-with-matches   #列出文件内容符合指定的样式的文件名称。 <code>grep -l license *</code>   </li><li>-i   –ignore-case         #忽略字符大小写的差别。</li><li>-x   –line-regexp         #只显示全列符合的列。 <code>grep -x &quot;boo&quot; sampler.log</code></li><li>-s   –no-messages         #不显示错误信息。 <code>grep -ls license *</code></li><li>-H   –with-filename       #在显示符合样式的那一行之前，表示该行所属的文件名称。  </li></ol><h3 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h3><p>awk 程序对输入文件的每一行进行操作。它可以有一个可选的 BEGIN{ } 部分在处理文件的任何内容之前执行的命令，然后主{ }部分运行在文件的每一行中，最后还有一个可选的END{ }部分操作将在后面执行文件读取完成:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">BEGIN &#123; …. initialization awk commands …&#125;</span><br><span class="line">&#123; …. awk commands for each line of the file…&#125;</span><br><span class="line">END &#123; …. finalization awk commands …&#125;</span><br></pre></td></tr></table></figure><p>对于输入文件的每一行，它会查看是否有任何模式匹配指令，在这种情况下它仅在与该模式匹配的行上运行，否则它在所有行上运行。 这些 ‘pattern-matching’ 命令可以包含与 grep 一样的正则表达式。 </p><p>类似数据库列的概念，但它是按照序号来指定的，比如我要第一个列是1， 第二列是2，依此类推。$0就是输出整个文本的内容。默认用空格作为分隔符，可以自己通过-F设置适合自己情况的分隔符。 例如：<code>awk &#39;{print $1}&#39; demo.txt</code></p><h3 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h3><p>sed执行时，会从文件或者标准输入中读取一行，将其复制到缓冲区，对文本编辑完成之后，读取下一行直到所有的文本行都编辑完毕。</p><p>所以sed命令处理时只会改变缓冲区中文本的副本，如果想要直接编辑原文件，可以使用-i选项或者将结果重定向到新的文件中。</p><p>常见命令:</p><ol><li>-e ：直接在命令列模式上进行 sed 的动作编辑。</li><li>-i ：直接修改读取的文件内容，而不是输出到终端。</li><li>-f ：直接将 sed 的动作写在一个文件内， -f filename 则可以运行 filename 内的 sed 动作。</li><li>-n ：使用安静(silent)模式。在一般 sed 的用法中，所有来自 STDIN 的数据一般都会被列出到终端上。但如果加上 -n 参数后，则只有经过sed 特殊处理的那一行(或者动作)才会被列出来。</li></ol><p>其他命令:</p><p>一般形式是</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed -e &#39;&#x2F;pattern&#x2F; command&#39; sampler.log</span><br></pre></td></tr></table></figure><p>其中 ‘pattern’ 是正则表达式，’command’ 可以是:</p><ul><li>a(append) ：新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～</li><li>c ：取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！</li><li>d(delete) ：删除，因为是删除啊，所以 d 后面通常不接任何咚咚；</li><li>i(insert) ：插入， i 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)；</li><li>p(print) ：列印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～</li><li>s(search＆replace) ：取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！例如 1,20s/old/new/g</li></ul><p>示例：</p><ol><li>删除:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 删除指定行(第三行)</span><br><span class="line">sed -e &#39;3d&#39; demo.txt</span><br><span class="line"></span><br><span class="line">➜  indigo git:(master) ✗ sed &#39;2d&#39; demo.txt  </span><br><span class="line">Twinkle, twinkle, little star</span><br><span class="line">Up above the world so high</span><br><span class="line">Like a diamond in the sky</span><br><span class="line">When the blazing sun is gone</span><br><span class="line"></span><br><span class="line"># 删除范围行(2-4行)</span><br><span class="line">sed -e &#39;2,4d&#39; demo.txt</span><br><span class="line"></span><br><span class="line">➜  indigo git:(master) ✗ sed &#39;2,4d&#39; demo.txt</span><br><span class="line">Twinkle, twinkle, little star</span><br><span class="line">When the blazing sun is gone</span><br><span class="line"></span><br><span class="line"># 到结尾行</span><br><span class="line">sed -e &#39;2,$d&#39; demo.txt</span><br><span class="line"></span><br><span class="line">➜  indigo git:(master) ✗ sed &#39;3,$d&#39; demo.txt</span><br><span class="line">Twinkle, twinkle, little star</span><br><span class="line">How I wonder what you are</span><br></pre></td></tr></table></figure></li></ol><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://cloud.tencent.com/developer/article/1465475" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1465475</a></li><li><a href="https://juejin.im/post/6845166891493785613" target="_blank" rel="noopener">https://juejin.im/post/6845166891493785613</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h3&gt;&lt;p&gt;awk、grep、sed 是 linux 操作文本的三大利器， 三者的功能都是处理文本，但侧重点各不相同。&lt;/p&gt;
+&lt;p&gt;grep适合单纯的
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux-io</title>
+    <link href="https://github.com/fafucoder/2020/09/14/linux-io/"/>
+    <id>https://github.com/fafucoder/2020/09/14/linux-io/</id>
+    <published>2020-09-14T12:22:13.000Z</published>
+    <updated>2020-09-14T12:22:13.969Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>http1.1, http2.0, http3.0区别</title>
+    <link href="https://github.com/fafucoder/2020/09/14/linux-http2/"/>
+    <id>https://github.com/fafucoder/2020/09/14/linux-http2/</id>
+    <published>2020-09-14T11:52:55.000Z</published>
+    <updated>2020-09-14T12:00:23.335Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="多路复用"><a href="#多路复用" class="headerlink" title="多路复用"></a>多路复用</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://mp.weixin.qq.com/s/T8848OB4EWCIdk7gFfRLbQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/T8848OB4EWCIdk7gFfRLbQ</a></li><li><a href="https://segmentfault.com/a/1190000020714686" target="_blank" rel="noopener">https://segmentfault.com/a/1190000020714686</a></li><li><a href="https://zhuanlan.zhihu.com/p/32553477" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/32553477</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;多路复用&quot;&gt;&lt;a href=&quot;#多路复用&quot; class=&quot;headerlink&quot; title=&quot;多路复用&quot;&gt;&lt;/a&gt;多路复用&lt;/h3&gt;&lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes update跟patch区别</title>
+    <link href="https://github.com/fafucoder/2020/09/09/kubernetes-update-patch/"/>
+    <id>https://github.com/fafucoder/2020/09/09/kubernetes-update-patch/</id>
+    <published>2020-09-09T13:58:47.000Z</published>
+    <updated>2020-09-09T15:13:06.368Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://github.com/fafucoder/2020/09/09/hello-world/"/>
+    <id>https://github.com/fafucoder/2020/09/09/hello-world/</id>
+    <published>2020-09-09T02:47:03.652Z</published>
+    <updated>2020-09-09T02:47:03.652Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>golang类型别名和类型定义</title>
+    <link href="https://github.com/fafucoder/2020/08/06/golang-type/"/>
+    <id>https://github.com/fafucoder/2020/08/06/golang-type/</id>
+    <published>2020-08-06T06:50:53.000Z</published>
+    <updated>2020-09-09T02:47:03.652Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="类型定义"><a href="#类型定义" class="headerlink" title="类型定义"></a>类型定义</h3><p>根据基本类型声明一个新的数据类型。</p><p>类型定义格式类似如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">type hello int</span><br><span class="line">type world func(name string) string</span><br></pre></td></tr></table></figure><h3 id="类型别名"><a href="#类型别名" class="headerlink" title="类型别名"></a>类型别名</h3><p>类型别名 是 Go 1.9 版本添加的新功能。主要应用于代码升级、工程重构、迁移中类型的兼容性问题。C/C++ 语言中，代码的重构升级可以使用宏快速定义新的代码。</p><p>类型别名格式类似如下:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">type hello &#x3D; int</span><br><span class="line">type world &#x3D; int32</span><br></pre></td></tr></table></figure><h3 id="类型定义与类型别名"><a href="#类型定义与类型别名" class="headerlink" title="类型定义与类型别名"></a>类型定义与类型别名</h3><p>类型别名规定：Type Alias只是Type 的别名，本质上Type Alias 与Type是同一个类型，即基本数据类型是一致的。这意味着这两种类型的数据可以互相赋值，而类型定义要和原始类型赋值的时候需要类型转换(Conversion T(x))。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import &quot;fmt&quot;</span><br><span class="line"></span><br><span class="line">type world func(name string) string</span><br><span class="line"></span><br><span class="line">type hello &#x3D; int</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">var h hello</span><br><span class="line">var w world</span><br><span class="line"></span><br><span class="line">fmt.Printf(&quot;hello Type: %T, value： %d\n&quot;, h, h)</span><br><span class="line">fmt.Printf(&quot;world Type: %T, value： %d\n&quot;, w, w)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">result:</span><br><span class="line"></span><br><span class="line">hello Type: int, value： 0</span><br><span class="line">world Type: main.world, value： 0</span><br></pre></td></tr></table></figure><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://blog.csdn.net/AMimiDou_212/article/details/94873163" target="_blank" rel="noopener">https://blog.csdn.net/AMimiDou_212/article/details/94873163</a></li><li><a href="https://sanyuesha.com/2017/07/27/go-type/" target="_blank" rel="noopener">https://sanyuesha.com/2017/07/27/go-type/</a></li><li><a href="https://colobu.com/2017/06/26/learn-go-type-aliases/" target="_blank" rel="noopener">https://colobu.com/2017/06/26/learn-go-type-aliases/</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;类型定义&quot;&gt;&lt;a href=&quot;#类型定义&quot; class=&quot;headerlink&quot; title=&quot;类型定义&quot;&gt;&lt;/a&gt;类型定义&lt;/h3&gt;&lt;p&gt;根据基本类型声明一个新的数据类型。&lt;/p&gt;
+&lt;p&gt;类型定义格式类似如下：&lt;/p&gt;
+&lt;figure class=&quot;highli
+      
+    
+    </summary>
+    
+    
+      <category term="golang" scheme="https://github.com/fafucoder/categories/golang/"/>
+    
+    
+      <category term="golang" scheme="https://github.com/fafucoder/tags/golang/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes-podSecurityPolicy</title>
+    <link href="https://github.com/fafucoder/2020/08/06/kubernetes-podSecurityPolicy/"/>
+    <id>https://github.com/fafucoder/2020/08/06/kubernetes-podSecurityPolicy/</id>
+    <published>2020-08-06T03:35:06.000Z</published>
+    <updated>2020-09-09T02:47:03.657Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://ieevee.com/tech/2019/02/18/psp.html" target="_blank" rel="noopener">https://ieevee.com/tech/2019/02/18/psp.html</a></li><li><a href="https://www.qikqiak.com/post/setup-psp-in-k8s/" target="_blank" rel="noopener">https://www.qikqiak.com/post/setup-psp-in-k8s/</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://ieevee.com/tech/2019/02/18/psp.html&quot; ta
+      
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes metallb 原理解析</title>
+    <link href="https://github.com/fafucoder/2020/08/06/kubernetes-metallb/"/>
+    <id>https://github.com/fafucoder/2020/08/06/kubernetes-metallb/</id>
+    <published>2020-08-06T03:02:25.000Z</published>
+    <updated>2020-09-09T02:47:03.657Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://zhuanlan.zhihu.com/p/103717169" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/103717169</a></li><li><a href="https://blog.fleeto.us/post/intro-metallb/" target="_blank" rel="noopener">https://blog.fleeto.us/post/intro-metallb/</a></li><li><a href="https://github.com/metallb/metallb">https://github.com/metallb/metallb</a></li><li><a href="https://cloud.tencent.com/developer/article/1631910" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1631910</a></li><li><a href="https://www.jianshu.com/p/5e39d1637184" target="_blank" rel="noopener">https://www.jianshu.com/p/5e39d1637184</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/103717169&quot; target=
+      
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ssh命令</title>
+    <link href="https://github.com/fafucoder/2020/08/04/linux-ssh/"/>
+    <id>https://github.com/fafucoder/2020/08/04/linux-ssh/</id>
+    <published>2020-08-04T12:49:26.000Z</published>
+    <updated>2020-09-09T02:47:03.662Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://cloud.tencent.com/developer/article/1114279" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1114279</a></li><li><a href="https://blog.csdn.net/sch0120/article/details/73770386" target="_blank" rel="noopener">https://blog.csdn.net/sch0120/article/details/73770386</a></li><li><a href="https://kanda.me/2019/07/01/ssh-over-http-or-socks/" target="_blank" rel="noopener">https://kanda.me/2019/07/01/ssh-over-http-or-socks/</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://cloud.tencent.com/developer/article/111
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>https与http</title>
+    <link href="https://github.com/fafucoder/2020/08/03/linux-https/"/>
+    <id>https://github.com/fafucoder/2020/08/03/linux-https/</id>
+    <published>2020-08-03T14:27:36.000Z</published>
+    <updated>2020-09-09T02:47:03.658Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes-ingress</title>
+    <link href="https://github.com/fafucoder/2020/08/03/kubernetes-ingress/"/>
+    <id>https://github.com/fafucoder/2020/08/03/kubernetes-ingress/</id>
+    <published>2020-08-03T14:27:16.000Z</published>
+    <updated>2020-09-09T02:47:03.656Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes kube-proxy实现原理</title>
+    <link href="https://github.com/fafucoder/2020/07/27/kubernetes-kube-proxy/"/>
+    <id>https://github.com/fafucoder/2020/07/27/kubernetes-kube-proxy/</id>
+    <published>2020-07-27T03:17:59.000Z</published>
+    <updated>2020-09-09T02:47:03.656Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>service 是一组pod的服务抽象，相当于一组pod的LoadBanlance, 负责将请求分发给对应的pod，service会为这个LB提供一个IP，一般称为cluster IP。ClusterIP是个假的IP，这个IP在整个集群中根本不存在，无法通过IP协议栈无法路由，底层underlay设备也无法感知这个IP的存在，因此ClusterIP只能是单主机(Host Only）作用域可见，这个IP在其他节点以及集群外均无法访问。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/907596/201906/907596-20190628121852780-440182082.png" alt="service,endpoint和pod关系" title="">                </div>                <div class="image-caption">service,endpoint和pod关系</div>            </figure><p>kube-proxy的作用主要是负责service的实现，具体来说，就是实现集群内的客户端pod访问service，或者是集群外的主机通过NodePort等方式访问service。</p><p>kube-proxy存在于各个node节点上，部署方式的daemonset, 默认使用iptables模式。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/907596/201906/907596-20190628135357260-2132881445.png" alt="service转发规则" title="">                </div>                <div class="image-caption">service转发规则</div>            </figure><p>kubernetes中各组件如下：</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://upload-images.jianshu.io/upload_images/9655707-8234c07859c4f3fe.jpg" alt="kube-proxy" title="">                </div>                <div class="image-caption">kube-proxy</div>            </figure><h3 id="kube-proxy模式"><a href="#kube-proxy模式" class="headerlink" title="kube proxy模式"></a>kube proxy模式</h3><p>kube-proxy 目前有3中常见的proxyMode, 分别是userspace, iptables, ipvs。userspace mode是v1.0及以前版本的默认模式。从v1.1版本开始，增加了iptables mode，在 v1.3版本中正式替代了 userspace 模式成为默认模式（需要 iptables 的版本&gt;= 1.4.11。IPVS 是 LVS 的负载均衡模块，同样基于 netfilter，但比 iptables 性能更好，具备更好的可扩展性。</p><h4 id="userspace-mode"><a href="#userspace-mode" class="headerlink" title="userspace mode"></a>userspace mode</h4><p>基于用户态的 proxy，service 的请求会先从用户空间进入内核 iptables，然后再回到用户空间，由 kube-proxy 完成后端 endpoints 的选择和代理工作，这种方式流量从用户空间进出内核带来的性能损耗比较大。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://knarfeh-1254074221.cos.na-siliconvalley.myqcloud.com/kube-proxy-userspace-mode.png" alt="userspace mode" title="">                </div>                <div class="image-caption">userspace mode</div>            </figure><p>userspace模式下，kube-proxy 持续监听 Service 以及 Endpoints 对象的变化；对每个 Service，它都为其在本地节点开放一个端口，作为其服务代理端口；发往该端口的请求会采用一定的策略转发给与该服务对应的后端 Pod 实体。kube-proxy 同时会在本地节点设置 iptables 规则，配置一个 Virtual IP，把发往 Virtual IP 的请求重定向到与该 Virtual IP 对应的服务代理端口上。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/907596/201903/907596-20190325170529464-807275929.png" alt="userspace请求模式" title="">                </div>                <div class="image-caption">userspace请求模式</div>            </figure><h4 id="iptables-mode"><a href="#iptables-mode" class="headerlink" title="iptables mode"></a>iptables mode</h4><p>iptables 的方式是完全通过内核的 iptables 实现 service 的代理和 LB。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/907596/201906/907596-20190628150040159-782250464.png" alt="iptables mode" title="">                </div>                <div class="image-caption">iptables mode</div>            </figure><p>iptables模式相比 userspace 模式，克服了请求在用户态-内核态反复传递的问题，性能上有所提升，但使用 iptables NAT 来完成转发，存在不可忽视的性能损耗</p><p>iptables 模式与 userspace 相同，kube-proxy 持续监听 Service 以及 Endpoints 对象的变化；但它并不在本地节点开启反向代理服务，而是把反向代理全部交给 iptables 来实现；即 iptables 直接将对 VIP 的请求转发给后端 Pod，通过 iptables 设置转发策略。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/907596/201903/907596-20190325170538450-107344229.png" alt="iptables请求模式" title="">                </div>                <div class="image-caption">iptables请求模式</div>            </figure><h4 id="ipvs-mode"><a href="#ipvs-mode" class="headerlink" title="ipvs mode"></a>ipvs mode</h4><p>ipvs模式是基于 NAT 实现的，通过ipvs的NAT模式，对访问k8s service的请求进行虚IP到POD IP的转发。当创建一个 service 后，kubernetes 会在每个节点上创建一个网卡，同时帮你将 Service IP(VIP) 绑定上。</p><p>与iptables、userspace 模式一样，kube-proxy依然监听Service以及Endpoints对象的变化, 不过它并不创建反向代理, 也不创建大量的 iptables 规则, 而是通过netlink 创建ipvs规则，并使用k8s Service与Endpoints信息，对所在节点的ipvs规则进行定期同步; netlink 与 iptables 底层都是基于 netfilter 钩子，但是 netlink 由于采用了 hash table 而且直接工作在内核态，在性能上比 iptables 更优</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://img2018.cnblogs.com/blog/907596/201903/907596-20190325170554554-1168234966.png" alt="ipvs请求模式" title="">                </div>                <div class="image-caption">ipvs请求模式</div>            </figure><h3 id="设置kube-proxy模式"><a href="#设置kube-proxy模式" class="headerlink" title="设置kube-proxy模式"></a>设置kube-proxy模式</h3><p>由于kube-proxy是daemonset, 因此通过编辑daemonset发现通过mount configMap把配置传递进去，因此只要修改configmap中的数据就行.</p><p>修改kube-proxy configMap中的mode设置kube-proxy模式</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">kind: KubeProxyConfiguration</span><br><span class="line">metricsBindAddress: &quot;&quot;</span><br><span class="line">mode: &quot;&quot;</span><br><span class="line">nodePortAddresses: null</span><br><span class="line">oomScoreAdj: null</span><br><span class="line">portRange: &quot;&quot;</span><br><span class="line">udpIdleTimeout: 0s</span><br></pre></td></tr></table></figure><h3 id="iptables-模式原理解析"><a href="#iptables-模式原理解析" class="headerlink" title="iptables 模式原理解析"></a>iptables 模式原理解析</h3><p>iptables 模式下的规则如下所示：</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://docs.cilium.io/en/v1.8/_images/kubernetes_iptables.svg" alt="kube-proxy iptables表" title="">                </div>                <div class="image-caption">kube-proxy iptables表</div>            </figure><h4 id="ClusterIp-模式"><a href="#ClusterIp-模式" class="headerlink" title="ClusterIp 模式"></a>ClusterIp 模式</h4><ol><li>非本机pod访问: <code>PREROUTING --&gt; KUBE-SERVICE --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li><li>本机pod访问: <code>OUTPUT --&gt; KUBE-SERVICE --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li></ol><p>访问流程：</p><ol><li>对于进入 PREROUTING 链的都转到 KUBE-SERVICES 链进行处理；</li><li>在 KUBE-SERVICES 链，对于访问 clusterIP 为 10.110.243.155 的转发到 KUBE-SVC-5SB6FTEHND4GTL2W；</li><li>访问 KUBE-SVC-5SB6FTEHND4GTL2W 的使用随机数负载均衡，并转发到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 上；</li><li>KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 对应 endpoint 中的 pod 192.168.137.147 和 192.168.98.213，设置 mark 标记，进行 DNAT 并转发到具体的 pod 上，如果某个 service 的 endpoints 中没有 pod，那么针对此 service 的请求将会被 drop 掉；</li></ol><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 1.对于进入 PREROUTING 链的都转到 KUBE-SERVICES 链进行处理；</span><br><span class="line">-A PREROUTING -m comment --comment &quot;kubernetes service portals&quot; -j KUBE-SERVICES</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 2.在 KUBE-SERVICES 链，对于访问 clusterIP 为 10.110.243.155 的转发到 KUBE-SVC-5SB6FTEHND4GTL2W；</span><br><span class="line">-A KUBE-SERVICES -d 10.110.243.155&#x2F;32 -p tcp -m comment --comment &quot;pks-system&#x2F;tenant-service: cluster IP&quot; -m tcp --dport 7000 -j KUBE-SVC-5SB6FTEHND4GTL2W</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 3.访问 KUBE-SVC-5SB6FTEHND4GTL2W 的使用随机数负载均衡，并转发到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 上；</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-CI5ZO3FTK7KBNRMG</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -j KUBE-SEP-OVNLTDWFHTHII4SC</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 4.KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 对应 endpoint 中的 pod 192.168.137.147 和 192.168.98.213，</span><br><span class="line">设置 mark 标记，进行 DNAT 并转发到具体的 pod 上，如果某个 service 的 endpoints 中没有 pod，那么针对此 service 的请求将会被 drop 掉；</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -s 192.168.137.147&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -p tcp -m tcp -j DNAT --to-destination 192.168.137.147:7000</span><br><span class="line"></span><br><span class="line">-A KUBE-SEP-OVNLTDWFHTHII4SC -s 192.168.98.213&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-OVNLTDWFHTHII4SC -p tcp -m tcp -j DNAT --to-destination 192.168.98.213:7000</span><br></pre></td></tr></table></figure><h4 id="NodePort-模式"><a href="#NodePort-模式" class="headerlink" title="NodePort 模式"></a>NodePort 模式</h4><p>在 nodePort 方式下，会用到 KUBE-NODEPORTS 规则链，通过 iptables -t nat -L -n 可以看到 KUBE-NODEPORTS 位于 KUBE-SERVICE 链的最后一个，iptables 在处理报文时会优先处理目的 IP 为clusterIP 的报文，在前面的 KUBE-SVC-XXX 都匹配失败之后再去使用 nodePort 方式进行匹配。</p><ol><li>本机模式： <code>OUTPUT --&gt; KUBE-SERVICE --&gt; KUBE-NODEPORTS --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li><li>非本机模式: <code>PREROUTING --&gt; KUBE-SERVICE --&gt; KUBE-NODEPORTS --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li></ol><p>访问流程：</p><p>该服务的 nodePort 端口为 30070，其 iptables 访问规则和使用 clusterIP 方式访问有点类似，不过 nodePort 方式会比 clusterIP 的方式多走一条链 KUBE-NODEPORTS，其会在 KUBE-NODEPORTS 链设置 mark 标记并转发到 KUBE-SVC-5SB6FTEHND4GTL2W，nodeport 与 clusterIP 访问方式最后都是转发到了 KUBE-SVC-xxx 链。</p><ol><li>经过 PREROUTING 转到 KUBE-SERVICES</li><li>经过 KUBE-SERVICES 转到 KUBE-NODEPORTS</li><li>经过 KUBE-NODEPORTS 转到 KUBE-SVC-5SB6FTEHND4GTL2W</li><li>经过KUBE-SVC-5SB6FTEHND4GTL2W 转到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV</li><li>经过 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV 分别转到 192.168.137.147:7000 和 192.168.89.11:7000</li></ol><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 1. 经过 PREROUTING 转到 KUBE-SERVICES</span><br><span class="line">-A PREROUTING -m comment --comment &quot;kubernetes service portals&quot; -j KUBE-SERVICES</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 2. 经过 KUBE-SERVICES 转到 KUBE-NODEPORTS</span><br><span class="line">-A KUBE-SERVICES xxx</span><br><span class="line">-A KUBE-SERVICES -m comment --comment &quot;kubernetes service nodeports; NOTE: this must be the last rule in this chain&quot; -m addrtype --dst-type LOCAL -j KUBE-NODEPORTS</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 3. 经过 KUBE-NODEPORTS 转到 KUBE-SVC-5SB6FTEHND4GTL2W</span><br><span class="line">-A KUBE-NODEPORTS -p tcp -m comment --comment &quot;pks-system&#x2F;tenant-service:&quot; -m tcp --dport 30070 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-NODEPORTS -p tcp -m comment --comment &quot;pks-system&#x2F;tenant-service:&quot; -m tcp --dport 30070 -j KUBE-SVC-5SB6FTEHND4GTL2W</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 4. 经过KUBE-SVC-5SB6FTEHND4GTL2W 转到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-CI5ZO3FTK7KBNRMG</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -j KUBE-SEP-VR562QDKF524UNPV</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 5. 经过 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV 分别转到 192.168.137.147:7000 和 192.168.89.11:7000</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -s 192.168.137.147&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -p tcp -m tcp -j DNAT --to-destination 192.168.137.147:7000</span><br><span class="line">-A KUBE-SEP-VR562QDKF524UNPV -s 192.168.89.11&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-VR562QDKF524UNPV -p tcp -m tcp -j DNAT --to-destination 192.168.89.11:7000</span><br></pre></td></tr></table></figure><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/fuyuteng/p/11598768.html" target="_blank" rel="noopener">https://www.cnblogs.com/fuyuteng/p/11598768.html</a></li><li><a href="https://zhuanlan.zhihu.com/p/94418251?from_voters_page=true" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/94418251?from_voters_page=true</a></li><li><a href="https://juejin.im/post/6844904098605563912" target="_blank" rel="noopener">https://juejin.im/post/6844904098605563912</a></li><li><a href="https://xuxinkun.github.io/2016/07/22/kubernetes-proxy/" target="_blank" rel="noopener">https://xuxinkun.github.io/2016/07/22/kubernetes-proxy/</a></li><li><a href="https://knarfeh.com/2018/07/28/Kubernetes%20%E6%BA%90%E7%A0%81%E7%AC%94%E8%AE%B0%EF%BC%88kube-proxy%EF%BC%89" target="_blank" rel="noopener">https://knarfeh.com/2018/07/28/Kubernetes%20%E6%BA%90%E7%A0%81%E7%AC%94%E8%AE%B0%EF%BC%88kube-proxy%EF%BC%89</a></li><li><a href="https://linuxops.dev/post/kubernetes%E7%9A%84kube-proxy%E7%9A%84%E8%BD%AC%E5%8F%91%E8%A7%84%E5%88%99%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">https://linuxops.dev/post/kubernetes%E7%9A%84kube-proxy%E7%9A%84%E8%BD%AC%E5%8F%91%E8%A7%84%E5%88%99%E5%88%86%E6%9E%90/</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;概念&quot;&gt;&lt;a href=&quot;#概念&quot; class=&quot;headerlink&quot; title=&quot;概念&quot;&gt;&lt;/a&gt;概念&lt;/h3&gt;&lt;p&gt;service 是一组pod的服务抽象，相当于一组pod的LoadBanlance, 负责将请求分发给对应的pod，service会为这个L
+      
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes PLEG不健康的问题</title>
+    <link href="https://github.com/fafucoder/2020/07/22/kubernetes-pleg-error/"/>
+    <id>https://github.com/fafucoder/2020/07/22/kubernetes-pleg-error/</id>
+    <published>2020-07-22T06:16:28.000Z</published>
+    <updated>2020-09-09T02:47:03.657Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://segmentfault.com/a/1190000018240634?utm_source=tag-newest" target="_blank" rel="noopener">https://segmentfault.com/a/1190000018240634?utm_source=tag-newest</a></li><li><a href="https://fuckcloudnative.io/posts/understanding-the-pleg-is-not-healthy/" target="_blank" rel="noopener">https://fuckcloudnative.io/posts/understanding-the-pleg-is-not-healthy/</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000018240634?utm
+      
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes scheduler</title>
+    <link href="https://github.com/fafucoder/2020/07/12/kubernetes-schedule/"/>
+    <id>https://github.com/fafucoder/2020/07/12/kubernetes-schedule/</id>
+    <published>2020-07-12T11:35:09.000Z</published>
+    <updated>2020-09-09T02:47:03.657Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://zhuanlan.zhihu.com/p/27754017" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/27754017</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/27754017&quot; target=&quot;
+      
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes service 原理解析</title>
+    <link href="https://github.com/fafucoder/2020/07/10/kubernetes-services/"/>
+    <id>https://github.com/fafucoder/2020/07/10/kubernetes-services/</id>
+    <published>2020-07-10T07:00:34.000Z</published>
+    <updated>2020-09-09T02:47:03.658Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>service 是一组具有相同 label pod 集合的抽象，集群内外的各个服务可以通过 service 进行互相通信，当创建一个 service 对象时也会对应创建一个 endpoint 对象，endpoint 是用来做容器发现的，service 只是将多个 pod 进行关联，实际的路由转发都是由 kubernetes  中的 kube-proxy 组件来实现。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://ask.qcloudimg.com/http-save/474918/c3rxputds9.png?imageView2/2/w/1620" alt="service原理" title="">                </div>                <div class="image-caption">service原理</div>            </figure><p>endpoints controller 是负责生成和维护所有 endpoints 对象的控制器，监听 service 和对应 pod 的变化，更新对应 service 的 endpoints 对象。当用户创建 service 后 endpoints controller 会监听 pod 的状态，当 pod 处于 running 且准备就绪时，endpoints controller 会将 pod ip 记录到 endpoints 对象中，因此，service 的容器发现是通过 endpoints 来实现的。而 kube-proxy 会监听 service 和 endpoints 的更新并调用其代理模块在主机上刷新路由转发规则。</p><h3 id="service-类型"><a href="#service-类型" class="headerlink" title="service 类型"></a>service 类型</h3><p>service 默认有四种 ClusterIP、NodePort、LoadBalancer、ExternelName 类型， 此外还有 Ingress</p><h4 id="ClusterIp"><a href="#ClusterIp" class="headerlink" title="ClusterIp"></a>ClusterIp</h4><p>ClusterIP 类型的 service 是 kubernetes 集群默认的服务暴露方式，它只能用于集群内部通信，可以被各 pod 访问，其访问方式为：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pod ---&gt; ClusterIP:ServicePort --&gt; (iptables)DNAT --&gt; PodIP:containePort</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://ask.qcloudimg.com/http-save/474918/nlnaj3ikh6.png?imageView2/2/w/1620" alt="ClusterIp类型" title="">                </div>                <div class="image-caption">ClusterIp类型</div>            </figure><h4 id="nodePort"><a href="#nodePort" class="headerlink" title="nodePort"></a>nodePort</h4><p>NodePort 类型的 service 会在集群内部署了 kube-proxy 的节点打开一个指定的端口，之后所有的流量直接发送到这个端口，然后会被转发到 service 后端真实的服务进行访问。Nodeport 构建在 ClusterIP 上，其访问链路如下所示：</p><p><code>client ---&gt; NodeIP:NodePort ---&gt; ClusterIP:ServicePort ---&gt; (iptables)DNAT ---&gt; PodIP:containePort</code></p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://ask.qcloudimg.com/http-save/474918/qbj7uzictn.png?imageView2/2/w/1620" alt="NodePort类型" title="">                </div>                <div class="image-caption">NodePort类型</div>            </figure><h4 id="LoadBalance"><a href="#LoadBalance" class="headerlink" title="LoadBalance"></a>LoadBalance</h4><p>LoadBalancer 类型的 service 通常和云厂商的 LB 结合一起使用，用于将集群内部的服务暴露到外网，云厂商的 LoadBalancer 会给用户分配一个 IP，之后通过该 IP 的流量会转发到你的 service 上。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://ask.qcloudimg.com/http-save/474918/l0wvn8je7c.png?imageView2/2/w/1620" alt="locadbanlance类型" title="">                </div>                <div class="image-caption">locadbanlance类型</div>            </figure><h4 id="ExternelName"><a href="#ExternelName" class="headerlink" title="ExternelName"></a>ExternelName</h4><p>通过 CNAME 将 service 与 externalName 的值(比如：foo.bar.example.com)映射起来，这种方式用的比较少。</p><h4 id="Ingress"><a href="#Ingress" class="headerlink" title="Ingress"></a>Ingress</h4><p>Ingress 其实不是 service 的一个类型，但是它可以作用于多个 service，被称为 service 的 service，作为集群内部服务的入口，Ingress 作用在七层，可以根据不同的 url，将请求转发到不同的 service 上。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://ask.qcloudimg.com/http-save/474918/qaq773e8bt.png?imageView2/2/w/1620" alt="ingress" title="">                </div>                <div class="image-caption">ingress</div>            </figure><h3 id="service服务发现"><a href="#service服务发现" class="headerlink" title="service服务发现"></a>service服务发现</h3><p>service 的 endpoints 解决了容器发现问题，但不提前知道 service 的 Cluster IP，怎么发现 service 服务呢？</p><p>service 当前支持两种类型的服务发现机制，一种是通过环境变量，另一种是通过 DNS。</p><h4 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h4><p>当一个 pod 创建完成之后，kubelet 会在该 pod 中注册该集群已经创建的所有 service 相关的环境变量，但是需要注意的是，在 service 创建之前的所有 pod 是不会注册该环境变量的，所以在平时使用时，建议通过 DNS 的方式进行 service 之间的服务发现。</p><h4 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h4><p>可以在集群中部署 CoreDNS 服务(旧版本的 kubernetes 群使用的是 kubeDNS)， 来达到集群内部的 pod 通过DNS 的方式进行集群内部各个服务之间的通讯。</p><p>当前 kubernetes 集群默认使用 CoreDNS 作为默认的 DNS 服务，主要原因是 CoreDNS 是基于 Plugin 的方式进行扩展的，简单，灵活，并且不完全被Kubernetes所捆绑。</p><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://segmentfault.com/a/1190000019376912?utm_source=tag-newest" target="_blank" rel="noopener">https://segmentfault.com/a/1190000019376912?utm_source=tag-newest</a></li><li><a href="https://draveness.me/kubernetes-service/" target="_blank" rel="noopener">https://draveness.me/kubernetes-service/</a></li><li><a href="https://kubernetes.io/zh/docs/tutorials/services/source-ip/" target="_blank" rel="noopener">https://kubernetes.io/zh/docs/tutorials/services/source-ip/</a></li><li><a href="https://cloud.tencent.com/developer/article/1553954" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1553954</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;概念&quot;&gt;&lt;a href=&quot;#概念&quot; class=&quot;headerlink&quot; title=&quot;概念&quot;&gt;&lt;/a&gt;概念&lt;/h3&gt;&lt;p&gt;service 是一组具有相同 label pod 集合的抽象，集群内外的各个服务可以通过 service 进行互相通信，当创建一个 ser
+      
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux网卡收发包流程</title>
+    <link href="https://github.com/fafucoder/2020/07/09/linux-nic/"/>
+    <id>https://github.com/fafucoder/2020/07/09/linux-nic/</id>
+    <published>2020-07-09T06:55:33.000Z</published>
+    <updated>2020-09-09T02:47:03.661Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="网卡数据包接收流程"><a href="#网卡数据包接收流程" class="headerlink" title="网卡数据包接收流程"></a>网卡数据包接收流程</h3><ol><li>网卡收到数据包。</li><li>将数据包从网卡硬件缓存转移到服务器内存中。</li><li>通过中断请求，通知内核处理。</li><li>经过 TCP/IP 协议逐层处理。</li><li>应用程序通过 read() 从 socket buffer 读取数据。</li></ol><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="http://qehtohz1z.bkt.clouddn.com/fafucoder-blog/hzh6s.png" alt="网卡收包流程" title="">                </div>                <div class="image-caption">网卡收包流程</div>            </figure><h3 id="网卡收到的数据包转移到主机内存（NIC-与驱动交互）"><a href="#网卡收到的数据包转移到主机内存（NIC-与驱动交互）" class="headerlink" title="网卡收到的数据包转移到主机内存（NIC 与驱动交互）"></a>网卡收到的数据包转移到主机内存（NIC 与驱动交互）</h3><p>NIC(网卡)在接收到数据包之后，首先需要将数据同步到内核中，这中间的桥梁是 <code>rx ring buffer</code>。它是由 NIC 和驱动程序共享的一片区域，事实上，<code>rx ring buffer</code>存储的并不是实际的 packet 数据，而是一个描述符，这个描述符指向了它真正的存储地址，具体流程如下：</p><ol><li>驱动在内存中分配一片缓冲区用来接收数据包，叫做 sk_buffer；</li><li>将上述缓冲区的地址和大小（即接收描述符），加入到 rx ring buffer。描述符中的缓冲区地址是 DMA 使用的物理地址；</li><li>驱动通知网卡有一个新的描述符；</li><li>网卡从 rx ring buffer 中取出描述符，从而获知缓冲区的地址和大小；</li><li>网卡收到新的数据包；</li><li>网卡将新数据包通过 DMA 直接写到 sk_buffer 中。</li></ol><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="http://qehtohz1z.bkt.clouddn.com/fafucoder-blog/1dup0.png" alt="Nic与驱动交互" title="">                </div>                <div class="image-caption">Nic与驱动交互</div>            </figure><p>当驱动处理速度跟不上网卡收包速度时，驱动来不及分配缓冲区，NIC 接收到的数据包无法及时写到 sk_buffer，就会产生堆积，当 NIC 内部缓冲区写满后，就会丢弃部分数据，引起丢包。这部分丢包为 rx_fifo_errors，在 /proc/net/dev 中体现为 fifo 字段增长，在 ifconfig 中体现为 overruns 指标增长。</p><h3 id="系统内核处理（驱动与-Linux-内核交互）"><a href="#系统内核处理（驱动与-Linux-内核交互）" class="headerlink" title="系统内核处理（驱动与 Linux 内核交互）"></a>系统内核处理（驱动与 Linux 内核交互）</h3><p>这个时候，数据包已经被转移到了 sk_buffer 中。前文提到，这是驱动程序在内存中分配的一片缓冲区，并且是通过 DMA 写入的，这种方式不依赖 CPU 直接将数据写到了内存中，意味着对内核来说，其实并不知道已经有新数据到了内存中。那么如何让内核知道有新数据进来了呢？答案就是中断，通过中断告诉内核有新数据进来了，并需要进行后续处理。</p><p>提到中断，就涉及到硬中断和软中断，首先需要简单了解一下它们的区别：</p><ul><li>硬中断：由硬件自己生成，具有随机性，硬中断被 CPU 接收后，触发执行中断处理程序。中断处理程序只会处理关键性的、短时间内可以处理完的工作，剩余耗时较长工作，会放到中断之后，由软中断来完成。硬中断也被称为上半部分。</li><li>软中断：由硬中断对应的中断处理程序生成，往往是预先在代码里实现好的，不具有随机性。（除此之外，也有应用程序触发的软中断，与本文讨论的网卡收包无关。）也被称为下半部分。<br>当 NIC 把数据包通过 DMA 复制到内核缓冲区 sk_buffer 后，NIC 立即发起一个硬件中断。CPU 接收后，首先进入上半部分，网卡中断对应的中断处理程序是网卡驱动程序的一部分，之后由它发起软中断，进入下半部分，开始消费 sk_buffer 中的数据，交给内核协议栈处理。</li></ul><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="http://qehtohz1z.bkt.clouddn.com/fafucoder-blog/hk0qi.png" alt="系统内核处理" title="">                </div>                <div class="image-caption">系统内核处理</div>            </figure><p>通过中断，能够快速及时地响应网卡数据请求，但如果数据量大，那么会产生大量中断请求，CPU 大部分时间都忙于处理中断，效率很低。为了解决这个问题，现在的内核及驱动都采用一种叫 NAPI（new API）的方式进行数据处理，其原理可以简单理解为 中断 + 轮询，在数据量大时，一次中断后通过轮询接收一定数量包再返回，避免产生多次中断。</p><h3 id="Ring-Buffer"><a href="#Ring-Buffer" class="headerlink" title="Ring Buffer"></a>Ring Buffer</h3><p>Ring Buffer 相关的收消息过程大致如下：</p><ol><li><p>NIC (network interface card) 在系统启动过程中会向系统注册自己的各种信息，系统会分配 Ring Buffer 队列也会分配一块专门的内核内存区域给 NIC 用于存放传输上来的数据包。struct sk_buff 是专门存放各种网络传输数据包的内存接口，在收到数据存放到 NIC 专用内核内存区域后，[<a href="http://elixir.free-electrons.com/linux/v4.4/source/include/linux/skbuff.h#L706]" target="_blank" rel="noopener">http://elixir.free-electrons.com/linux/v4.4/source/include/linux/skbuff.h#L706]</a>(sk_buff 内有个 data 指针会指向这块内存)</p></li><li><p>Ring Buffer 队列内存放的是一个个 Packet Descriptor ，其有两种状态： ready 和 used 。初始时 Descriptor 是空的，指向一个空的 sk_buff，处在 ready 状态。当有数据时，DMA 负责从 NIC 取数据，并在 Ring Buffer 上按顺序找到下一个 ready 的 Descriptor，将数据存入该 Descriptor 指向的 sk_buff 中，并标记槽为 used。因为是按顺序找 ready 的槽，所以 Ring Buffer 是个 FIFO 的队列。</p></li><li><p>当 DMA 读完数据之后，NIC 会触发一个 IRQ(中断请求) 让 CPU 去处理收到的数据。因为每次触发 IRQ(中断请求) 后 CPU 都要花费时间去处理 Interrupt Handler，如果 NIC 每收到一个 Packet 都触发一个 IRQ 会导致 CPU 花费大量的时间在处理 Interrupt Handler，处理完后又只能从 Ring Buffer 中拿出一个 Packet，虽然 Interrupt Handler 执行时间很短，但这么做也非常低效，并会给 CPU 带去很多负担。所以目前都是采用一个叫做 New API(NAPI) 的机制，去对 IRQ 做合并以减少 IRQ 次数。</p></li></ol><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="http://qehtohz1z.bkt.clouddn.com/fafucoder-blog/3orb9.png" alt="Ring Buffer" title="">                </div>                <div class="image-caption">Ring Buffer</div>            </figure><h3 id="NAPI"><a href="#NAPI" class="headerlink" title="NAPI"></a>NAPI</h3><p>NAPI 主要是让 NIC 的 driver 能注册一个 poll 函数，之后 NAPI 的 subsystem 能通过 poll 函数去从 Ring Buffer 中批量拉取收到的数据。主要事件及其顺序如下：</p><ol><li>NIC driver 初始化时向 Kernel 注册 poll 函数，用于后续从 Ring Buffer 拉取收到的数据</li><li>driver 注册开启 NAPI，这个机制默认是关闭的，只有支持 NAPI 的 driver 才会去开启</li><li>收到数据后 NIC 通过 DMA 将数据存到内存</li><li>NIC 触发一个 IRQ，并触发 CPU 开始执行 driver 注册的 Interrupt Handler</li><li>driver 的 Interrupt Handler 通过 napi_schedule 函数触发 softirq (NET_RX_SOFTIRQ) 来唤醒 NAPI subsystem，NET_RX_SOFTIRQ 的 handler 是 net_rx_action 会在另一个线程中被执行，在其中会调用 driver 注册的 poll 函数获取收到的 Packet</li><li>driver 会禁用当前 NIC 的 IRQ，从而能在 poll 完所有数据之前不会再有新的 IRQ</li><li>当所有事情做完之后，NAPI subsystem 会被禁用，并且会重新启用 NIC 的 IRQ</li><li>回到第三步</li></ol><p>从上面的描述可以看出来还缺一些东西，Ring Buffer 上的数据被 poll 走之后是怎么交付上层网络栈继续处理的呢？以及被消耗掉的 sk_buff 是怎么被重新分配重新放入 Ring Buffer 的呢？</p><p>这两个工作都在 poll 中完成，上面说过 poll 是个 driver 实现的函数，所以每个 driver 实现可能都不相同。但 poll 的工作基本是一致的就是：</p><ol><li>从 Ring Buffer 中将收到的 sk_buff 读取出来</li><li>对 sk_buff 做一些基本检查，可能会涉及到将几个 sk_buff 合并因为可能同一个 Frame 被分散放在多个 sk_buff 中</li><li>将 sk_buff 交付上层网络栈处理</li><li>清理 sk_buff，清理 Ring Buffer 上的 Descriptor 将其指向新分配的 sk_buff 并将状态设置为 ready</li><li>更新一些统计数据，比如收到了多少 packet，一共多少字节等</li></ol><h3 id="软中断处理"><a href="#软中断处理" class="headerlink" title="软中断处理"></a>软中断处理</h3><ol><li>遍历 ptype_base 链表，找出 Protocol Layer 中能处理当前数据包的 packet_type 来接着处理数据。所有能处理链路层数据包的协议都会注册到 ptype_base 中。</li><li>基本就是在做各种检查以及为 transport 层做一些数据准备。最后如果各种检查都能过，就执行 NF_HOOK。如果有检查不过需要丢弃数据包就会返回 NET_RX_DROP 并在之后会对丢数据包这个事情进行计数。</li><li>NF_HOOK 比较神，它实际是 HOOK 到一个叫做 Netfilter 的东西，在这里你可以根据各种规则对数据包做过滤以及对数据包做一些修改。如果 HOOK 执行后返回 1 表示 Netfilter 允许继续处理该数据包，就会进入 ip_rcv_finish，HOOK 没有返回 1 则会返回 Netfilter 的结果，数据包不会继续被处理。</li><li>ip_rcv_finish 负责为 sk_buff 从 IP Route System 中找到路由目标，如果是路由到本机则在下一个处理这个 sk_buff 的协议内(比如上层的 TCP/UDP 协议)还需要从 sk_buff 中找到对应的 socket。</li></ol><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://mp.weixin.qq.com/s/0TGH6zZP_psKyZl4JA-3Qw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/0TGH6zZP_psKyZl4JA-3Qw</a></li><li><a href="https://ylgrgyq.github.io/2017/07/23/linux-receive-packet-1/" target="_blank" rel="noopener">https://ylgrgyq.github.io/2017/07/23/linux-receive-packet-1/</a></li><li><a href="https://elixir.bootlin.com/linux/v4.4/source/drivers/net/ethernet/intel/igb/igb_main.c#L6361" target="_blank" rel="noopener">https://elixir.bootlin.com/linux/v4.4/source/drivers/net/ethernet/intel/igb/igb_main.c#L6361</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;网卡数据包接收流程&quot;&gt;&lt;a href=&quot;#网卡数据包接收流程&quot; class=&quot;headerlink&quot; title=&quot;网卡数据包接收流程&quot;&gt;&lt;/a&gt;网卡数据包接收流程&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;网卡收到数据包。&lt;/li&gt;
+&lt;li&gt;将数据包从网卡硬件缓存转移到服务器内
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux make编译脚本</title>
+    <link href="https://github.com/fafucoder/2020/07/09/linux-make/"/>
+    <id>https://github.com/fafucoder/2020/07/09/linux-make/</id>
+    <published>2020-07-09T06:53:52.000Z</published>
+    <updated>2020-09-09T02:47:03.659Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="http://www.ruanyifeng.com/blog/2015/02/make.html" target="_blank" rel="noopener">http://www.ruanyifeng.com/blog/2015/02/make.html</a></li><li><a href="https://seisman.github.io/how-to-write-makefile/overview.html" target="_blank" rel="noopener">https://seisman.github.io/how-to-write-makefile/overview.html</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.ruanyifeng.com/blog/2015/02/make.htm
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kubernetes raft一致性算法</title>
+    <link href="https://github.com/fafucoder/2020/07/08/kubernetes-raft/"/>
+    <id>https://github.com/fafucoder/2020/07/08/kubernetes-raft/</id>
+    <published>2020-07-08T09:36:30.000Z</published>
+    <updated>2020-09-09T02:47:03.657Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://cizixs.com/2017/12/04/raft-consensus-algorithm" target="_blank" rel="noopener">https://cizixs.com/2017/12/04/raft-consensus-algorithm</a></li><li><a href="https://mp.weixin.qq.com/s/2fr1gMcOUcwktP1lz_EGcw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/2fr1gMcOUcwktP1lz_EGcw</a></li><li><a href="https://www.cnblogs.com/mindwind/p/5231986.html" target="_blank" rel="noopener">https://www.cnblogs.com/mindwind/p/5231986.html</a></li><li><a href="https://segmentfault.com/a/1190000016641336" target="_blank" rel="noopener">https://segmentfault.com/a/1190000016641336</a></li><li><a href="https://zhuanlan.zhihu.com/p/27415397" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/27415397</a></li><li><a href="https://github.com/happyer/distributed-computing">https://github.com/happyer/distributed-computing</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://cizixs.com/2017/12/04/raft-consensus-al
+      
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
+    
+    
+      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
+    
+  </entry>
+  
+</feed>
