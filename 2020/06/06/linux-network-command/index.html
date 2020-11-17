@@ -30,7 +30,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://github.com/fafucoder/2020/06/06/linux-network-command/linux-netowrk-command/net-tools.png">
 <meta property="article:published_time" content="2020-06-06T11:19:10.000Z">
-<meta property="article:modified_time" content="2020-09-09T02:47:03.659Z">
+<meta property="article:modified_time" content="2020-11-17T12:50:36.798Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
@@ -158,7 +158,7 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#网卡相关"><span class="post-toc-text">网卡相关</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#ifconfig-和ip"><span class="post-toc-text">ifconfig 和ip</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#ethtool"><span class="post-toc-text">ethtool</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#路由相关"><span class="post-toc-text">路由相关</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#route"><span class="post-toc-text">route</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#内核模块相关"><span class="post-toc-text">内核模块相关</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#lsmod"><span class="post-toc-text">lsmod</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#modprobe"><span class="post-toc-text">modprobe</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#modinfo"><span class="post-toc-text">modinfo</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#lspci"><span class="post-toc-text">lspci</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#连通测试"><span class="post-toc-text">连通测试</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#telnet"><span class="post-toc-text">telnet</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#traceroute"><span class="post-toc-text">traceroute</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#tcpdump"><span class="post-toc-text">tcpdump</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#参考文档"><span class="post-toc-text">参考文档</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#网卡相关"><span class="post-toc-text">网卡相关</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#ifconfig-和ip"><span class="post-toc-text">ifconfig 和ip</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#ethtool"><span class="post-toc-text">ethtool</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#路由相关"><span class="post-toc-text">路由相关</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#route"><span class="post-toc-text">route</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#内核模块相关"><span class="post-toc-text">内核模块相关</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#lsmod"><span class="post-toc-text">lsmod</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#modprobe"><span class="post-toc-text">modprobe</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#modinfo"><span class="post-toc-text">modinfo</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#lspci"><span class="post-toc-text">lspci</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#连通测试"><span class="post-toc-text">连通测试</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#telnet"><span class="post-toc-text">telnet</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#traceroute"><span class="post-toc-text">traceroute</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#tcpdump"><span class="post-toc-text">tcpdump</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#tcpdump-expression"><span class="post-toc-text">tcpdump expression</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#参考文档"><span class="post-toc-text">参考文档</span></a></li></ol>
         </nav>
     </aside>
 
@@ -542,7 +542,58 @@
 <p>telnet 192.168.56.100 22</p>
 <h4 id="traceroute"><a href="#traceroute" class="headerlink" title="traceroute"></a>traceroute</h4><p>traceroute 用于跟踪到达目的主机过程中所经过的路径,例如:</p>
 <p>traceroute 192.168.56.100</p>
-<h4 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h4><p>tcpdump 用于监听网卡收包情况</p>
+<h4 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h4><p>tcpdump 用于监听网卡收包情况, tcpdump 常见命令如下表：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-i</td>
+<td>指定监听网络接口</td>
+<td>tcpdump -i eth0 (抓取eth0包)</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>不将网络接口设置成混杂模式</td>
+<td></td>
+</tr>
+<tr>
+<td>-c</td>
+<td>指定监听数据包数量，当收到指定的包的数目后，tcpdump就会停止</td>
+<td></td>
+</tr>
+<tr>
+<td>-n</td>
+<td>不把网络地址转换成名字</td>
+<td>tcpdump -ni em2 -vv -e</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>在输出行打印出数据链路层的头部信息</td>
+<td>tcpdump -ni em2 -vv -e</td>
+</tr>
+<tr>
+<td>-d</td>
+<td>将匹配信息包的代码以人们能够理解的汇编格式给出</td>
+<td></td>
+</tr>
+<tr>
+<td>-vv</td>
+<td>输出详细的报文信息</td>
+<td>tcpdump -ni em2 -vv -e</td>
+</tr>
+</tbody></table>
+<h4 id="tcpdump-expression"><a href="#tcpdump-expression" class="headerlink" title="tcpdump expression"></a>tcpdump expression</h4><p>tcpdump expression 用于tcpdump 数据包过滤，如果不过滤的话数据包很多，不好排查，因此需要用expression 进行数据包过滤.</p>
+<p>tcpdump利用正则表达式作为过滤报文的条件，如果数据包满足表达式的条件，则会被捕获。如果没有给出任何条件，则网络上所有的数据包将会被截获。表达式中常用关键字如下：</p>
+<p>(1) 指定参数类型的关键字，主要包括host，net，port等，如果没有指定类型，缺省的类型是host；例如：#tcpdump host 222.24.20.86 截获ip为222.24.20.86的主机收发的所有数据包</p>
+<p>(2) 指定数据报文传输方向的关键字，主要包括src , dst ,dst or src, dst and src，缺省为src or dst；例如：#tcpdump src net 222.24.20.1 截取源网络地址为 222.24.20.1 的所有数据包</p>
+<p>(3) 指定协议的关键字，主要包括fddi，ip，arp，rarp，tcp，udp等类型，默认监听所有协议的数据包；例如：#tucpdump arp 截获所有arp协议的数据包</p>
+<p>(4) 其他重要的关键字还有，gateway，broadcast，less，greater，三种逻辑运算（取非运算是 ‘not ‘,’! ‘； 与运算是 ‘and ‘,’&amp;&amp; ‘；或运算 是’or ‘,’|| ‘）等。这些关键字的巧妙组合，能灵活构造过滤条件，从而满足用户需要。例如：#tcpdump host ubuntu and src port (80 or 8080) 截取主机ubuntu上源端口为80或8080的所有数据包。</p>
+<p>expression 的整体结构 <code>expr relop expr</code> relop表示关系操作符，可以为&gt;, &lt; ,&gt;=,&lt;=, =, !=之一。</p>
 <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
 <li><a href="https://blog.csdn.net/u011956172/article/details/54617516" target="_blank" rel="noopener">https://blog.csdn.net/u011956172/article/details/54617516</a>  //net-tool跟iproute2对照表</li>
 <li><a href="https://www.cnblogs.com/baiduboy/p/7278715.html" target="_blank" rel="noopener">https://www.cnblogs.com/baiduboy/p/7278715.html</a> //route指令详解</li>
