@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn85pg2d84j316u070788.jpg">
 <meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn85u1y817j316406atc7.jpg">
 <meta property="article:published_time" content="2021-01-29T11:11:37.000Z">
-<meta property="article:modified_time" content="2021-02-01T10:09:10.509Z">
+<meta property="article:modified_time" content="2021-02-22T11:11:33.056Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
@@ -234,6 +234,12 @@
 </li>
 <li><p>请求的根路径需要应答请求，否则会报404错误（<code>kubectl get apiservice v1alpha3.demo.com.cn  -o yaml</code> 能拷看到状态）</p>
 <p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn85u1y817j316406atc7.jpg" alt="404状态"></p>
+</li>
+<li><p>请求的根路径的应答结果需要包含<code>kind</code>, <code>apiVersion</code>, <code>groupVersion</code>, <code>resources</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">"kind"</span>: <span class="string">"APIResourceList"</span>,</span><br><span class="line"><span class="attr">"apiVersion"</span>: <span class="string">"v1"</span>,</span><br><span class="line"><span class="attr">"groupVersion"</span>: <span class="string">"metrics.k8s.io/v1beta1"</span>,</span><br><span class="line"><span class="attr">"resources"</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 </li>
 </ol>
 <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>

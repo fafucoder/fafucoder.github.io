@@ -21,15 +21,15 @@
     
     
     <meta name="keywords" content="kubernetes">
-    <meta name="description" content="参考文档 https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000018240634?utm_source&#x3D;tag-newest https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000022163789 https:&#x2F;&#x2F;fuckcloudnative.io&#x2F;posts&#x2F;understanding-the-pleg-is-not-healthy&#x2F;">
+    <meta name="description" content="node no ready的可能问题 网络插件有问题 kubelet有问题（PLEG的问题) 系统资源问题（cpu或者内存满了)  参考文档 https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000018240634?utm_source&#x3D;tag-newest https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000022163789 https:&#x2F;&#x2F;fuckcloudna">
 <meta property="og:type" content="article">
 <meta property="og:title" content="kubernetes PLEG不健康的问题">
 <meta property="og:url" content="https://github.com/fafucoder/2020/07/22/kubernetes-pleg-error/index.html">
 <meta property="og:site_name" content="好记忆不如烂笔头">
-<meta property="og:description" content="参考文档 https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000018240634?utm_source&#x3D;tag-newest https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000022163789 https:&#x2F;&#x2F;fuckcloudnative.io&#x2F;posts&#x2F;understanding-the-pleg-is-not-healthy&#x2F;">
+<meta property="og:description" content="node no ready的可能问题 网络插件有问题 kubelet有问题（PLEG的问题) 系统资源问题（cpu或者内存满了)  参考文档 https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000018240634?utm_source&#x3D;tag-newest https:&#x2F;&#x2F;segmentfault.com&#x2F;a&#x2F;1190000022163789 https:&#x2F;&#x2F;fuckcloudna">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-07-22T06:16:28.000Z">
-<meta property="article:modified_time" content="2020-11-30T12:17:26.764Z">
+<meta property="article:modified_time" content="2021-02-26T12:40:38.922Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
@@ -156,7 +156,7 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#参考文档"><span class="post-toc-text">参考文档</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#node-no-ready的可能问题"><span class="post-toc-text">node no ready的可能问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#参考文档"><span class="post-toc-text">参考文档</span></a></li></ol>
         </nav>
     </aside>
 
@@ -178,10 +178,16 @@
 
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
-            <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+            <h3 id="node-no-ready的可能问题"><a href="#node-no-ready的可能问题" class="headerlink" title="node no ready的可能问题"></a>node no ready的可能问题</h3><ol>
+<li>网络插件有问题</li>
+<li>kubelet有问题（PLEG的问题)</li>
+<li>系统资源问题（cpu或者内存满了)</li>
+</ol>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
 <li><a href="https://segmentfault.com/a/1190000018240634?utm_source=tag-newest" target="_blank" rel="noopener">https://segmentfault.com/a/1190000018240634?utm_source=tag-newest</a></li>
 <li><a href="https://segmentfault.com/a/1190000022163789" target="_blank" rel="noopener">https://segmentfault.com/a/1190000022163789</a></li>
 <li><a href="https://fuckcloudnative.io/posts/understanding-the-pleg-is-not-healthy/" target="_blank" rel="noopener">https://fuckcloudnative.io/posts/understanding-the-pleg-is-not-healthy/</a></li>
+<li><a href="https://blog.csdn.net/Tulipyx/article/details/113869714" target="_blank" rel="noopener">https://blog.csdn.net/Tulipyx/article/details/113869714</a></li>
 </ul>
 
         </div>
