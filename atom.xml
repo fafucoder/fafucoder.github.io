@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://github.com/fafucoder/"/>
-  <updated>2021-03-21T12:49:52.598Z</updated>
+  <updated>2021-03-30T12:43:11.643Z</updated>
   <id>https://github.com/fafucoder/</id>
   
   <author>
@@ -15,6 +15,115 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>linux 终端控制</title>
+    <link href="https://github.com/fafucoder/2021/03/30/linux-terminal/"/>
+    <id>https://github.com/fafucoder/2021/03/30/linux-terminal/</id>
+    <published>2021-03-30T03:22:59.000Z</published>
+    <updated>2021-03-30T12:43:11.643Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ol><li>linux打开一个终端运行一个程序，在程序运行未结束的时候如果关掉终端的话，那么该程序也会跟着退出。</li><li>如果终端运行的程序堵塞了，则整个终端窗口将无法再执行其他程序。</li></ol><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp243alnjxj31e008q111.jpg" alt="进程" title="">                </div>                <div class="image-caption">进程</div>            </figure><p>为了使进程不堵塞整个终端，可使用如下命令使进程在后台运行:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup &lt;command&gt; &amp;</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp24hwww9wj30zm01sdgi.jpg" alt="nohup" title="">                </div>                <div class="image-caption">nohup</div>            </figure><p>其中： </p><ul><li>nohup表示让我们的程序进程忽略所有挂断（SIGHUP）信号。</li><li>“&amp;”表示让我们的程序进入后台运行</li></ul><h3 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h3><h5 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h5><p>进程是linux进行分配资源的最小单位，分为前台进程和后台进程</p><ul><li>前台进程：例如这样： hexo server</li><li>后台进程： 例如这样： hexo sever &amp;</li></ul><h5 id="进程组"><a href="#进程组" class="headerlink" title="进程组"></a>进程组</h5><p>每个进程除了有一进程ID外，还属于一个进程组，进程组就是一个或多个进程的集合。进程组中有一个进程组长，组长的进程 ID 是进程组 ID(PGID)。</p><p>当我们在终端中敲下一条命令，然后按下回车的时候，Shell会开启一个新进程来执行这条命令。如果这条命令是由管道连接起来的多个命令组成的话，Shell便会开启多个进程来执行这一组任务。无论是单独的一条命令，还是由管道连接的多条命令，都会被放入到一个新的<strong>进程组(任务)</strong>中。只包含一条命令的时候，就会创建一个由一个进程组成的进程组。进程组中的每个进程都具有相同的进程组标识符(进程组ID)，这个进程组标识符其实就是进程组中某个进程(即进程组组长)的进程ID。<strong>一个进程组也被称为「作业」</strong></p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp25p3hlajj30wy04yt9d.jpg" alt="进程组" title="">                </div>                <div class="image-caption">进程组</div>            </figure><p>如上截图所示：</p><ul><li>bash：进程和进程组ID都是2571(父进程是sshd进程)</li><li>ps: 进程和进程组ID都是14245，父进程是bash(2571),因为是在shell上执行的命令</li><li>cat: 进程组ID和ps的进程组相同，父进程为bash(2571)进程</li></ul><p>那为啥Linux里要有进程组呢？其实，提供进程组就是为了方便对进程进行管理。假设要完成一个任务，需要同时并发100个进程。当用户处于某种原因要终止 这个任务时，要是没有进程组，就需要手动的一个个去杀死这100个进程。</p><h5 id="守护进程"><a href="#守护进程" class="headerlink" title="守护进程"></a>守护进程</h5><p>守护进程是一种长期运行的后台服务进程，通常以daemon的方式运行，通常以字母d结尾，与其他进程相比较，它大概有如下特点：</p><ul><li>无需控制终端(不需要与用户交互)</li><li>在后台运行</li><li>生命周期比较长，一般随系统启动和关闭</li></ul><h5 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h5><p><strong>由一个或者多个进程组组成的集合，</strong>一个会话中的所有进程都具有相同的会话标识符，会话首进程是指创建会话的进程，其进程ID会成为会话ID。</p><p><strong>使用会话最多的是支持任务控制的shell,由shell创建的所有进程组及shell自身隶属与同一个会话，shell自身就是该会话的会话首进程</strong>。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp269e4zjcj30ya052t9h.jpg" alt="session id" title="">                </div>                <div class="image-caption">session id</div>            </figure><p>在任意时刻，会话中总有一个前台进程组(前台任务)，可以从终端读取输入，向终端发送输出。如果用户输入Ctrl+C或者Ctrl+Z,就可以分别让任务终止或挂起。同时，一个会话还可以拥有任意多个后台进程组，后台进程组可以用’&amp;’结尾的命令行创建。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp263d7z3bj31v00nqgsy.jpg" alt="会话" title="">                </div>                <div class="image-caption">会话</div>            </figure><p> 如图，该会话中有三个进程组。通常是由shell的管道将几个进程编成一组的。上图有可能是由下列形式的shell命令形成的:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> proc1 | proc2 &amp; </span></span><br><span class="line"><span class="meta">$</span><span class="bash"> proc3 | proc4 | proc5</span></span><br></pre></td></tr></table></figure><h5 id="终端"><a href="#终端" class="headerlink" title="终端"></a>终端</h5><p>终端(Terminal)也是一台物理设备，只用于输入输出，本身没有强大的计算能力。一台计算机只有一个控制台，在计算资源紧张的时代，人们想共享一台计算机，可以通过终端连接到计算机上，将指令输入终端，终端传送给计算机，计算机完成指令后，将输出传送给终端，终端将结果显示给用户。</p><h5 id="登录终端"><a href="#登录终端" class="headerlink" title="登录终端"></a>登录终端</h5><p>在早期的计算机上面，用户用哑终端（用硬连接连到主机）进行登录，这种登录要经由内核的终端设备驱动程序。因为连到主机上的终端设备数是固定的，所以同时的登录数也就有了已知的上限。随着图形终端的出现，创建终端窗口的应用也被开发出来，它仿真了基于字符的终端，使用户可以用熟悉的方式（shell命令行）与主机进行交互。包括使用网络进行远程登录的远程终端也是使用的这种方式。</p><h5 id="伪终端"><a href="#伪终端" class="headerlink" title="伪终端"></a>伪终端</h5><p>随着图形终端的出现，创建终端窗口的应用也被开发出来，它仿真了基于字符的终端，使用户可以用熟悉的方式（shell命令行）与主机进行交互。包括使用网络进行远程登录的远程终端也是使用的这种方式。网络登录与传统的串行终端登录的区别在于，前者必须等待一个网络连接请求到达，而不是使一个进程等待每一个可能的登录。为了使同一个软件既能处理终端登录又能处理网络登录，系统使用了一种称为伪终端（pseudo terminal）的软件驱动程序，<br>它仿真串行终端的运行行为，并将终端操作映射为网络操作。</p><h5 id="控制终端"><a href="#控制终端" class="headerlink" title="控制终端"></a>控制终端</h5><ul><li>当一个终端与一个会话相关联后，那么这个终端就称为该会话的控制终端(controlling terminal)。</li><li>建立与控制终端连接的会话首进程被称为控制进程(controlling process)。</li><li>一个会话中的几个进程组可被分成一个前台进程组(foreground process group)以及一个或多个后台进程组(background process group)。</li><li>如果一个会话有一个控制终端的话， 则它有一个前台进程组，其他进程组为后台进程组。</li><li>无论何时键入终端的中断键或退出键，都会将中断信号或退出信号发送至前台进程组的所有进程。</li><li>如果终端检测到调制解调器（或网络）断开，则挂断信号（SIGHUP）发送至控制进程（会话首进程），如果<strong>会话首进程退出,则将挂断信号（SIGHUP）发送至前台进程组的所有进程</strong>。</li></ul><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp26l1y3u1j31gn0u0tmu.jpg" alt="控制终端" title="">                </div>                <div class="image-caption">控制终端</div>            </figure><h3 id="相关命令"><a href="#相关命令" class="headerlink" title="相关命令"></a>相关命令</h3><h4 id="jobs"><a href="#jobs" class="headerlink" title="jobs"></a>jobs</h4><p>查看当前所有的后台进程</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp272ozs1uj30sa038wet.jpg" alt="jobs" title="">                </div>                <div class="image-caption">jobs</div>            </figure><h4 id="fg"><a href="#fg" class="headerlink" title="fg"></a>fg</h4><p>将后台运行的命令调至前台继续运行, fg 命令格式为<code>fg %作业号</code> 其中 <code>％</code>可以省略，但若将<code>% 工作号</code>全部省略，则此命令会将带有 + 号的工作恢复到前台。另外，使用此命令的过程中， % 可有可无。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp277qt4mfj313m0n2tcf.jpg" alt="fg" title="">                </div>                <div class="image-caption">fg</div>            </figure><h5 id="bg"><a href="#bg" class="headerlink" title="bg"></a>bg</h5><p>将一个在后台暂停的命令变成继续执行状态</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp279l6n8qj30w809w75s.jpg" alt="bg" title="">                </div>                <div class="image-caption">bg</div>            </figure><h5 id="ctrl-z"><a href="#ctrl-z" class="headerlink" title="ctrl + z"></a>ctrl + z</h5><p>可以将一个正在前台执行的命令放到后台，并且暂停</p><h4 id="tty"><a href="#tty" class="headerlink" title="tty"></a>tty</h4><p>tty命令看看当前bash关联到了哪个tty</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp27c81h2mj30sq022q30.jpg" alt="tty" title="">                </div>                <div class="image-caption">tty</div>            </figure><h5 id="lsof"><a href="#lsof" class="headerlink" title="lsof"></a>lsof</h5><p>lsof 用于查看你进程打开的文件，打开文件的相关进程，进程打开的端口(TCP、UDP)等，在linux环境下，任何事物都以文件的形式存在，通过文件不仅仅可以访问常规数据，还可以访问网络连接和硬件。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp27f1dw3gj310q08o76r.jpg" alt="lsof" title="">                </div>                <div class="image-caption">lsof</div>            </figure><h6 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h6><table><thead><tr><th align="left">参数</th><th align="left">描述</th></tr></thead><tbody><tr><td align="left">-a</td><td align="left">列出打开文件存在的进程</td></tr><tr><td align="left">-c&lt;进程名&gt;</td><td align="left">列出指定进程所打开的文件</td></tr><tr><td align="left">-g</td><td align="left">列出GID号进程详情</td></tr><tr><td align="left">-d&lt;文件号&gt;</td><td align="left">列出占用该文件号的进程</td></tr><tr><td align="left">+d&lt;目录&gt;</td><td align="left">列出目录下被打开的文件</td></tr><tr><td align="left">+D&lt;目录&gt;</td><td align="left">递归列出目录下被打开的文件</td></tr><tr><td align="left">-n&lt;目录&gt;</td><td align="left">列出使用NFS的文件</td></tr><tr><td align="left">-i&lt;条件&gt;</td><td align="left">列出符合条件的进程。（4、6、协议、:端口、 @ip ）</td></tr><tr><td align="left">-p&lt;进程号&gt;</td><td align="left">列出指定进程号所打开的文件</td></tr><tr><td align="left">-u</td><td align="left">列出UID号进程详情</td></tr><tr><td align="left">-h</td><td align="left">显示帮助信息</td></tr><tr><td align="left">-v</td><td align="left">显示版本信息</td></tr></tbody></table><h6 id="查看哪个进程正在使用某个文件"><a href="#查看哪个进程正在使用某个文件" class="headerlink" title="查看哪个进程正在使用某个文件"></a>查看哪个进程正在使用某个文件</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof &#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp27n2nuv8j30wq054jsv.jpg" alt="lsof /bin/bash" title="">                </div>                <div class="image-caption">lsof /bin/bash</div>            </figure><h6 id="查看哪个进程打开指定端口"><a href="#查看哪个进程打开指定端口" class="headerlink" title="查看哪个进程打开指定端口"></a>查看哪个进程打开指定端口</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof -i :22</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp27p127ffj319i06kdig.jpg" alt="losf -i :22" title="">                </div>                <div class="image-caption">losf -i :22</div>            </figure><h6 id="查看指定进程打开的文件信息"><a href="#查看指定进程打开的文件信息" class="headerlink" title="查看指定进程打开的文件信息"></a>查看指定进程打开的文件信息</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof -p 1257</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp27r9r1wej30uj0u07s9.jpg" alt="lsof -p 1257" title="">                </div>                <div class="image-caption">lsof -p 1257</div>            </figure><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.linuxidc.com/Linux/2019-02/157126.htm" target="_blank" rel="noopener">https://www.linuxidc.com/Linux/2019-02/157126.htm</a></li><li><a href="https://segmentfault.com/a/1190000009082089" target="_blank" rel="noopener">https://segmentfault.com/a/1190000009082089</a></li><li><a href="https://segmentfault.com/a/1190000009152815" target="_blank" rel="noopener">https://segmentfault.com/a/1190000009152815</a></li><li><a href="http://shareinto.k8s.101.com/2016/11/17/linux-terminal/" target="_blank" rel="noopener">http://shareinto.k8s.101.com/2016/11/17/linux-terminal/</a></li><li><a href="https://blog.csdn.net/caoshangpa/article/details/80140888" target="_blank" rel="noopener">https://blog.csdn.net/caoshangpa/article/details/80140888</a></li><li><a href="https://andrewpqc.github.io/2018/10/31/linux-process-group-and-session-and-jobs-manage/" target="_blank" rel="noopener">https://andrewpqc.github.io/2018/10/31/linux-process-group-and-session-and-jobs-manage/</a></li><li><a href="https://www.cnblogs.com/huchong/p/10095152.html" target="_blank" rel="noopener">https://www.cnblogs.com/huchong/p/10095152.html</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;linux打开一个终端运行一个程序，在程序运行未结束的时候如果关掉终端的话，那么该程序也会跟着退出。&lt;/li&gt;
+&lt;li&gt;如果终端
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux中的信号量</title>
+    <link href="https://github.com/fafucoder/2021/03/25/linux-signal/"/>
+    <id>https://github.com/fafucoder/2021/03/25/linux-signal/</id>
+    <published>2021-03-25T14:55:11.000Z</published>
+    <updated>2021-03-30T09:45:08.367Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/33debug/p/6993397.html" target="_blank" rel="noopener">https://www.cnblogs.com/33debug/p/6993397.html</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.cnblogs.com/33debug/p/6993397.html&quot;
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux ps命令和 pstree 命令</title>
+    <link href="https://github.com/fafucoder/2021/03/25/linux-ps/"/>
+    <id>https://github.com/fafucoder/2021/03/25/linux-ps/</id>
+    <published>2021-03-25T14:50:07.000Z</published>
+    <updated>2021-03-30T08:20:02.982Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>ps命令能够给出当前系统中进程的快照。它能捕获系统在某一事件的进程状态。如果你想不断更新查看的这个状态，可以使用top命令。</p><p>ps 命令支持的语法风格</p><ol><li><strong>UNIX风格</strong>: 选项可以组合在一起，并且选项前必须有“-”连字符</li><li><strong>BSD风格</strong>: 选项可以组合在一起，但是选项前不能有“-”连字符</li><li><strong>GNU风格</strong>: 选项前有两个“-”连字符</li></ol><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1xlxnfb4j31be0u078m.jpg" alt="example" title="">                </div>                <div class="image-caption">example</div>            </figure><h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><p>–sort: 对结果集进行排序</p><p>-L: 显示指定进程的线程, 例如 ps -L 1234(1234 为pid)</p><p>-o: 控制输入的列数据</p><p>-e: 显示所有进程信息</p><p>-f: 做一个更为完整的输出,通常跟<code>-e</code>参数一块使用</p><p>-u: 以用户为主的进程状态,通常跟-a一块使用</p><p>-a: 显示现行终端机下的所有进程，包括其他用户的进程(这是当前终端的所有进程，通过配合<code>-aux</code>查看所有的进程)</p><p>-x: 显示较完整信息。通常与<code>-a</code>这个参数一起使用</p><p>-A: 列出所有的进程(这是所有进程)</p><p>-C: 根据进程名做筛选, 例如， ps -C nginx</p><p>-j: 以job的格式展示</p><h5 id="ps-aux-与-ps-ef的区别"><a href="#ps-aux-与-ps-ef的区别" class="headerlink" title="ps -aux 与 ps -ef的区别"></a>ps -aux 与 ps -ef的区别</h5><p>输出的格式不一样，ps -aux输出包括进程的cpu跟内存的使用情况，而ps -ef只输出进程的信息(如pid, ppid等)，未输出进程的更详细信息，如果要通过<code>--sort</code>参数做排序的话，通常使用<code>ps -aux</code></p><h5 id="–sort参数详解"><a href="#–sort参数详解" class="headerlink" title="–sort参数详解"></a>–sort参数详解</h5><p>在<code>--sort</code>参数中，<code>-</code>减号是降序，<code>+</code>号表示升序，–sort的排序列跟<code>-o</code> 的列一致，默认是升序格式</p><h5 id="o-格式化的参数"><a href="#o-格式化的参数" class="headerlink" title="-o 格式化的参数"></a>-o 格式化的参数</h5><p>format格式较多，可通过man ps查看，主要的参数有<code>pid, ppid, pgid, cmd(command,agrs), pcpu, pmem, tty</code>等</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zdwx9ukj31830u0n6o.jpg" alt="ps -o" title="">                </div>                <div class="image-caption">ps -o</div>            </figure><h4 id="显示进程树"><a href="#显示进程树" class="headerlink" title="显示进程树"></a>显示进程树</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ejH 或者 ps axjf</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zjd7r6vj31q40u0dp6.jpg" alt="显示进程数" title="">                </div>                <div class="image-caption">显示进程数</div>            </figure><h4 id="显示线程"><a href="#显示线程" class="headerlink" title="显示线程"></a>显示线程</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ps -aux | grep container</span><br><span class="line">px -L pid</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zllvtllj31pm0nuag7.jpg" alt="显示线程" title="">                </div>                <div class="image-caption">显示线程</div>            </figure><h4 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -eo pid,ppid,pgid,tty,cmd</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zoqjad4j31om0tgjwx.jpg" alt="格式化输出" title="">                </div>                <div class="image-caption">格式化输出</div>            </figure><h4 id="实时输出"><a href="#实时输出" class="headerlink" title="实时输出"></a>实时输出</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch -n 1 'ps -aux --sort -pcpu,-pmem | head -20'</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zx2eqygj31x00pi0zs.jpg" alt="实时输出" title="">                </div>                <div class="image-caption">实时输出</div>            </figure><h3 id="pstree"><a href="#pstree" class="headerlink" title="pstree"></a>pstree</h3><p>pstree命令以树状图显示进程间的关系（display a tree of processes）。ps命令可以显示当前正在运行的那些进程的信息，但是对于它们之间的关系却显示得不够清晰。在Linux系统中，系统调用fork可以创建子进程，通过子shell也可以创建子进程，Linux系统中进程之间的关系天生就是一棵树，树的根就是进程PID为1的init进程。</p><h4 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h4><p>-p: 显示pid</p><p>-a: 显示进程参数</p><h5 id="进程树显示进程pid"><a href="#进程树显示进程pid" class="headerlink" title="进程树显示进程pid"></a>进程树显示进程pid</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree -p</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp205oxnd6j30v60u0aii.jpg" alt="pstree -p" title="">                </div>                <div class="image-caption">pstree -p</div>            </figure><h5 id="显示指定进程的进程树"><a href="#显示指定进程的进程树" class="headerlink" title="显示指定进程的进程树"></a>显示指定进程的进程树</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree -p 1234</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp206k758dj30us04et9q.jpg" alt="pstree -p" title="">                </div>                <div class="image-caption">pstree -p</div>            </figure><h5 id="显示参数"><a href="#显示参数" class="headerlink" title="显示参数"></a>显示参数</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree -ap 1234</span><br></pre></td></tr></table></figure><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp208117z1j31060amdh6.jpg" alt="pstree -a" title="">                </div>                <div class="image-caption">pstree -a</div>            </figure><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/huchong/p/10065246.html" target="_blank" rel="noopener">https://www.cnblogs.com/huchong/p/10065246.html</a></li><li><a href="https://zhuanlan.zhihu.com/p/93473461" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/93473461</a> </li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h3&gt;&lt;p&gt;ps命令能够给出当前系统中进程的快照。它能捕获系统在某一事件的进程状态。如果你想不断更新查看的这个状态，可以使用top命令。&lt;/p&gt;
+&lt;p&gt;
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>docker 面试高频题</title>
+    <link href="https://github.com/fafucoder/2021/03/17/docker-interview/"/>
+    <id>https://github.com/fafucoder/2021/03/17/docker-interview/</id>
+    <published>2021-03-17T15:19:21.000Z</published>
+    <updated>2021-03-30T09:44:48.690Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://docs.docker.com/engine/reference/builder/#cmd" target="_blank" rel="noopener">Dockerfile 官方文档</a></li><li><a href="https://blog.csdn.net/u010900754/article/details/78526443" target="_blank" rel="noopener">Docker cmd entrypoint 区别 终极解读</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.docker.com/engine/reference/builde
+      
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://github.com/fafucoder/categories/docker/"/>
+    
+    
+      <category term="docker" scheme="https://github.com/fafucoder/tags/docker/"/>
+    
+  </entry>
   
   <entry>
     <title>linux openssl 命令详解</title>
@@ -93,6 +202,32 @@
     
     
       <category term="docker" scheme="https://github.com/fafucoder/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>linux中stdin, stdout, stderr</title>
+    <link href="https://github.com/fafucoder/2021/03/07/linux-std/"/>
+    <id>https://github.com/fafucoder/2021/03/07/linux-std/</id>
+    <published>2021-03-07T03:45:51.000Z</published>
+    <updated>2021-03-30T09:43:58.400Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h3><p>对Linux进程来讲，每个打开的文件都是通过文件描述符(File Descriptor)来标识的，内核为每个进程维护了一个文件描述符表，这个表以FD为索引，再进一步指向文件的详细信息。在进程创建时，内核为进程默认创建了0、1、2三个特殊的FD，这就是STDIN、STDOUT和STDERR。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnjioex4j318c0iyjwp.jpg" alt="文件描述符" title="">                </div>                <div class="image-caption">文件描述符</div>            </figure><p>I/O重定向也就是让已创建的FD指向其他文件。比如，下面是对STDOUT重定向到testfile.txt前后内核文件描述符表变化的示意图</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnkjht9yj31qe0q6n0f.jpg" alt="io重定向" title="">                </div>                <div class="image-caption">io重定向</div>            </figure><p>在I/O重定向的过程中，不变的是FD 0/1/2代表STDIN/STDOUT/STDERR，变化的是文件描述符表中FD 0/1/2对应的具体文件，  Shell正是通过I/O重定向和管道这种特殊的文件把多个程序的STDIN和STDOUT串联在一起组成更复杂功能的，下面是Shell中通过管道的示意图：</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnmgdm7qj31jy0g0aci.jpg" alt="shell 管道" title="">                </div>                <div class="image-caption">shell 管道</div>            </figure><p><strong>示例：</strong></p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnofym2sj316m0kaaf4.jpg" alt="proc" title="">                </div>                <div class="image-caption">proc</div>            </figure><h4 id="pgrep-命令"><a href="#pgrep-命令" class="headerlink" title="pgrep 命令"></a>pgrep 命令</h4><p>pgrep查看当前正在运行的进程，并将与选择条件匹配的进程ID列出到stdout（屏幕）。当你想要某个进程的PID时，pgrep很方便。(通过<code>ps -ef | grep xxx</code>也能实现)</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobo1kab79j31gg04wabi.jpg" alt="pgrep" title="">                </div>                <div class="image-caption">pgrep</div>            </figure><p>选项#</p><ul><li>-o：仅显示找到的最小（起始）进程号；</li><li>-n：仅显示找到的最大（结束）进程号；</li><li>-l：显示进程名称；</li><li>-P：指定父进程号；</li><li>-g：指定进程组；</li><li>-t：指定开启进程的终端；</li><li>-u：指定进程的有效用户ID。</li></ul><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/weidagang2046/p/io-redirection.html" target="_blank" rel="noopener">https://www.cnblogs.com/weidagang2046/p/io-redirection.html</a></li><li><a href="https://zhuanlan.zhihu.com/p/99120125" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/99120125</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;文件描述符&quot;&gt;&lt;a href=&quot;#文件描述符&quot; class=&quot;headerlink&quot; title=&quot;文件描述符&quot;&gt;&lt;/a&gt;文件描述符&lt;/h3&gt;&lt;p&gt;对Linux进程来讲，每个打开的文件都是通过文件描述符(File Descriptor)来标识的，内核为每个进程维护
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
     
   </entry>
   
@@ -409,139 +544,6 @@
     
     
       <category term="golang" scheme="https://github.com/fafucoder/tags/golang/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>kubernetes生成swagger ui</title>
-    <link href="https://github.com/fafucoder/2020/11/29/kubernetes-swagger/"/>
-    <id>https://github.com/fafucoder/2020/11/29/kubernetes-swagger/</id>
-    <published>2020-11-29T09:02:37.000Z</published>
-    <updated>2020-11-29T09:23:54.665Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="如何获取kubernetes的Openapi"><a href="#如何获取kubernetes的Openapi" class="headerlink" title="如何获取kubernetes的Openapi"></a>如何获取kubernetes的Openapi</h3><p>百度上搜索kubernetes获取Openapi基本上都是老版本的获取方法，非常繁琐。</p><p>kubernetes会自己生成openapi，不需要任何配置只需要：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl proxy --port=8081</span><br></pre></td></tr></table></figure><p>配置kubectl proxy即可，通过localhost:8081就可以查看api的定义，要获取到openapi.json只需要访问<code>http://localhost:8081/openapi/v2</code> 保存为json就行， 获取通过curl <code>curl localhost:8081/openapi/v2 &gt; swagger.json</code></p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gl65smm4izj312208kdh3.jpg" alt="openapi" title="">                </div>                <div class="image-caption">openapi</div>            </figure><h3 id="运行Swagger-UI"><a href="#运行Swagger-UI" class="headerlink" title="运行Swagger UI"></a>运行Swagger UI</h3><p>通过直接跑docker 可以运行swgger ui</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    --rm \</span><br><span class="line">    -p 80:8080 \</span><br><span class="line">    -e SWAGGER_JSON=/swagger.json \</span><br><span class="line">    -v $(<span class="built_in">pwd</span>)/swagger.json:/swagger.json \</span><br><span class="line">    swaggerapi/swagger-ui</span><br></pre></td></tr></table></figure><h3 id="生成自定义Swagger-UI"><a href="#生成自定义Swagger-UI" class="headerlink" title="生成自定义Swagger UI"></a>生成自定义Swagger UI</h3><p>k8s 的swagger ui 包含了所有crd的api, 有时候只想生成自己定义的CRD的swgger ui，这时候就需要编写代码生成， 分为go生成方式跟java生成方式，推荐使用go的生成方式。</p><p>生成的方法可以参考文档2, 整体的思想就是自己定义一个apiserver, 然后把自定义的api 通过scheme注册到apiserver中。</p><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://jonnylangefeld.com/blog/kubernetes-how-to-view-swagger-ui" target="_blank" rel="noopener">kubernetes: 如何查看Swagger UI</a></li><li><a href="https://blog.gmem.cc/openapi" target="_blank" rel="noopener">OpenAPI学习笔记</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;如何获取kubernetes的Openapi&quot;&gt;&lt;a href=&quot;#如何获取kubernetes的Openapi&quot; class=&quot;headerlink&quot; title=&quot;如何获取kubernetes的Openapi&quot;&gt;&lt;/a&gt;如何获取kubernetes的Opena
-      
-    
-    </summary>
-    
-    
-      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
-    
-    
-      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>kubernetes scheme原理解析</title>
-    <link href="https://github.com/fafucoder/2020/11/29/kubernetes-scheme/"/>
-    <id>https://github.com/fafucoder/2020/11/29/kubernetes-scheme/</id>
-    <published>2020-11-29T05:11:23.000Z</published>
-    <updated>2020-11-29T05:17:52.109Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://blog.csdn.net/shida_csdn/article/details/83060586" target="_blank" rel="noopener">https://blog.csdn.net/shida_csdn/article/details/83060586</a></li><li><a href="https://blog.csdn.net/zhonglinzhang/article/details/105482996" target="_blank" rel="noopener">https://blog.csdn.net/zhonglinzhang/article/details/105482996</a></li><li><a href="https://blog.csdn.net/weixin_42663840/article/details/102558455" target="_blank" rel="noopener">https://blog.csdn.net/weixin_42663840/article/details/102558455</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://blog.csdn.net/shida_csdn/article/detail
-      
-    
-    </summary>
-    
-    
-      <category term="kubernetes" scheme="https://github.com/fafucoder/categories/kubernetes/"/>
-    
-    
-      <category term="kubernetes" scheme="https://github.com/fafucoder/tags/kubernetes/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>linux netstat命令</title>
-    <link href="https://github.com/fafucoder/2020/11/17/linux-netstat/"/>
-    <id>https://github.com/fafucoder/2020/11/17/linux-netstat/</id>
-    <published>2020-11-17T12:19:13.000Z</published>
-    <updated>2020-11-17T14:55:38.758Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>netstat 是控制台命令，是一个监控tcp/ip网络有用的工具， n用于显示各种网络相关信息， 如网络连接， 路由表，接口状态,  多播成员， masquerade连接等。一般用于检测本机端口的网络连接情况。</p><h3 id="常用命令参数"><a href="#常用命令参数" class="headerlink" title="常用命令参数"></a>常用命令参数</h3><table><thead><tr><th>参数</th><th>说明</th></tr></thead><tbody><tr><td>-a</td><td>列出所有的连接</td></tr><tr><td>-t</td><td>列出所有的tcp连接</td></tr><tr><td>-u</td><td>列出所有的udp连接</td></tr><tr><td>-n</td><td>禁用域名解析</td></tr><tr><td>-l</td><td>仅列出有在 Listen (监听) 的服务状态。</td></tr><tr><td>-p</td><td>显示PID</td></tr><tr><td>-c</td><td>持续输出，定时执行netstat命令</td></tr></tbody></table><h3 id="检查网卡状态"><a href="#检查网卡状态" class="headerlink" title="检查网卡状态"></a>检查网卡状态</h3><p>netstat 能够列举出所有的网卡，或者看网卡详情，与此功能相同的命令为<code>ip 或者 ethtool</code>。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-I, --interfaces=&lt;Iface&gt; 展示网卡详情</span><br><span class="line">-i, --interfaces         列出所有的网卡</span><br></pre></td></tr></table></figure><p>通过netstat -I 参数可以统计网卡的包统计情况，可用于网卡丢包排查</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@xxx ~]<span class="comment"># netstat -Ieth0</span></span><br><span class="line">Iface             MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg</span><br><span class="line">eth0             1500  4976182      0      0 0       2752891      0      0      0 BMRU</span><br></pre></td></tr></table></figure><h3 id="统计包信息"><a href="#统计包信息" class="headerlink" title="统计包信息"></a>统计包信息</h3><p>通过<code>netstat -s</code> 显示网络的统计信息，包括接收到的ip/icmp/tcp/udp包数，转发的ip/icmp/tcp/udp包数等</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 ~]<span class="comment"># netstat -s</span></span><br><span class="line">Ip:</span><br><span class="line">    321020293 total packets received</span><br><span class="line">    4096798 forwarded</span><br><span class="line">    17 with unknown protocol</span><br><span class="line">    0 incoming packets discarded</span><br><span class="line">    316923403 incoming packets delivered</span><br><span class="line">    326072495 requests sent out</span><br><span class="line">    3651 outgoing packets dropped</span><br><span class="line">    108 dropped because of missing route</span><br><span class="line">Icmp:</span><br><span class="line">    315961 ICMP messages received</span><br><span class="line">    629 input ICMP message failed.</span><br><span class="line">    ICMP input histogram:</span><br><span class="line">        destination unreachable: 1208</span><br><span class="line">        timeout <span class="keyword">in</span> transit: 7</span><br><span class="line">        <span class="built_in">echo</span> requests: 296605</span><br><span class="line">        <span class="built_in">echo</span> replies: 18140</span><br><span class="line">        timestamp request: 1</span><br><span class="line">    318614 ICMP messages sent</span><br><span class="line">    0 ICMP messages failed</span><br><span class="line">    ICMP output histogram:</span><br><span class="line">        destination unreachable: 3869</span><br><span class="line">        <span class="built_in">echo</span> request: 18139</span><br><span class="line">        <span class="built_in">echo</span> replies: 296605</span><br><span class="line">        timestamp replies: 1</span><br><span class="line">  ......</span><br></pre></td></tr></table></figure><h3 id="列举路由表"><a href="#列举路由表" class="headerlink" title="列举路由表"></a>列举路由表</h3><p>netstat能列出当前主机的路由表，曾几何时就知道查看路由表只有<code>ip route 跟 route</code> ,不曾想netstat也能列出路由表</p><p><code>netstat -r</code> 用于列出当前主机的路由表</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xxx ~]<span class="comment"># netstat -r</span></span><br><span class="line">Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface</span><br><span class="line">default         gateway         0.0.0.0         UG        0 0          0 eth0</span><br><span class="line">link-local      0.0.0.0         255.255.0.0     U         0 0          0 eth0</span><br><span class="line">192.168.0.0     0.0.0.0         255.255.255.0   U         0 0          0 eth0</span><br></pre></td></tr></table></figure><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/ggjucheng/archive/2012/01/08/2316661.HTML" target="_blank" rel="noopener">netstat命令详解</a></li><li><a href="https://blog.csdn.net/dviewer/article/details/51340587" target="_blank" rel="noopener">Netstat 的10个基本用法</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h3&gt;&lt;p&gt;netstat 是控制台命令，是一个监控tcp/ip网络有用的工具， n用于显示各种网络相关信息， 如网络连接， 路由表，接口状态,  多播
-      
-    
-    </summary>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>linux网络问题排查思路</title>
-    <link href="https://github.com/fafucoder/2020/11/17/linux-network/"/>
-    <id>https://github.com/fafucoder/2020/11/17/linux-network/</id>
-    <published>2020-11-17T12:13:41.000Z</published>
-    <updated>2020-11-19T09:26:24.799Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="网卡收包流程"><a href="#网卡收包流程" class="headerlink" title="网卡收包流程"></a>网卡收包流程</h3><p>Linux 网卡收包流程如下：</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkubvmck6bj30lc160gsi.jpg" alt="网卡收包流程" title="">                </div>                <div class="image-caption">网卡收包流程</div>            </figure><ol><li>网卡收到数据包</li><li>将数据包从网卡硬件缓存移动到服务器内存中(DMA方式，不经过CPU)</li><li>通过硬中断通知CPU处理</li><li>CPU通过软中断通知内核处理</li><li>经过TCP/IP协议栈处理</li><li>应用程序通过read()从socket buffer读取数据</li></ol><h3 id="网卡到内存中的问题排查"><a href="#网卡到内存中的问题排查" class="headerlink" title="网卡到内存中的问题排查"></a>网卡到内存中的问题排查</h3><h5 id="网卡丢包"><a href="#网卡丢包" class="headerlink" title="网卡丢包"></a>网卡丢包</h5><p>我们先看下ifconfig的输出：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># ifconfig eth0</span><br><span class="line">eth0: flags&#x3D;4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 10.5.224.27  netmask 255.255.255.0  broadcast 10.5.224.255</span><br><span class="line">        inet6 fe80::5054:ff:fea4:44ae  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 52:54:00:a4:44:ae  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 9525661556  bytes 10963926751740 (9.9 TiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 8801210220  bytes 12331600148587 (11.2 TiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0Copy</span><br></pre></td></tr></table></figure><p>RX（receive） 代表接收报文， TX(transmit) 表示发送报文。</p><ul><li>RX errors: 表示总的收包的错误数量，这包括 too-long-frames 错误，Ring Buffer 溢出错误，crc 校验错误，帧同步错误，fifo overruns 以及 missed pkg 等等。</li><li>RX dropped: 表示数据包已经进入了 Ring Buffer，但是由于内存不够等系统原因，导致在拷贝到内存的过程中被丢弃。</li><li>RX overruns: 表示 fifo 的 overruns，由于 Ring Buffer(aka Driver Queue) 传输的 IO 大于 kernel 能够处理的 IO 导致的，而 Ring Buffer 则是指在发起 IRQ 请求之前的那块 buffer。很明显，overruns 的增大意味着数据包没到 Ring Buffer 就被网卡物理层给丢弃了，CPU 无法及时的处理中断是造成 Ring Buffer 满的原因之一，可能原因是因为 interruprs 分布的不均匀，没有做 affinity 而造成的丢包。</li><li>RX frame: 表示 misaligned 的 frames。</li></ul><p>dropped 与 overruns 的区别：</p><ol><li>dropped，表示这个数据包已经进入到网卡的接收缓存 fifo 队列，并且开始被系统中断处理准备进行数据包拷贝（从网卡缓存 fifo 队列拷贝到系统内存），但由于此时的系统原因（比如内存不够等）导致这个数据包被丢掉，即这个数据包被 Linux 系统丢掉。 </li><li>overruns，表示这个数据包还没有被进入到网卡的接收缓存 fifo 队列就被丢掉，因此此时网卡的 fifo 是满的。为什么 fifo 会是满的？因为系统繁忙，来不及响应网卡中断，导致网卡里的数据包没有及时的拷贝到系统内存， fifo 是满的就导致后面的数据包进不来，即这个数据包被网卡硬件丢掉。所以，如果遇到 overruns 非0，需要检测cpu负载与cpu中断情况。</li></ol><h5 id="环形队列Ring-Buffer溢出"><a href="#环形队列Ring-Buffer溢出" class="headerlink" title="环形队列Ring Buffer溢出"></a>环形队列Ring Buffer溢出</h5><p>当网卡的缓存区（ring buffer）设置的太小。网络数据包到达（生产）的速率快于内核处理（消费）的速率时， Ring Buffer 很快会被填满，新来的数据包将被丢弃。</p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkuiokk2uzj30p00iwtdo.jpg" alt="ring buffer" title="">                </div>                <div class="image-caption">ring buffer</div>            </figure><p>通过 <code>ethtool</code> 或 <code>/proc/net/dev</code> 可以查看因Ring Buffer满而丢弃的包统计</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xxx ~]<span class="comment"># ethtool -S ens2 | grep fifo</span></span><br><span class="line">     rx_fifo_errors: 0</span><br><span class="line">     tx_fifo_errors: 0</span><br><span class="line">[root@xxx ~]<span class="comment"># cat /proc/net/dev | grep ens2</span></span><br><span class="line">  ens2:  659229    8107    0    0    0     0          0         0   249827    2833    0    0    0     0       0          0</span><br></pre></td></tr></table></figure><p>可以通过ethtool 设置ring buffer 的缓冲区大小</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改网卡eth0接收与发送硬件缓存区大小</span></span><br><span class="line">$ ethtool -G eth0 rx 4096 tx 4096</span><br><span class="line">Pre-set maximums:</span><br><span class="line">RX:     4096   </span><br><span class="line">RX Mini:    0</span><br><span class="line">RX Jumbo:   0</span><br><span class="line">TX:     4096   </span><br><span class="line">Current hardware settings:</span><br><span class="line">RX:     4096   </span><br><span class="line">RX Mini:    0</span><br><span class="line">RX Jumbo:   0</span><br><span class="line">TX:     4096</span><br></pre></td></tr></table></figure><h3 id="中断过程中的问题"><a href="#中断过程中的问题" class="headerlink" title="中断过程中的问题"></a>中断过程中的问题</h3><h6 id="什么是中断"><a href="#什么是中断" class="headerlink" title="什么是中断"></a>什么是中断</h6><p>中断有两种：一种硬中断；一种软中断。硬中断是由硬件产生的，比如，像磁盘，网卡，键盘；软中断是由当前正在运行的进程所产生的。</p><p>硬中断，是一种由硬件产生的电信号直接发送到中断控制器上，然后由中断控制器向 CPU 发送信号，CPU 检测到该信号后，会中断当前的工作转而去处理中断。然后，处理器会通知内核已经产生中断，这样内核就会对这个中断进行适当的处理。</p><p>当网卡收到数据包时会产生中断请求(硬中断)通知到 CPU，CPU 会中断当前正在运行的任务，然后通知内核有新数据包，内核调用中断处理程序(软中断)进行响应，把数据包从网卡缓存及时拷贝到内存，否则会因为缓存溢出被丢弃。剩下的处理和操作数据包的工作就会交给软中断。</p><h6 id="什么是多队列网卡"><a href="#什么是多队列网卡" class="headerlink" title="什么是多队列网卡"></a>什么是多队列网卡</h6><p>当网卡不断的接收数据包，就会产生很多中断，一个中断请求只能被一个CPU处理， 而现在的机器都是用多个CPU，同时只有一个 CPU 去处理 Ring Buffer 数据会很低效，这个时候就产生了叫做 Receive Side Scaling(RSS) 或者叫做 multiqueue 的机制来处理这个问题， 这就是为啥需要多队列的原因。</p><p>RSS（Receive Side Scaling）是网卡的硬件特性，实现了多队列。通过多队列网卡驱动加载，获取网卡型号，得到网卡的硬件 queue 的数量，并结合 CPU 核的数量，最终通过 Sum=Min（网卡 queue，CPU core）得出所要激活的网卡 queue 数量。</p><p>NIC 收到 Frame 的时候能通过 Hash Function 来决定 Frame 该放在哪个 Ring Buffer 上，触发的 IRQ 也可以通过操作系统或者手动配置 IRQ affinity 将 IRQ 分配到多个 CPU 上。这样 IRQ 能被不同的 CPU 处理，从而做到 Ring Buffer 上的数据也能被不同的 CPU 处理，从而提高数据的并行处理能力。</p><p>RSS 除了会影响到 NIC 将 IRQ 发到哪个 CPU 之外，不会影响别的逻辑。</p><h6 id="什么是RPS"><a href="#什么是RPS" class="headerlink" title="什么是RPS"></a>什么是RPS</h6><p><a href="https://github.com/torvalds/linux/blob/v3.13/Documentation/networking/scaling.txt#L99-L222">Receive Packet Steering(RPS)</a> 是在 NIC 不支持 RSS 时候在软件中实现 RSS 类似功能的机制。其好处就是对 NIC 没有要求，任何 NIC 都能支持 RPS，但缺点是 NIC 收到数据后 DMA 将数据存入的还是一个 Ring Buffer，NIC 触发 IRQ 还是发到一个 CPU，还是由这一个 CPU 调用 driver 的 <code>poll</code> 来将 Ring Buffer 的数据取出来。RPS 是在单个 CPU 将数据从 Ring Buffer 取出来之后才开始起作用，它会为每个 Packet 计算 Hash 之后将 Packet 发到对应 CPU 的 backlog 中，并通过 Inter-processor Interrupt(IPI) 告知目标 CPU 来处理 backlog。后续 Packet 的处理流程就由这个目标 CPU 来完成。从而实现将负载分到多个 CPU 的目的。通常如果开启了RPS会加重所有 CPU 的负担.</p><h6 id="IRQ-中断请求-亲和绑定"><a href="#IRQ-中断请求-亲和绑定" class="headerlink" title="IRQ 中断请求 亲和绑定"></a>IRQ 中断请求 亲和绑定</h6><p><code>/proc/interrupts</code> 文件中可以看到各个 CPU 上的中断情况。</p><p><code>/proc/irq/[irq_num]/smp_affinity_list</code> 可以查看指定中断当前绑定的 CPU。</p><p>可以通过配置 IRQ affinity 指定 IRQ 由哪个 CPU 来处理中断, 先通过 <code>/proc/interrupts</code> 找到 IRQ 号之后，将希望绑定的 CPU 号写入 <code>/proc/irq/IRQ_NUMBER/smp_affinity</code>，写入的是 16 进制的 bit mask。比如看到队列 rx_0 对应的中断号是 41 那就执行：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo 6 &gt; &#x2F;proc&#x2F;irq&#x2F;41&#x2F;smp_affinity</span><br><span class="line">6 表示的是 CPU2 和 CPU1</span><br></pre></td></tr></table></figure><p>0 号 CPU 的掩码是 0x1 (0001)，1 号 CPU 掩码是 0x2 (0010)，2 号 CPU 掩码是 0x4 (0100)，3 号 CPU 掩码是 0x8 (1000) 依此类推。</p><h6 id="softirq-数统计"><a href="#softirq-数统计" class="headerlink" title="softirq 数统计"></a>softirq 数统计</h6><p>通过 <code>/proc/softirqs</code> 能看到每个 CPU 上 softirq 数量统计：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/softirqs</span><br><span class="line">                    CPU0       CPU1       </span><br><span class="line">          HI:          1          0</span><br><span class="line">       TIMER: 1650579324 3521734270</span><br><span class="line">      NET_TX:   10282064   10655064</span><br><span class="line">      NET_RX: 3618725935       2446</span><br><span class="line">       BLOCK:          0          0</span><br><span class="line">BLOCK_IOPOLL:          0          0</span><br><span class="line">     TASKLET:      47013      41496</span><br><span class="line">       SCHED: 1706483540 1003457088</span><br><span class="line">     HRTIMER:    1698047   11604871</span><br><span class="line">         RCU: 4218377992 3049934909</span><br></pre></td></tr></table></figure><p>NET_RX 表示网卡收到包时候触发的 softirq，一般看这个统计是为了看看 softirq 在每个 CPU 上分布是否均匀，不均匀的话可能就需要做一些调整。比如上面看到 CPU0 和 CPU1 两个差距很大，原因是这个机器的 NIC 不支持 RSS，没有多个 Ring Buffer。开启 RPS 后就均匀多了。</p><h6 id="如何开启RPS"><a href="#如何开启RPS" class="headerlink" title="如何开启RPS"></a>如何开启RPS</h6><p>RPS 默认是关闭的，当机器有多个 CPU 并且通过 softirqs 的统计 <code>/proc/softirqs</code> 发现 NET_RX 在 CPU 上分布不均匀或者发现网卡不支持 mutiqueue 时，就可以考虑开启 RPS。</p><p>开启 RPS 需要调整 <code>/sys/class/net/DEVICE_NAME/queues/QUEUE/rps_cpus</code> 的值。比如执行:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo f &gt; &#x2F;sys&#x2F;class&#x2F;net&#x2F;eth0&#x2F;queues&#x2F;rx-0&#x2F;rps_cpus</span><br></pre></td></tr></table></figure><p>表示的含义是处理网卡 eth0 的 rx-0 队列的 CPU 数设置为 f 。即设置有 15 个 CPU 来处理 rx-0 这个队列的数据，如果你的 CPU 数没有这么多就会默认使用所有 CPU 。</p><h6 id="netdev-max-backlog调优"><a href="#netdev-max-backlog调优" class="headerlink" title="netdev_max_backlog调优"></a>netdev_max_backlog调优</h6><p>netdev_max_backlog 是内核从 NIC 收到包后，交由协议栈（如 IP、TCP ）处理之前的缓冲队列, 通过softnet_stat可以确定是否发生了netdev backlog队列溢出</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@xxx ~]# cat &#x2F;proc&#x2F;net&#x2F;softnet_stat</span><br><span class="line">000000bf 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000028 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">000000c7 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000031 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">000021d8 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000929 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br></pre></td></tr></table></figure><ol><li>每一行代表每个 CPU 核的状态统计，从 CPU0 依次往下。</li><li>每一列代表一个 CPU 核的各项统计：第一列代表中断处理程序收到的包总数；第二列即代表由于 netdev_max_backlog 队列溢出而被丢弃的包总数。</li><li>第3列表示软中断一次取走netdev_budget个数据包，或取数据包时间超过2ms的次数。</li><li>第4~8列固定为0，没有意义。</li><li>第9列表示发送数据包时，对应的队列被锁住的次数。</li></ol><p>netdev_max_backlog 的默认值是 1000，我们可以修改内核参数来调优：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl -w net.core.netdev_max_backlog=2000</span><br></pre></td></tr></table></figure><h3 id="协议栈过程中的问题"><a href="#协议栈过程中的问题" class="headerlink" title="协议栈过程中的问题"></a>协议栈过程中的问题</h3><h3 id="socket-buffer过程中的问题"><a href="#socket-buffer过程中的问题" class="headerlink" title="socket buffer过程中的问题"></a>socket buffer过程中的问题</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://ylgrgyq.github.io/2017/07/23/linux-receive-packet-1/" target="_blank" rel="noopener">网络协议栈收包过程</a></li><li><a href="https://leeweir.github.io/posts/irq-not-balance/" target="_blank" rel="noopener">关于网卡中断不均衡问题及其解决方案</a></li><li><a href="https://leeweir.github.io/posts/linux-packet-loss/" target="_blank" rel="noopener">Linux 丢包那些事</a></li><li><a href="https://www.wumingx.com/performance/network-performance.html" target="_blank" rel="noopener">网络性能优化之套路篇</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;网卡收包流程&quot;&gt;&lt;a href=&quot;#网卡收包流程&quot; class=&quot;headerlink&quot; title=&quot;网卡收包流程&quot;&gt;&lt;/a&gt;网卡收包流程&lt;/h3&gt;&lt;p&gt;Linux 网卡收包流程如下：&lt;/p&gt;
-&lt;figure class=&quot;image-bubble&quot;&gt;
-    
-      
-    
-    </summary>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>linux-nic2</title>
-    <link href="https://github.com/fafucoder/2020/11/17/linux-nic2/"/>
-    <id>https://github.com/fafucoder/2020/11/17/linux-nic2/</id>
-    <published>2020-11-17T12:13:32.000Z</published>
-    <updated>2020-11-19T09:26:10.263Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="网卡收发包流程"><a href="#网卡收发包流程" class="headerlink" title="网卡收发包流程"></a>网卡收发包流程</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://ylgrgyq.github.io/2017/07/24/linux-receive-packet-2/" target="_blank" rel="noopener">https://ylgrgyq.github.io/2017/07/24/linux-receive-packet-2/</a></li><li><a href="https://ylgrgyq.github.io/2017/08/01/linux-receive-packet-3/" target="_blank" rel="noopener">https://ylgrgyq.github.io/2017/08/01/linux-receive-packet-3/</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;网卡收发包流程&quot;&gt;&lt;a href=&quot;#网卡收发包流程&quot; class=&quot;headerlink&quot; title=&quot;网卡收发包流程&quot;&gt;&lt;/a&gt;网卡收发包流程&lt;/h3&gt;&lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; titl
-      
-    
-    </summary>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
     
   </entry>
   
