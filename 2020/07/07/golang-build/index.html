@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>golang build方法详解 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="golang">
+    <meta name="description" content="build 参数使用方法usage: go build [-o output] [-i] [build flags] [packages] go build的使用比较简洁，所有的参数都可以忽略，直到只有go build，这个时候意味着使用当前目录进行编译, 因此: go build &#x3D; go build . &#x3D; go build main.go go build 主要参数是 -o output 指">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang build方法详解">
+<meta property="og:url" content="https://github.com/fafucoder/2020/07/07/golang-build/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="build 参数使用方法usage: go build [-o output] [-i] [build flags] [packages] go build的使用比较简洁，所有的参数都可以忽略，直到只有go build，这个时候意味着使用当前目录进行编译, 因此: go build &#x3D; go build . &#x3D; go build main.go go build 主要参数是 -o output 指">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-07T04:24:32.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.325Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">golang build方法详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">golang build方法详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-07-07T04:24:32.000Z" itemprop="datePublished" class="page-time">
+  2020-07-07
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-golang-build"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">golang build方法详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-07-07 12:24:32" datetime="2020-07-07T04:24:32.000Z"  itemprop="datePublished">2020-07-07</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="build-参数"><a href="#build-参数" class="headerlink" title="build 参数"></a>build 参数</h3><p>使用方法<code>usage: go build [-o output] [-i] [build flags] [packages]</code></p>
+<p>go build的使用比较简洁，所有的参数都可以忽略，直到只有go build，这个时候意味着使用当前目录进行编译, 因此:</p>
+<p><code>go build = go build . = go build main.go</code></p>
+<p>go build 主要参数是 -o output 指定编译输出的名称，代替默认的包名。</p>
+<p>此外还有一些基础参数，包括install, run, test都能用的参数包括:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">-gcflags &#39;arg list&#39;: 垃圾回收参数</span><br><span class="line"></span><br><span class="line">-ldflags &#39;-s -w&#39;: 压缩编译后的体积</span><br><span class="line">    -s: 去掉符号表</span><br><span class="line">    -w: 去掉调试信息，不能gdb调试了</span><br><span class="line"></span><br><span class="line">-p n</span><br><span class="line">    开多少核cpu来并行编译，默认为本机CPU核数.</span><br><span class="line"></span><br><span class="line">-work</span><br><span class="line">    打印临时工作目录的名称，并在退出时不删除它</span><br><span class="line"></span><br><span class="line">-race</span><br><span class="line">    同时检测数据竞争状态，只支持 linux&#x2F;amd64, freebsd&#x2F;amd64, darwin&#x2F;amd64 和 windows&#x2F;amd64.</span><br><span class="line"></span><br><span class="line">-tags &#39;tag list&#39;</span><br><span class="line">    构建出带tag的版本.</span><br><span class="line"></span><br><span class="line">-linkshared(-buildmode&#x3D;shared)</span><br><span class="line">    链接到以前使用创建的共享库</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-buildmode mode</span><br><span class="line">    编译模式(go help buildmode)</span><br></pre></td></tr></table></figure>
+
+<p>其中通过利用 <code>-ldflags</code> 参数，可以向链接器传递指令。向链接器传一个 -X 指令可以设置程序中字符串变量的值。利用这个方法能够实现例如在编译时设置程序的版本信息， 例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"> </span><br><span class="line">import &quot;fmt&quot;</span><br><span class="line">import &quot;flag&quot;</span><br><span class="line"> </span><br><span class="line">var _version_ &#x3D; &quot;v0.1&quot;</span><br><span class="line"> </span><br><span class="line">func main() &#123;</span><br><span class="line">    var version bool</span><br><span class="line">    flag.BoolVar(&amp;version, &quot;v&quot;, false, &quot;-v&quot;)</span><br><span class="line">    flag.Parse()</span><br><span class="line"> </span><br><span class="line">    if version &#123;</span><br><span class="line">        fmt.Printf(&quot;Version: %s&quot;, _version_)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过设置 <code>go build -ldflags &#39;-X main._version_=&quot;v0.2&quot;&#39;</code>编译后输出的版本信息就是v0.2, 通过-X参数可以很方便的设置一些频繁改动的变量。需要注意的是-X只能给string类型变量赋值</p>
+<p>如果要设置多个变量可以: <code>go build -ldflags &quot;-X importpath.name=value -X importpath_2.name_2=value_2&quot;</code></p>
+<p>如果要赋值的变量包含空格，需要用引号将 -X 后面的变量和值都扩起来：<code>go build -ldflags &quot;-X &#39;importpath.name=a string contains space&#39; -X &#39;importpath_2.name_2=v</code></p>
+<p>通过利用<code>-gcflags</code>参数， 可以做一些逃逸分析等操作，用<code>-gcflags</code>给go编译器传入参数，也就是传给go tool compile的参数，因此可以用<code>go tool compile --help</code>查看所有gcflags可用的参数， 例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">go build -gcflags -gcflags&#x3D;&#39;log&#x3D;-N -l&#39; main.go</span><br><span class="line"></span><br><span class="line">-N参数代表禁止优化, -l参数代表禁止内联,</span><br><span class="line">go在编译目标程序的时候会嵌入运行时(runtime)的二进制,</span><br><span class="line">禁止优化和内联可以让运行时(runtime)中的函数变得更容易调试(runtime还是需要好好研读的)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Go-交叉编译"><a href="#Go-交叉编译" class="headerlink" title="Go 交叉编译"></a>Go 交叉编译</h3><p>go build 提供了跨平台编译，默认情况下，都是根据我们当前的机器生成的可执行文件，比如你的是Linux 64位，就会生成Linux 64位下的可执行文件。</p>
+<p>可以通过go env 来查看当前的环境变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ go env</span><br><span class="line">GO111MODULE&#x3D;&quot;on&quot;</span><br><span class="line">GOARCH&#x3D;&quot;amd64&quot;</span><br><span class="line">GOBIN&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;go&#x2F;bin&quot;</span><br><span class="line">GOCACHE&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;Library&#x2F;Caches&#x2F;go-build&quot;</span><br><span class="line">GOENV&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;Library&#x2F;Application Support&#x2F;go&#x2F;env&quot;</span><br><span class="line">GOEXE&#x3D;&quot;&quot;</span><br><span class="line">GOFLAGS&#x3D;&quot;&quot;</span><br><span class="line">GOHOSTARCH&#x3D;&quot;amd64&quot;</span><br><span class="line">GOHOSTOS&#x3D;&quot;darwin&quot;</span><br><span class="line">GOINSECURE&#x3D;&quot;&quot;</span><br><span class="line">GONOPROXY&#x3D;&quot;&quot;</span><br><span class="line">GONOSUMDB&#x3D;&quot;&quot;</span><br><span class="line">GOOS&#x3D;&quot;darwin&quot;</span><br><span class="line">GOPATH&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;go&quot;</span><br><span class="line">GOPRIVATE&#x3D;&quot;&quot;</span><br><span class="line">GOPROXY&#x3D;&quot;https:&#x2F;&#x2F;goproxy.cn,direct&quot;</span><br><span class="line">GOROOT&#x3D;&quot;&#x2F;usr&#x2F;local&#x2F;Cellar&#x2F;go&#x2F;1.14.2_1&#x2F;libexec&quot;</span><br><span class="line">GOSUMDB&#x3D;&quot;sum.golang.google.cn&quot;</span><br><span class="line">GOTMPDIR&#x3D;&quot;&quot;</span><br><span class="line">GOTOOLDIR&#x3D;&quot;&#x2F;usr&#x2F;local&#x2F;Cellar&#x2F;go&#x2F;1.14.2_1&#x2F;libexec&#x2F;pkg&#x2F;tool&#x2F;darwin_amd64&quot;</span><br><span class="line">GCCGO&#x3D;&quot;gccgo&quot;</span><br><span class="line">AR&#x3D;&quot;ar&quot;</span><br><span class="line">CC&#x3D;&quot;clang&quot;</span><br><span class="line">CXX&#x3D;&quot;clang++&quot;</span><br><span class="line">CGO_ENABLED&#x3D;&quot;1&quot;</span><br><span class="line">GOMOD&#x3D;&quot;&#x2F;dev&#x2F;null&quot;</span><br><span class="line">CGO_CFLAGS&#x3D;&quot;-g -O2&quot;</span><br><span class="line">CGO_CPPFLAGS&#x3D;&quot;&quot;</span><br><span class="line">CGO_CXXFLAGS&#x3D;&quot;-g -O2&quot;</span><br><span class="line">CGO_FFLAGS&#x3D;&quot;-g -O2&quot;</span><br><span class="line">CGO_LDFLAGS&#x3D;&quot;-g -O2&quot;</span><br><span class="line">PKG_CONFIG&#x3D;&quot;pkg-config&quot;</span><br><span class="line">GOGCCFLAGS&#x3D;&quot;-fPIC -m64 -pthread -fno-caret-diagnostics -Qunused-arguments -fmessage-length&#x3D;0 -fdebug-prefix-map&#x3D;&#x2F;var&#x2F;folders&#x2F;4g&#x2F;tx2_phhn0gx5j81d1y286bf80000gn&#x2F;T&#x2F;go-build124067622&#x3D;&#x2F;tmp&#x2F;go-build -gno-record-gcc-switches -fno-common&quot;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的环境变量中，与跨平台编译有关的变量有GOOS, GOARCH, GOOS指的是目标操作系统, GOARCH指的是目标处理器的架构。</p>
+<p>GOOS可选的值包括: android，darwin（MACOS 10.11和上述和IOS),  dragonfly，freebsd，illumos，js， linux，netbsd，，openbsd 和。 plan9solariswindows</p>
+<p>GOARCH可选的值包括 amd64（64位x86，最成熟的端口）， 386（32位x86），arm（32位ARM），arm64（64位ARM）， ppc64le（PowerPC 64位，little-endian），ppc64（PowerPC 64位（big-endian）， mips64le（MIPS 64位，little-endian），mips64（MIPS 64位，big-endian）， mipsle（MIPS 32位，little-endian），mips（MIPS 32位，big-endian） ）， s390x（IBM System z 64位，big-endian）和 wasm（WebAssembly 32位)。</p>
+<p>关于他们的对应关系可以参考<a href="https://golang.org/doc/install/source#environment" target="_blank" rel="noopener">官方文档</a></p>
+<p>在交叉编译中通过指定不同的GOOS跟GOARCH，就可以编译成不同平台的可执行文件</p>
+<p>例如可以在linux系统下编译成window跟mac的可执行文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED&#x3D;0 GOOS&#x3D;darwin GOARCH&#x3D;amd64 go build main.go</span><br><span class="line">CGO_ENABLED&#x3D;0 GOOS&#x3D;windows GOARCH&#x3D;amd64 go build main.go</span><br></pre></td></tr></table></figure>
+
+<p>可以在mac系统中编译成linux跟windows的可执行文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED&#x3D;0 GOOS&#x3D;windows GOARCH&#x3D;amd64 go build main.go</span><br><span class="line">CGO_ENABLED&#x3D;0 GOOS&#x3D;linux GOARCH&#x3D;amd64 go build main.go</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://cloud.tencent.com/developer/article/1410259" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1410259</a></li>
+<li><a href="https://www.cnblogs.com/Dong-Ge/articles/11276862.html" target="_blank" rel="noopener">https://www.cnblogs.com/Dong-Ge/articles/11276862.html</a></li>
+<li><a href="https://blog.csdn.net/u013870094/article/details/78500478" target="_blank" rel="noopener">https://blog.csdn.net/u013870094/article/details/78500478</a></li>
+<li><a href="https://blog.csdn.net/zl1zl2zl3/article/details/83374131" target="_blank" rel="noopener">https://blog.csdn.net/zl1zl2zl3/article/details/83374131</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/07/07/golang-escape-analysis/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">go逃逸分析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/07/06/kubernetes-cilium/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">kubernetes-cilium</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

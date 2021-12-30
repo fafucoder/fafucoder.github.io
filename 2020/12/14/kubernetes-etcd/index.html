@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>etcd 获取 kubernetes 中的数据 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="etcdctl 命令etcd厂商提供了命令行客户端 etcdctl，可以使用客户端直接跟etcd交互 etcdctl使用方法:                                 kubernetes etcd pod中执行命令在kubernetes中执行etcdctl命令需要知道endpoint地址以及证书 查看endpoint地址可以通过kube-apiserver与etcd交互获">
+<meta property="og:type" content="article">
+<meta property="og:title" content="etcd 获取 kubernetes 中的数据">
+<meta property="og:url" content="https://github.com/fafucoder/2020/12/14/kubernetes-etcd/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="etcdctl 命令etcd厂商提供了命令行客户端 etcdctl，可以使用客户端直接跟etcd交互 etcdctl使用方法:                                 kubernetes etcd pod中执行命令在kubernetes中执行etcdctl命令需要知道endpoint地址以及证书 查看endpoint地址可以通过kube-apiserver与etcd交互获">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1glno5yzncaj312h0u0hdt.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1glnobnpvozj31la0fc79m.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1glnojh7e8sj31gy03e0t6.jpg">
+<meta property="article:published_time" content="2020-12-14T12:35:44.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.335Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1glno5yzncaj312h0u0hdt.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">etcd 获取 kubernetes 中的数据</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">etcd 获取 kubernetes 中的数据</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-12-14T12:35:44.000Z" itemprop="datePublished" class="page-time">
+  2020-12-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-etcd"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">etcd 获取 kubernetes 中的数据</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-12-14 20:35:44" datetime="2020-12-14T12:35:44.000Z"  itemprop="datePublished">2020-12-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="etcdctl-命令"><a href="#etcdctl-命令" class="headerlink" title="etcdctl 命令"></a>etcdctl 命令</h3><p>etcd厂商提供了命令行客户端 etcdctl，可以使用客户端直接跟etcd交互</p>
+<p>etcdctl使用方法:</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1glno5yzncaj312h0u0hdt.jpg" alt="etcdctl 命令" title="">
+            </p>
+
+<h3 id="kubernetes-etcd-pod中执行命令"><a href="#kubernetes-etcd-pod中执行命令" class="headerlink" title="kubernetes etcd pod中执行命令"></a>kubernetes etcd pod中执行命令</h3><p>在kubernetes中执行etcdctl命令需要知道endpoint地址以及证书</p>
+<h4 id="查看endpoint地址"><a href="#查看endpoint地址" class="headerlink" title="查看endpoint地址"></a>查看endpoint地址</h4><p>可以通过kube-apiserver与etcd交互获取endpoint地址，通过 <code>ps -ef | grep kube-apiserver</code>能够获取到kube-apiserver的启动参数</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1glnobnpvozj31la0fc79m.jpg" alt="endpoint地址" title="">
+            </p>
+
+<h4 id="获取证书"><a href="#获取证书" class="headerlink" title="获取证书"></a>获取证书</h4><p>etcd证书一般在<code>/etc/kubernetes/pki</code>目录下，或者在 <code>/etc/ssl/etcd/ssl</code>目录下</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1glnojh7e8sj31gy03e0t6.jpg" alt="etcd证书" title="">
+            </p>
+
+<h3 id="etcd命令操作"><a href="#etcd命令操作" class="headerlink" title="etcd命令操作"></a>etcd命令操作</h3><ol>
+<li><p>设置etcdctl版本<br>export ETCDCTL_API=3</p>
+</li>
+<li><p>执行etcdctl 命令(命令跟上面的一致)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line"># 获取 endpoint status</span><br><span class="line"></span><br><span class="line">etcdctl --endpoints&#x3D;https:&#x2F;&#x2F;192.168.0.171:2379 --cert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1.pem --key&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1-key.pem  --cacert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;ca.pem -w table endpoint status</span><br><span class="line">+----------------------------+------------------+---------+---------+-----------+-----------+------------+</span><br><span class="line">|          ENDPOINT          |        ID        | VERSION | DB SIZE | IS LEADER | RAFT TERM | RAFT INDEX |</span><br><span class="line">+----------------------------+------------------+---------+---------+-----------+-----------+------------+</span><br><span class="line">| https:&#x2F;&#x2F;192.168.0.171:2379 | 7c4294e7b9a48ff3 |  3.3.12 |   19 MB |      true |         2 |    1916345 |</span><br><span class="line">+----------------------------+------------------+---------+---------+-----------+-----------+------------+</span><br><span class="line"></span><br><span class="line"># 获取endpoint health</span><br><span class="line"></span><br><span class="line">etcdctl --endpoints&#x3D;https:&#x2F;&#x2F;192.168.0.171:2379 --cert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1.pem --key&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1-key.pem  --cacert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;ca.pem -w table endpoint health</span><br><span class="line">https:&#x2F;&#x2F;192.168.0.171:2379 is healthy: successfully committed proposal: took &#x3D; 826.779µs</span><br><span class="line"></span><br><span class="line"># 获取k8s注册的数据</span><br><span class="line">etcdctl --endpoints&#x3D;https:&#x2F;&#x2F;192.168.0.171:2379 --cert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1.pem --key&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1-key.pem  --cacert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;ca.pem get &#x2F; --prefix --keys-only&#x3D;true</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;alertmanagers.monitoring.coreos.com</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;applications.app.k8s.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;blockdeviceclaims.openebs.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;blockdevices.openebs.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;cdiconfigs.cdi.kubevirt.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;cdis.cdi.kubevirt.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;clusterconfigurations.installer.kubesphere.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;clusterpropagatedversions.core.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;clusters.cluster.kubesphere.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;dashboards.monitoring.kubesphere.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;datavolumes.cdi.kubevirt.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;devopsprojects.devops.kubesphere.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;dnsendpoints.multiclusterdns.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;domains.multiclusterdns.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;emailconfigs.notification.kubesphere.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;emailreceivers.notification.kubesphere.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;exporters.events.kubesphere.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;externalips.kubeovn.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;externalsubnets.kubeovn.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedapplications.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedclusterrolebindings.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedclusterroles.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedconfigmaps.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federateddeployments.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedglobalrolebindings.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedglobalroles.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedingresses.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedjobs.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedlimitranges.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatednamespaces.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedpersistentvolumeclaims.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedreplicasets.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedsecrets.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedserviceaccounts.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedservices.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedservicestatuses.core.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedstatefulsets.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedtypeconfigs.core.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedusers.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedworkspacerolebindings.types.kubefed.io</span><br><span class="line"></span><br><span class="line">&#x2F;registry&#x2F;apiextensions.k8s.io&#x2F;customresourcedefinitions&#x2F;federatedworkspaceroles.types.kubefed.io</span><br><span class="line"></span><br><span class="line"># 获取具体的数据(先拿到key,然后获取key的内容)</span><br><span class="line">etcdctl --endpoints&#x3D;https:&#x2F;&#x2F;192.168.0.171:2379 --cert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1.pem --key&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1-key.pem  --cacert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;ca.pem get &#x2F;registry&#x2F;kubeovn.io&#x2F;subnets&#x2F;ovn-default</span><br><span class="line">&#x2F;registry&#x2F;kubeovn.io&#x2F;subnets&#x2F;ovn-default</span><br><span class="line">&#123;&quot;apiVersion&quot;:&quot;kubeovn.io&#x2F;v1&quot;,&quot;kind&quot;:&quot;Subnet&quot;,&quot;metadata&quot;:&#123;&quot;creationTimestamp&quot;:&quot;2020-12-11T09:25:44Z&quot;,&quot;finalizers&quot;:[&quot;kube-ovn-controller&quot;],&quot;generation&quot;:1,&quot;name&quot;:&quot;ovn-default&quot;,&quot;uid&quot;:&quot;89ac06b6-7ca8-4606-843e-6630eb818317&quot;&#125;,&quot;spec&quot;:&#123;&quot;cidrBlock&quot;:&quot;10.233.64.0&#x2F;18&quot;,&quot;default&quot;:true,&quot;excludeIps&quot;:[&quot;10.233.64.1&quot;],&quot;gateway&quot;:&quot;10.233.64.1&quot;,&quot;gatewayNode&quot;:&quot;&quot;,&quot;gatewayType&quot;:&quot;distributed&quot;,&quot;natOutgoing&quot;:true,&quot;private&quot;:false,&quot;protocol&quot;:&quot;IPv4&quot;,&quot;provider&quot;:&quot;ovn&quot;,&quot;underlayGateway&quot;:false&#125;,&quot;status&quot;:&#123;&quot;activateGateway&quot;:&quot;&quot;,&quot;availableIPs&quot;:16314,&quot;conditions&quot;:[&#123;&quot;lastTransitionTime&quot;:&quot;2020-12-11T09:25:50Z&quot;,&quot;lastUpdateTime&quot;:&quot;2020-12-11T09:25:50Z&quot;,&quot;reason&quot;:&quot;ResetLogicalSwitchAclSuccess&quot;,&quot;status&quot;:&quot;True&quot;,&quot;type&quot;:&quot;Validated&quot;&#125;,&#123;&quot;lastTransitionTime&quot;:&quot;2020-12-11T09:25:50Z&quot;,&quot;lastUpdateTime&quot;:&quot;2020-12-11T09:25:50Z&quot;,&quot;reason&quot;:&quot;ResetLogicalSwitchAclSuccess&quot;,&quot;status&quot;:&quot;True&quot;,&quot;type&quot;:&quot;Ready&quot;&#125;],&quot;usingIPs&quot;:67&#125;&#125;</span><br><span class="line"></span><br><span class="line"># curd</span><br><span class="line">......</span><br><span class="line"></span><br><span class="line"># etcd 数据备份</span><br><span class="line">etcdctl --endpoints&#x3D;https:&#x2F;&#x2F;192.168.0.171:2379 --cert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1.pem --key&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1-key.pem  --cacert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;ca.pem snapshot save &#x2F;root&#x2F;backup</span><br><span class="line">Snapshot saved at &#x2F;root&#x2F;backup</span><br><span class="line"></span><br><span class="line"># etcd 数据恢复</span><br><span class="line">etcdctl --endpoints&#x3D;https:&#x2F;&#x2F;192.168.0.171:2379 --cert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1.pem --key&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;admin-node1-key.pem  --cacert&#x3D;&#x2F;etc&#x2F;ssl&#x2F;etcd&#x2F;ssl&#x2F;ca.pem snapshot restore &#x2F;root&#x2F;backup</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://blog.csdn.net/u013693952/article/details/106358339" target="_blank" rel="noopener">etcd 及 etcd 在 k8s中的用法</a></li>
+<li><a href="https://juejin.cn/post/6844903997707386887" target="_blank" rel="noopener">[译]走进Kubernetes集群的大脑：Etcd</a></li>
+<li><a href="https://feisky.gitbooks.io/kubernetes/content/components/etcd.html" target="_blank" rel="noopener">etcd</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/01/03/kubernetes-cni-plugins/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">kubernetes常见的网络插件</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/11/30/kubernetes-exec/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">kubernetes exec原理</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

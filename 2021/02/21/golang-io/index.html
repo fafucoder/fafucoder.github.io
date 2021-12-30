@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>golang io.Reader/io.Writer | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="golang">
+    <meta name="description" content="概述在使用Go语言的过程中，无论是实现web应用程序，还是控制台输入输出，又或者是网络操作，不可避免的会遇到IO操作，使用到io.Reader和io.Writer接口。                                 io.Readerio.Reader 表示一个读取器，它将数据从某个资源读取到传输缓冲区。在缓冲区中，数据可以被流式传输和使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang io.Reader&#x2F;io.Writer">
+<meta property="og:url" content="https://github.com/fafucoder/2021/02/21/golang-io/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概述在使用Go语言的过程中，无论是实现web应用程序，还是控制台输入输出，又或者是网络操作，不可避免的会遇到IO操作，使用到io.Reader和io.Writer接口。                                 io.Readerio.Reader 表示一个读取器，它将数据从某个资源读取到传输缓冲区。在缓冲区中，数据可以被流式传输和使用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv6vcq9iej315m078jvu.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv6wqpi95j31720a2n1s.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv73ri3h0j315o0ai435.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv6fu1e37j312k0l4gsz.jpg">
+<meta property="article:published_time" content="2021-02-21T06:14:24.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.326Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv6vcq9iej315m078jvu.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">golang io.Reader/io.Writer</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">golang io.Reader/io.Writer</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-02-21T06:14:24.000Z" itemprop="datePublished" class="page-time">
+  2021-02-21
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-golang-io"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">golang io.Reader/io.Writer</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-02-21 14:14:24" datetime="2021-02-21T06:14:24.000Z"  itemprop="datePublished">2021-02-21</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>在使用Go语言的过程中，无论是实现web应用程序，还是控制台输入输出，又或者是网络操作，不可避免的会遇到IO操作，使用到io.Reader和io.Writer接口。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv6vcq9iej315m078jvu.jpg" alt="io" title="">
+            </p>
+
+<h3 id="io-Reader"><a href="#io-Reader" class="headerlink" title="io.Reader"></a>io.Reader</h3><p><code>io.Reader</code> 表示一个读取器，它将数据从某个资源读取到传输缓冲区。在缓冲区中，数据可以被流式传输和使用。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv6wqpi95j31720a2n1s.jpg" alt="io reader" title="">
+            </p>
+
+<p>io.Reader接口定义如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Reader <span class="keyword">interface</span> &#123;</span><br><span class="line">    Read(p []<span class="keyword">byte</span>) (n <span class="keyword">int</span>, err error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>io.Reader</code>接口定义了<code>Read(p []byte) (n int, err error)</code>方法，我们可以使用它从Reader中读取一批数据。在Reader中：</p>
+<ul>
+<li>一次最多读取<code>len(p)</code>长度的数据</li>
+<li>读取遭遇到error(io.EOF或者其它错误), 会返回已读取的数据的字节数和error</li>
+<li>即使读取字节数&lt; len(p),也不会更改p的大小</li>
+<li>当输入流结束时，调用它可能返回 <code>err == EOF</code> 或者 <code>err == nil</code>，并且<code>n &gt;=0</code>, 但是下一次调用肯定返回 <code>n=0</code>, <code>err=io.EOF</code></li>
+</ul>
+<h3 id="io-Writer"><a href="#io-Writer" class="headerlink" title="io.Writer"></a>io.Writer</h3><p><code>io.Writer</code> 表示一个编写器，它从缓冲区读取数据，并将数据写入目标资源。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv73ri3h0j315o0ai435.jpg" alt="io writer" title="">
+            </p>
+
+<p>io.Writer接口定义如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Writer <span class="keyword">interface</span> &#123;</span><br><span class="line">    Write(p []<span class="keyword">byte</span>) (n <span class="keyword">int</span>, err error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Write()</code> 方法有两个返回值，一个是写入到目标资源的字节数，一个是发生错误时的错误。</p>
+<h3 id="接口继承关系"><a href="#接口继承关系" class="headerlink" title="接口继承关系"></a>接口继承关系</h3><p>围绕着<code>io.Reader io.Writer</code>接口的实现，主要有：</p>
+<ul>
+<li><p>net.Conn, os.Stdin, os.File: 网络、标准输入输出、文件的流读取</p>
+</li>
+<li><p>strings.Reader: 把字符串抽象成Reader</p>
+</li>
+<li><p>bytes.Reader: 把<code>[]byte</code>抽象成Reader</p>
+</li>
+<li><p>bytes.Buffer: 把<code>[]byte</code>抽象成Reader和Writer</p>
+</li>
+<li><p>bufio.Reader/Writer: 抽象成带缓冲的流读取（比如按行读写）</p>
+</li>
+</ul>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv6fu1e37j312k0l4gsz.jpg" alt="接口继承关系" title="">
+            </p>
+
+
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">stringReader</span><span class="params">()</span></span> &#123;</span><br><span class="line">	reader := strings.NewReader(<span class="string">"hello world"</span>)</span><br><span class="line">	b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		n, err := reader.Read(b)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">				fmt.Println(<span class="string">"finish read"</span>)</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			fmt.Println(err)</span><br><span class="line">			os.Exit(<span class="number">1</span>)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(n, <span class="keyword">string</span>(b[:n]))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">bufferWriter</span><span class="params">()</span></span> &#123;</span><br><span class="line">	providers := []<span class="keyword">string</span>&#123;</span><br><span class="line">		<span class="string">"hello"</span>,</span><br><span class="line">		<span class="string">"world"</span>,</span><br><span class="line">		<span class="string">"golang"</span>,</span><br><span class="line">		<span class="string">"is great"</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> writer bytes.Buffer</span><br><span class="line">	<span class="keyword">for</span> _, s := <span class="keyword">range</span> providers &#123;</span><br><span class="line">		n, err := writer.Write([]<span class="keyword">byte</span>(s))</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			fmt.Println(err)</span><br><span class="line">			os.Exit(<span class="number">1</span>)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> n != <span class="built_in">len</span>(s) &#123;</span><br><span class="line">			fmt.Println(<span class="string">"failed to write data"</span>)</span><br><span class="line">			os.Exit(<span class="number">1</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(writer.String())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fileWriter</span><span class="params">()</span></span> &#123;</span><br><span class="line">	file, err := os.Create(<span class="string">"./files.txt"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">		os.Exit(<span class="number">1</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> file.Close()</span><br><span class="line"></span><br><span class="line">	providers := []<span class="keyword">string</span>&#123;</span><br><span class="line">		<span class="string">"hello"</span>,</span><br><span class="line">		<span class="string">"world"</span>,</span><br><span class="line">		<span class="string">"golang"</span>,</span><br><span class="line">		<span class="string">"is great"</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, p := <span class="keyword">range</span> providers &#123;</span><br><span class="line">		c, err := file.Write([]<span class="keyword">byte</span>(p))</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			fmt.Println(err)</span><br><span class="line">			os.Exit(<span class="number">1</span>)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> c != <span class="built_in">len</span>(p) &#123;</span><br><span class="line">			fmt.Println(<span class="string">"failed to write data"</span>)</span><br><span class="line">			os.Exit(<span class="number">1</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//file reader</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fileReader</span><span class="params">()</span></span> &#123;</span><br><span class="line">	file, err := os.Open(<span class="string">"./files.txt"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">		os.Exit(<span class="number">1</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> file.Close()</span><br><span class="line"></span><br><span class="line">	p := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">4</span>)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		n, err := file.Read(p)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			fmt.Println(err)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		fmt.Println(<span class="keyword">string</span>(p[:n]))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//buffio</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">bufReader</span><span class="params">()</span></span> &#123;</span><br><span class="line">	file, err := os.Open(<span class="string">"./files.txt"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> file.Close()</span><br><span class="line"></span><br><span class="line">	p := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">4</span>)</span><br><span class="line">	reader := bufio.NewReader(file)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		n, err := reader.Read(p)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		fmt.Println(<span class="keyword">string</span>(p[:n]))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//ioutil 包</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ioutilReader</span><span class="params">()</span></span> &#123;</span><br><span class="line">	bytes, err := ioutil.ReadFile(<span class="string">"./files.txt"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(bytes))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://segmentfault.com/a/1190000015591319" target="_blank" rel="noopener">Go中io包的使用方法</a></li>
+<li><a href="https://www.jianshu.com/p/758c4e2b4ab8" target="_blank" rel="noopener">Go编程技巧–io.Reader/Writer</a></li>
+<li><a href="https://colobu.com/2019/02/18/read-data-from-net-Conn/" target="_blank" rel="noopener">从 io.Reader 中读数据</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/03/06/linux-process/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">linux中进程，线程，协程</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/02/08/golang-context/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">golang-context</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

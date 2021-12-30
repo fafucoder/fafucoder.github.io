@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>kubernetes kube-proxy实现原理 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="概念service 是一组pod的服务抽象，相当于一组pod的LoadBanlance, 负责将请求分发给对应的pod，service会为这个LB提供一个IP，一般称为cluster IP。ClusterIP是个假的IP，这个IP在整个集群中根本不存在，无法通过IP协议栈无法路由，底层underlay设备也无法感知这个IP的存在，因此ClusterIP只能是单主机(Host Only）作用域可见，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes kube-proxy实现原理">
+<meta property="og:url" content="https://github.com/fafucoder/2020/07/27/kubernetes-kube-proxy/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概念service 是一组pod的服务抽象，相当于一组pod的LoadBanlance, 负责将请求分发给对应的pod，service会为这个LB提供一个IP，一般称为cluster IP。ClusterIP是个假的IP，这个IP在整个集群中根本不存在，无法通过IP协议栈无法路由，底层underlay设备也无法感知这个IP的存在，因此ClusterIP只能是单主机(Host Only）作用域可见，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu05yernj313e0nogow.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu0l31npj315q0ocgoq.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu12g1x5j30xa0rk0yt.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu4uqamgj31gp0u0b29.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu1ouleoj318o0fo45j.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu23nxw5j31140n041r.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu2n6mt2j30yu0fq44f.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu315s0sj30yy0fk44c.jpg">
+<meta property="og:image" content="https://docs.cilium.io/en/v1.8/_images/kubernetes_iptables.svg">
+<meta property="article:published_time" content="2020-07-27T03:17:59.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.336Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu05yernj313e0nogow.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kubernetes kube-proxy实现原理</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kubernetes kube-proxy实现原理</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-07-27T03:17:59.000Z" itemprop="datePublished" class="page-time">
+  2020-07-27
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-kube-proxy"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kubernetes kube-proxy实现原理</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-07-27 11:17:59" datetime="2020-07-27T03:17:59.000Z"  itemprop="datePublished">2020-07-27</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>service 是一组pod的服务抽象，相当于一组pod的LoadBanlance, 负责将请求分发给对应的pod，service会为这个LB提供一个IP，一般称为cluster IP。ClusterIP是个假的IP，这个IP在整个集群中根本不存在，无法通过IP协议栈无法路由，底层underlay设备也无法感知这个IP的存在，因此ClusterIP只能是单主机(Host Only）作用域可见，这个IP在其他节点以及集群外均无法访问。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu05yernj313e0nogow.jpg" alt="service,endpoint和pod关系" title="">
+            </p>
+
+<p>kube-proxy的作用主要是负责service的实现，具体来说，就是实现集群内的客户端pod访问service，或者是集群外的主机通过NodePort等方式访问service。</p>
+<p>kube-proxy存在于各个node节点上，部署方式的daemonset, 默认使用iptables模式。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu0l31npj315q0ocgoq.jpg" alt="service转发规则" title="">
+            </p>
+
+<p>kubernetes中各组件如下：</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu12g1x5j30xa0rk0yt.jpg" alt="kube-proxy" title="">
+            </p>
+
+<h3 id="kube-proxy模式"><a href="#kube-proxy模式" class="headerlink" title="kube proxy模式"></a>kube proxy模式</h3><p>kube-proxy 目前有3中常见的proxyMode, 分别是userspace, iptables, ipvs。userspace mode是v1.0及以前版本的默认模式。从v1.1版本开始，增加了iptables mode，在 v1.3版本中正式替代了 userspace 模式成为默认模式（需要 iptables 的版本&gt;= 1.4.11。IPVS 是 LVS 的负载均衡模块，同样基于 netfilter，但比 iptables 性能更好，具备更好的可扩展性。</p>
+<h4 id="userspace-mode"><a href="#userspace-mode" class="headerlink" title="userspace mode"></a>userspace mode</h4><p>基于用户态的 proxy，service 的请求会先从用户空间进入内核 iptables，然后再回到用户空间，由 kube-proxy 完成后端 endpoints 的选择和代理工作，这种方式流量从用户空间进出内核带来的性能损耗比较大。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu4uqamgj31gp0u0b29.jpg" alt="userspace mode" title="">
+            </p>
+
+<p>userspace模式下，kube-proxy 持续监听 Service 以及 Endpoints 对象的变化；对每个 Service，它都为其在本地节点开放一个端口，作为其服务代理端口；发往该端口的请求会采用一定的策略转发给与该服务对应的后端 Pod 实体。kube-proxy 同时会在本地节点设置 iptables 规则，配置一个 Virtual IP，把发往 Virtual IP 的请求重定向到与该 Virtual IP 对应的服务代理端口上。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu1ouleoj318o0fo45j.jpg" alt="userspace请求模式" title="">
+            </p>
+
+<h4 id="iptables-mode"><a href="#iptables-mode" class="headerlink" title="iptables mode"></a>iptables mode</h4><p>iptables 的方式是完全通过内核的 iptables 实现 service 的代理和 LB。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu23nxw5j31140n041r.jpg" alt="iptables mode" title="">
+            </p>
+
+<p>iptables模式相比 userspace 模式，克服了请求在用户态-内核态反复传递的问题，性能上有所提升，但使用 iptables NAT 来完成转发，存在不可忽视的性能损耗</p>
+<p>iptables 模式与 userspace 相同，kube-proxy 持续监听 Service 以及 Endpoints 对象的变化；但它并不在本地节点开启反向代理服务，而是把反向代理全部交给 iptables 来实现；即 iptables 直接将对 VIP 的请求转发给后端 Pod，通过 iptables 设置转发策略。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu2n6mt2j30yu0fq44f.jpg" alt="iptables请求模式" title="">
+            </p>
+
+<h4 id="ipvs-mode"><a href="#ipvs-mode" class="headerlink" title="ipvs mode"></a>ipvs mode</h4><p>ipvs模式是基于 NAT 实现的，通过ipvs的NAT模式，对访问k8s service的请求进行虚IP到POD IP的转发。当创建一个 service 后，kubernetes 会在每个节点上创建一个网卡，同时帮你将 Service IP(VIP) 绑定上。</p>
+<p>与iptables、userspace 模式一样，kube-proxy依然监听Service以及Endpoints对象的变化, 不过它并不创建反向代理, 也不创建大量的 iptables 规则, 而是通过netlink 创建ipvs规则，并使用k8s Service与Endpoints信息，对所在节点的ipvs规则进行定期同步; netlink 与 iptables 底层都是基于 netfilter 钩子，但是 netlink 由于采用了 hash table 而且直接工作在内核态，在性能上比 iptables 更优</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbu315s0sj30yy0fk44c.jpg" alt="ipvs请求模式" title="">
+            </p>
+
+<h3 id="设置kube-proxy模式"><a href="#设置kube-proxy模式" class="headerlink" title="设置kube-proxy模式"></a>设置kube-proxy模式</h3><p>由于kube-proxy是daemonset, 因此通过编辑daemonset发现通过mount configMap把配置传递进去，因此只要修改configmap中的数据就行.</p>
+<p>修改kube-proxy configMap中的mode设置kube-proxy模式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">kind: KubeProxyConfiguration</span><br><span class="line">metricsBindAddress: &quot;&quot;</span><br><span class="line">mode: &quot;&quot;</span><br><span class="line">nodePortAddresses: null</span><br><span class="line">oomScoreAdj: null</span><br><span class="line">portRange: &quot;&quot;</span><br><span class="line">udpIdleTimeout: 0s</span><br></pre></td></tr></table></figure>
+
+<h3 id="iptables-模式原理解析"><a href="#iptables-模式原理解析" class="headerlink" title="iptables 模式原理解析"></a>iptables 模式原理解析</h3><p>iptables 模式下的规则如下所示：</p>
+<p class="img-lightbox">
+                <img src="https://docs.cilium.io/en/v1.8/_images/kubernetes_iptables.svg" alt="kube-proxy iptables表" title="">
+            </p>
+
+<h4 id="ClusterIp-模式"><a href="#ClusterIp-模式" class="headerlink" title="ClusterIp 模式"></a>ClusterIp 模式</h4><ol>
+<li>非本机节点pod访问: <code>PREROUTING --&gt; KUBE-SERVICE --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li>
+<li>本机节点访问pod: <code>OUTPUT --&gt; KUBE-SERVICE --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li>
+</ol>
+<p>访问流程：</p>
+<ol>
+<li>对于进入 PREROUTING 链的都转到 KUBE-SERVICES 链进行处理；</li>
+<li>在 KUBE-SERVICES 链，对于访问 clusterIP 为 10.110.243.155 的转发到 KUBE-SVC-5SB6FTEHND4GTL2W；</li>
+<li>访问 KUBE-SVC-5SB6FTEHND4GTL2W 的使用随机数负载均衡，并转发到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 上；</li>
+<li>KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 对应 endpoint 中的 pod 192.168.137.147 和 192.168.98.213，设置 mark 标记，进行 DNAT 并转发到具体的 pod 上，如果某个 service 的 endpoints 中没有 pod，那么针对此 service 的请求将会被 drop 掉；</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 1.对于进入 PREROUTING 链的都转到 KUBE-SERVICES 链进行处理；</span><br><span class="line">-A PREROUTING -m comment --comment &quot;kubernetes service portals&quot; -j KUBE-SERVICES</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 2.在 KUBE-SERVICES 链，对于访问 clusterIP 为 10.110.243.155 的转发到 KUBE-SVC-5SB6FTEHND4GTL2W；</span><br><span class="line">-A KUBE-SERVICES -d 10.110.243.155&#x2F;32 -p tcp -m comment --comment &quot;pks-system&#x2F;tenant-service: cluster IP&quot; -m tcp --dport 7000 -j KUBE-SVC-5SB6FTEHND4GTL2W</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 3.访问 KUBE-SVC-5SB6FTEHND4GTL2W 的使用随机数负载均衡，并转发到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 上；</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-CI5ZO3FTK7KBNRMG</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -j KUBE-SEP-OVNLTDWFHTHII4SC</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 4.KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-OVNLTDWFHTHII4SC 对应 endpoint 中的 pod 192.168.137.147 和 192.168.98.213，</span><br><span class="line">设置 mark 标记，进行 DNAT 并转发到具体的 pod 上，如果某个 service 的 endpoints 中没有 pod，那么针对此 service 的请求将会被 drop 掉；</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -s 192.168.137.147&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -p tcp -m tcp -j DNAT --to-destination 192.168.137.147:7000</span><br><span class="line"></span><br><span class="line">-A KUBE-SEP-OVNLTDWFHTHII4SC -s 192.168.98.213&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-OVNLTDWFHTHII4SC -p tcp -m tcp -j DNAT --to-destination 192.168.98.213:7000</span><br></pre></td></tr></table></figure>
+
+<h4 id="NodePort-模式"><a href="#NodePort-模式" class="headerlink" title="NodePort 模式"></a>NodePort 模式</h4><p>在 nodePort 方式下，会用到 KUBE-NODEPORTS 规则链，通过 iptables -t nat -L -n 可以看到 KUBE-NODEPORTS 位于 KUBE-SERVICE 链的最后一个，iptables 在处理报文时会优先处理目的 IP 为clusterIP 的报文，在前面的 KUBE-SVC-XXX 都匹配失败之后再去使用 nodePort 方式进行匹配。</p>
+<ol>
+<li>本机模式： <code>OUTPUT --&gt; KUBE-SERVICE --&gt; KUBE-NODEPORTS --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li>
+<li>非本机模式: <code>PREROUTING --&gt; KUBE-SERVICE --&gt; KUBE-NODEPORTS --&gt; KUBE-SVC-XXX --&gt; KUBE-SEP-XXX</code></li>
+</ol>
+<p>访问流程：</p>
+<p>该服务的 nodePort 端口为 30070，其 iptables 访问规则和使用 clusterIP 方式访问有点类似，不过 nodePort 方式会比 clusterIP 的方式多走一条链 KUBE-NODEPORTS，其会在 KUBE-NODEPORTS 链设置 mark 标记并转发到 KUBE-SVC-5SB6FTEHND4GTL2W，nodeport 与 clusterIP 访问方式最后都是转发到了 KUBE-SVC-xxx 链。</p>
+<ol>
+<li>经过 PREROUTING 转到 KUBE-SERVICES</li>
+<li>经过 KUBE-SERVICES 转到 KUBE-NODEPORTS</li>
+<li>经过 KUBE-NODEPORTS 转到 KUBE-SVC-5SB6FTEHND4GTL2W</li>
+<li>经过KUBE-SVC-5SB6FTEHND4GTL2W 转到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV</li>
+<li>经过 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV 分别转到 192.168.137.147:7000 和 192.168.89.11:7000</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 1. 经过 PREROUTING 转到 KUBE-SERVICES</span><br><span class="line">-A PREROUTING -m comment --comment &quot;kubernetes service portals&quot; -j KUBE-SERVICES</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 2. 经过 KUBE-SERVICES 转到 KUBE-NODEPORTS</span><br><span class="line">-A KUBE-SERVICES xxx</span><br><span class="line">-A KUBE-SERVICES -m comment --comment &quot;kubernetes service nodeports; NOTE: this must be the last rule in this chain&quot; -m addrtype --dst-type LOCAL -j KUBE-NODEPORTS</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 3. 经过 KUBE-NODEPORTS 转到 KUBE-SVC-5SB6FTEHND4GTL2W</span><br><span class="line">-A KUBE-NODEPORTS -p tcp -m comment --comment &quot;pks-system&#x2F;tenant-service:&quot; -m tcp --dport 30070 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-NODEPORTS -p tcp -m comment --comment &quot;pks-system&#x2F;tenant-service:&quot; -m tcp --dport 30070 -j KUBE-SVC-5SB6FTEHND4GTL2W</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 4. 经过KUBE-SVC-5SB6FTEHND4GTL2W 转到 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-CI5ZO3FTK7KBNRMG</span><br><span class="line">-A KUBE-SVC-5SB6FTEHND4GTL2W -j KUBE-SEP-VR562QDKF524UNPV</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 5. 经过 KUBE-SEP-CI5ZO3FTK7KBNRMG 和 KUBE-SEP-VR562QDKF524UNPV 分别转到 192.168.137.147:7000 和 192.168.89.11:7000</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -s 192.168.137.147&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-CI5ZO3FTK7KBNRMG -p tcp -m tcp -j DNAT --to-destination 192.168.137.147:7000</span><br><span class="line">-A KUBE-SEP-VR562QDKF524UNPV -s 192.168.89.11&#x2F;32 -j KUBE-MARK-MASQ</span><br><span class="line">-A KUBE-SEP-VR562QDKF524UNPV -p tcp -m tcp -j DNAT --to-destination 192.168.89.11:7000</span><br></pre></td></tr></table></figure>
+
+<h3 id="ipvs模式解析"><a href="#ipvs模式解析" class="headerlink" title="ipvs模式解析"></a>ipvs模式解析</h3><p>ipvs的实现模式跟iptables的实现模式类似，底层都是基于netfilter, 但是<strong>ipvs使用hash表进行规则查找(时间复杂度为O(1))，而iptables使用链表进行查找(平均时间复杂度O(n/2),最好的情况是O(1),最坏的情况是O(n))</strong>。其次，<strong>由于 IPVS 的 DNAT 钩子挂在 INPUT 链上，因此为了让内核识别 VIP 是本机的 IP，ipvs模式下k8s 会将service cluster ip 绑定到虚拟网卡kube-ipvs0上</strong></p>
+<blockquote>
+<p>ipvs跟iptables的主要区别如下：</p>
+<ul>
+<li>iptables 使用链表，ipvs 使用哈希表；</li>
+<li>iptables 只支持随机、轮询两种负载均衡算法而 ipvs 支持的多达 8 种；</li>
+<li>ipvs 还支持 realserver 运行状况检查、连接重试、端口映射、会话保持等功能。</li>
+</ul>
+</blockquote>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://www.cnblogs.com/fuyuteng/p/11598768.html" target="_blank" rel="noopener">https://www.cnblogs.com/fuyuteng/p/11598768.html</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/94418251?from_voters_page=true" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/94418251?from_voters_page=true</a></li>
+<li><a href="https://juejin.im/post/6844904098605563912" target="_blank" rel="noopener">https://juejin.im/post/6844904098605563912</a></li>
+<li><a href="https://xuxinkun.github.io/2016/07/22/kubernetes-proxy/" target="_blank" rel="noopener">https://xuxinkun.github.io/2016/07/22/kubernetes-proxy/</a></li>
+<li><a href="https://knarfeh.com/2018/07/28/Kubernetes%20%E6%BA%90%E7%A0%81%E7%AC%94%E8%AE%B0%EF%BC%88kube-proxy%EF%BC%89" target="_blank" rel="noopener">https://knarfeh.com/2018/07/28/Kubernetes%20%E6%BA%90%E7%A0%81%E7%AC%94%E8%AE%B0%EF%BC%88kube-proxy%EF%BC%89</a></li>
+<li><a href="https://linuxops.dev/post/kubernetes%E7%9A%84kube-proxy%E7%9A%84%E8%BD%AC%E5%8F%91%E8%A7%84%E5%88%99%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">https://linuxops.dev/post/kubernetes%E7%9A%84kube-proxy%E7%9A%84%E8%BD%AC%E5%8F%91%E8%A7%84%E5%88%99%E5%88%86%E6%9E%90/</a></li>
+<li><a href="https://www.cnblogs.com/charlieroro/p/9588019.html" target="_blank" rel="noopener">https://www.cnblogs.com/charlieroro/p/9588019.html</a></li>
+<li><a href="https://www.cnblogs.com/luozhiyun/p/13782077.html" target="_blank" rel="noopener">https://www.cnblogs.com/luozhiyun/p/13782077.html</a>   // 深入k8s：kube-proxy ipvs及其源码分析</li>
+<li><a href="https://blog.csdn.net/u011563903/article/details/87904873" target="_blank" rel="noopener">https://blog.csdn.net/u011563903/article/details/87904873</a>  // K8S kube-proxy ipvs 原理分析</li>
+<li><a href="https://mp.weixin.qq.com/s/X6EL8GwWoi9_DyvhHL6Mlw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/X6EL8GwWoi9_DyvhHL6Mlw</a> // 米开朗基杨博客</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/08/04/linux-ssh/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">ssh命令知多少</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/07/22/kubernetes-pleg-error/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">kubernetes PLEG不健康的问题</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

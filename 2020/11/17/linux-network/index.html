@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux网络问题排查思路 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="网卡收包流程Linux 网卡收包流程如下：                                  网卡收到数据包 将数据包从网卡硬件缓存移动到服务器内存中(DMA方式，不经过CPU) 通过硬中断通知CPU处理 CPU通过软中断通知内核处理 经过TCP&#x2F;IP协议栈处理 应用程序通过read()从socket buffer读取数据  网卡到内存中的问题排查网卡丢包我们先看下ifconfig">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux网络问题排查思路">
+<meta property="og:url" content="https://github.com/fafucoder/2020/11/17/linux-network/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="网卡收包流程Linux 网卡收包流程如下：                                  网卡收到数据包 将数据包从网卡硬件缓存移动到服务器内存中(DMA方式，不经过CPU) 通过硬中断通知CPU处理 CPU通过软中断通知内核处理 经过TCP&#x2F;IP协议栈处理 应用程序通过read()从socket buffer读取数据  网卡到内存中的问题排查网卡丢包我们先看下ifconfig">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkubvmck6bj30lc160gsi.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkuiokk2uzj30p00iwtdo.jpg">
+<meta property="article:published_time" content="2020-11-17T12:13:41.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.348Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkubvmck6bj30lc160gsi.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux网络问题排查思路</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux网络问题排查思路</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-11-17T12:13:41.000Z" itemprop="datePublished" class="page-time">
+  2020-11-17
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-network"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux网络问题排查思路</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-11-17 20:13:41" datetime="2020-11-17T12:13:41.000Z"  itemprop="datePublished">2020-11-17</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="网卡收包流程"><a href="#网卡收包流程" class="headerlink" title="网卡收包流程"></a>网卡收包流程</h3><p>Linux 网卡收包流程如下：</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkubvmck6bj30lc160gsi.jpg" alt="网卡收包流程" title="">
+            </p>
+
+<ol>
+<li>网卡收到数据包</li>
+<li>将数据包从网卡硬件缓存移动到服务器内存中(DMA方式，不经过CPU)</li>
+<li>通过硬中断通知CPU处理</li>
+<li>CPU通过软中断通知内核处理</li>
+<li>经过TCP/IP协议栈处理</li>
+<li>应用程序通过read()从socket buffer读取数据</li>
+</ol>
+<h3 id="网卡到内存中的问题排查"><a href="#网卡到内存中的问题排查" class="headerlink" title="网卡到内存中的问题排查"></a>网卡到内存中的问题排查</h3><h5 id="网卡丢包"><a href="#网卡丢包" class="headerlink" title="网卡丢包"></a>网卡丢包</h5><p>我们先看下ifconfig的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># ifconfig eth0</span><br><span class="line">eth0: flags&#x3D;4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 10.5.224.27  netmask 255.255.255.0  broadcast 10.5.224.255</span><br><span class="line">        inet6 fe80::5054:ff:fea4:44ae  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 52:54:00:a4:44:ae  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 9525661556  bytes 10963926751740 (9.9 TiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 8801210220  bytes 12331600148587 (11.2 TiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0Copy</span><br></pre></td></tr></table></figure>
+
+<p>RX（receive） 代表接收报文， TX(transmit) 表示发送报文。</p>
+<ul>
+<li>RX errors: 表示总的收包的错误数量，这包括 too-long-frames 错误，Ring Buffer 溢出错误，crc 校验错误，帧同步错误，fifo overruns 以及 missed pkg 等等。</li>
+<li>RX dropped: 表示数据包已经进入了 Ring Buffer，但是由于内存不够等系统原因，导致在拷贝到内存的过程中被丢弃。</li>
+<li>RX overruns: 表示 fifo 的 overruns，由于 Ring Buffer(aka Driver Queue) 传输的 IO 大于 kernel 能够处理的 IO 导致的，而 Ring Buffer 则是指在发起 IRQ 请求之前的那块 buffer。很明显，overruns 的增大意味着数据包没到 Ring Buffer 就被网卡物理层给丢弃了，CPU 无法及时的处理中断是造成 Ring Buffer 满的原因之一，可能原因是因为 interruprs 分布的不均匀，没有做 affinity 而造成的丢包。</li>
+<li>RX frame: 表示 misaligned 的 frames。</li>
+</ul>
+<p>dropped 与 overruns 的区别：</p>
+<ol>
+<li>dropped，表示这个数据包已经进入到网卡的接收缓存 fifo 队列，并且开始被系统中断处理准备进行数据包拷贝（从网卡缓存 fifo 队列拷贝到系统内存），但由于此时的系统原因（比如内存不够等）导致这个数据包被丢掉，即这个数据包被 Linux 系统丢掉。 </li>
+<li>overruns，表示这个数据包还没有被进入到网卡的接收缓存 fifo 队列就被丢掉，因此此时网卡的 fifo 是满的。为什么 fifo 会是满的？因为系统繁忙，来不及响应网卡中断，导致网卡里的数据包没有及时的拷贝到系统内存， fifo 是满的就导致后面的数据包进不来，即这个数据包被网卡硬件丢掉。所以，如果遇到 overruns 非0，需要检测cpu负载与cpu中断情况。</li>
+</ol>
+<h5 id="环形队列Ring-Buffer溢出"><a href="#环形队列Ring-Buffer溢出" class="headerlink" title="环形队列Ring Buffer溢出"></a>环形队列Ring Buffer溢出</h5><p>当网卡的缓存区（ring buffer）设置的太小。网络数据包到达（生产）的速率快于内核处理（消费）的速率时， Ring Buffer 很快会被填满，新来的数据包将被丢弃。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkuiokk2uzj30p00iwtdo.jpg" alt="ring buffer" title="">
+            </p>
+
+<p>通过 <code>ethtool</code> 或 <code>/proc/net/dev</code> 可以查看因Ring Buffer满而丢弃的包统计</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xxx ~]<span class="comment"># ethtool -S ens2 | grep fifo</span></span><br><span class="line">     rx_fifo_errors: 0</span><br><span class="line">     tx_fifo_errors: 0</span><br><span class="line">[root@xxx ~]<span class="comment"># cat /proc/net/dev | grep ens2</span></span><br><span class="line">  ens2:  659229    8107    0    0    0     0          0         0   249827    2833    0    0    0     0       0          0</span><br></pre></td></tr></table></figure>
+
+<p>可以通过ethtool 设置ring buffer 的缓冲区大小</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改网卡eth0接收与发送硬件缓存区大小</span></span><br><span class="line">$ ethtool -G eth0 rx 4096 tx 4096</span><br><span class="line">Pre-set maximums:</span><br><span class="line">RX:     4096   </span><br><span class="line">RX Mini:    0</span><br><span class="line">RX Jumbo:   0</span><br><span class="line">TX:     4096   </span><br><span class="line">Current hardware settings:</span><br><span class="line">RX:     4096   </span><br><span class="line">RX Mini:    0</span><br><span class="line">RX Jumbo:   0</span><br><span class="line">TX:     4096</span><br></pre></td></tr></table></figure>
+
+<h3 id="中断过程中的问题"><a href="#中断过程中的问题" class="headerlink" title="中断过程中的问题"></a>中断过程中的问题</h3><h6 id="什么是中断"><a href="#什么是中断" class="headerlink" title="什么是中断"></a>什么是中断</h6><p>中断有两种：一种硬中断；一种软中断。硬中断是由硬件产生的，比如，像磁盘，网卡，键盘；软中断是由当前正在运行的进程所产生的。</p>
+<p>硬中断，是一种由硬件产生的电信号直接发送到中断控制器上，然后由中断控制器向 CPU 发送信号，CPU 检测到该信号后，会中断当前的工作转而去处理中断。然后，处理器会通知内核已经产生中断，这样内核就会对这个中断进行适当的处理。</p>
+<p>当网卡收到数据包时会产生中断请求(硬中断)通知到 CPU，CPU 会中断当前正在运行的任务，然后通知内核有新数据包，内核调用中断处理程序(软中断)进行响应，把数据包从网卡缓存及时拷贝到内存，否则会因为缓存溢出被丢弃。剩下的处理和操作数据包的工作就会交给软中断。</p>
+<h6 id="什么是多队列网卡"><a href="#什么是多队列网卡" class="headerlink" title="什么是多队列网卡"></a>什么是多队列网卡</h6><p>当网卡不断的接收数据包，就会产生很多中断，一个中断请求只能被一个CPU处理， 而现在的机器都是用多个CPU，同时只有一个 CPU 去处理 Ring Buffer 数据会很低效，这个时候就产生了叫做 Receive Side Scaling(RSS) 或者叫做 multiqueue 的机制来处理这个问题， 这就是为啥需要多队列的原因。</p>
+<p>RSS（Receive Side Scaling）是网卡的硬件特性，实现了多队列。通过多队列网卡驱动加载，获取网卡型号，得到网卡的硬件 queue 的数量，并结合 CPU 核的数量，最终通过 Sum=Min（网卡 queue，CPU core）得出所要激活的网卡 queue 数量。</p>
+<p>NIC 收到 Frame 的时候能通过 Hash Function 来决定 Frame 该放在哪个 Ring Buffer 上，触发的 IRQ 也可以通过操作系统或者手动配置 IRQ affinity 将 IRQ 分配到多个 CPU 上。这样 IRQ 能被不同的 CPU 处理，从而做到 Ring Buffer 上的数据也能被不同的 CPU 处理，从而提高数据的并行处理能力。</p>
+<p>RSS 除了会影响到 NIC 将 IRQ 发到哪个 CPU 之外，不会影响别的逻辑。</p>
+<h6 id="什么是RPS"><a href="#什么是RPS" class="headerlink" title="什么是RPS"></a>什么是RPS</h6><p><a href="https://github.com/torvalds/linux/blob/v3.13/Documentation/networking/scaling.txt#L99-L222">Receive Packet Steering(RPS)</a> 是在 NIC 不支持 RSS 时候在软件中实现 RSS 类似功能的机制。其好处就是对 NIC 没有要求，任何 NIC 都能支持 RPS，但缺点是 NIC 收到数据后 DMA 将数据存入的还是一个 Ring Buffer，NIC 触发 IRQ 还是发到一个 CPU，还是由这一个 CPU 调用 driver 的 <code>poll</code> 来将 Ring Buffer 的数据取出来。RPS 是在单个 CPU 将数据从 Ring Buffer 取出来之后才开始起作用，它会为每个 Packet 计算 Hash 之后将 Packet 发到对应 CPU 的 backlog 中，并通过 Inter-processor Interrupt(IPI) 告知目标 CPU 来处理 backlog。后续 Packet 的处理流程就由这个目标 CPU 来完成。从而实现将负载分到多个 CPU 的目的。通常如果开启了RPS会加重所有 CPU 的负担.</p>
+<h6 id="IRQ-中断请求-亲和绑定"><a href="#IRQ-中断请求-亲和绑定" class="headerlink" title="IRQ 中断请求 亲和绑定"></a>IRQ 中断请求 亲和绑定</h6><p><code>/proc/interrupts</code> 文件中可以看到各个 CPU 上的中断情况。</p>
+<p><code>/proc/irq/[irq_num]/smp_affinity_list</code> 可以查看指定中断当前绑定的 CPU。</p>
+<p>可以通过配置 IRQ affinity 指定 IRQ 由哪个 CPU 来处理中断, 先通过 <code>/proc/interrupts</code> 找到 IRQ 号之后，将希望绑定的 CPU 号写入 <code>/proc/irq/IRQ_NUMBER/smp_affinity</code>，写入的是 16 进制的 bit mask。比如看到队列 rx_0 对应的中断号是 41 那就执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo 6 &gt; &#x2F;proc&#x2F;irq&#x2F;41&#x2F;smp_affinity</span><br><span class="line">6 表示的是 CPU2 和 CPU1</span><br></pre></td></tr></table></figure>
+
+<p>0 号 CPU 的掩码是 0x1 (0001)，1 号 CPU 掩码是 0x2 (0010)，2 号 CPU 掩码是 0x4 (0100)，3 号 CPU 掩码是 0x8 (1000) 依此类推。</p>
+<h6 id="softirq-数统计"><a href="#softirq-数统计" class="headerlink" title="softirq 数统计"></a>softirq 数统计</h6><p>通过 <code>/proc/softirqs</code> 能看到每个 CPU 上 softirq 数量统计：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/softirqs</span><br><span class="line">                    CPU0       CPU1       </span><br><span class="line">          HI:          1          0</span><br><span class="line">       TIMER: 1650579324 3521734270</span><br><span class="line">      NET_TX:   10282064   10655064</span><br><span class="line">      NET_RX: 3618725935       2446</span><br><span class="line">       BLOCK:          0          0</span><br><span class="line">BLOCK_IOPOLL:          0          0</span><br><span class="line">     TASKLET:      47013      41496</span><br><span class="line">       SCHED: 1706483540 1003457088</span><br><span class="line">     HRTIMER:    1698047   11604871</span><br><span class="line">         RCU: 4218377992 3049934909</span><br></pre></td></tr></table></figure>
+
+<p>NET_RX 表示网卡收到包时候触发的 softirq，一般看这个统计是为了看看 softirq 在每个 CPU 上分布是否均匀，不均匀的话可能就需要做一些调整。比如上面看到 CPU0 和 CPU1 两个差距很大，原因是这个机器的 NIC 不支持 RSS，没有多个 Ring Buffer。开启 RPS 后就均匀多了。</p>
+<h6 id="如何开启RPS"><a href="#如何开启RPS" class="headerlink" title="如何开启RPS"></a>如何开启RPS</h6><p>RPS 默认是关闭的，当机器有多个 CPU 并且通过 softirqs 的统计 <code>/proc/softirqs</code> 发现 NET_RX 在 CPU 上分布不均匀或者发现网卡不支持 mutiqueue 时，就可以考虑开启 RPS。</p>
+<p>开启 RPS 需要调整 <code>/sys/class/net/DEVICE_NAME/queues/QUEUE/rps_cpus</code> 的值。比如执行:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo f &gt; &#x2F;sys&#x2F;class&#x2F;net&#x2F;eth0&#x2F;queues&#x2F;rx-0&#x2F;rps_cpus</span><br></pre></td></tr></table></figure>
+
+<p>表示的含义是处理网卡 eth0 的 rx-0 队列的 CPU 数设置为 f 。即设置有 15 个 CPU 来处理 rx-0 这个队列的数据，如果你的 CPU 数没有这么多就会默认使用所有 CPU 。</p>
+<h6 id="netdev-max-backlog调优"><a href="#netdev-max-backlog调优" class="headerlink" title="netdev_max_backlog调优"></a>netdev_max_backlog调优</h6><p>netdev_max_backlog 是内核从 NIC 收到包后，交由协议栈（如 IP、TCP ）处理之前的缓冲队列, 通过softnet_stat可以确定是否发生了netdev backlog队列溢出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@xxx ~]# cat &#x2F;proc&#x2F;net&#x2F;softnet_stat</span><br><span class="line">000000bf 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000028 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">000000c7 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000031 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">000021d8 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br><span class="line">00000929 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>每一行代表每个 CPU 核的状态统计，从 CPU0 依次往下。</li>
+<li>每一列代表一个 CPU 核的各项统计：第一列代表中断处理程序收到的包总数；第二列即代表由于 netdev_max_backlog 队列溢出而被丢弃的包总数。</li>
+<li>第3列表示软中断一次取走netdev_budget个数据包，或取数据包时间超过2ms的次数。</li>
+<li>第4~8列固定为0，没有意义。</li>
+<li>第9列表示发送数据包时，对应的队列被锁住的次数。</li>
+</ol>
+<p>netdev_max_backlog 的默认值是 1000，我们可以修改内核参数来调优：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl -w net.core.netdev_max_backlog=2000</span><br></pre></td></tr></table></figure>
+
+<h3 id="协议栈过程中的问题"><a href="#协议栈过程中的问题" class="headerlink" title="协议栈过程中的问题"></a>协议栈过程中的问题</h3><h3 id="socket-buffer过程中的问题"><a href="#socket-buffer过程中的问题" class="headerlink" title="socket buffer过程中的问题"></a>socket buffer过程中的问题</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://ylgrgyq.github.io/2017/07/23/linux-receive-packet-1/" target="_blank" rel="noopener">网络协议栈收包过程</a></li>
+<li><a href="https://leeweir.github.io/posts/irq-not-balance/" target="_blank" rel="noopener">关于网卡中断不均衡问题及其解决方案</a></li>
+<li><a href="https://leeweir.github.io/posts/linux-packet-loss/" target="_blank" rel="noopener">Linux 丢包那些事</a></li>
+<li><a href="https://www.wumingx.com/performance/network-performance.html" target="_blank" rel="noopener">网络性能优化之套路篇</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/11/17/linux-netstat/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">linux netstat命令</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/11/17/linux-nic2/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">linux-nic2</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux openssl 命令详解 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="openssl 命令模块openssl 命令主要包括以下几个模块：  version模块:   用于查看openssl版本信息 s_client&#x2F;s_server模块:  通用SSL&#x2F;TLS测试工具 genrsa: 用于生成私钥 x509： x509证书管理 verify:   x509证书验证 rsa:   RSA秘钥管理(例如对证书进行签名) rsautl:  用于完成RSA签名，验证，加密和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux openssl 命令详解">
+<meta property="og:url" content="https://github.com/fafucoder/2021/03/09/linux-openssl/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="openssl 命令模块openssl 命令主要包括以下几个模块：  version模块:   用于查看openssl版本信息 s_client&#x2F;s_server模块:  通用SSL&#x2F;TLS测试工具 genrsa: 用于生成私钥 x509： x509证书管理 verify:   x509证书验证 rsa:   RSA秘钥管理(例如对证书进行签名) rsautl:  用于完成RSA签名，验证，加密和">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1goe0dqpfj9j31790u0n53.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gorqrlbdctj30u010a7hq.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gorr0rglykj31uw0bkdip.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gorr4i3cuaj317e0h2tcz.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gorsowumboj31460u0k2v.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gort5xzo7tj30yu0u019a.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gortfb0gl3j311u0u013u.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1goqrfszbjkj31f30u07qz.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1goqs6p3em4j31de0h8goq.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1goqs8wu6t8j30zf0u07ik.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gorpma0xcvj30uk0u0wub.jpg">
+<meta property="article:published_time" content="2021-03-09T12:28:02.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.350Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1goe0dqpfj9j31790u0n53.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux openssl 命令详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux openssl 命令详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-03-09T12:28:02.000Z" itemprop="datePublished" class="page-time">
+  2021-03-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-openssl"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux openssl 命令详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-03-09 20:28:02" datetime="2021-03-09T12:28:02.000Z"  itemprop="datePublished">2021-03-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="openssl-命令模块"><a href="#openssl-命令模块" class="headerlink" title="openssl 命令模块"></a>openssl 命令模块</h3><p>openssl 命令主要包括以下几个模块：</p>
+<ul>
+<li>version模块:   用于查看openssl版本信息</li>
+<li>s_client/s_server模块:  通用SSL/TLS测试工具</li>
+<li>genrsa: 用于生成私钥</li>
+<li>x509： x509证书管理</li>
+<li>verify:   x509证书验证</li>
+<li>rsa:   RSA秘钥管理(例如对证书进行签名)</li>
+<li>rsautl:  用于完成RSA签名，验证，加密和解密功能</li>
+<li>req:      生成证书签名请求(CSR)</li>
+<li>enc:      用于加解密</li>
+<li>dgst:   生成信息摘要</li>
+<li>passwd:  生成散列密码</li>
+<li>rand:    生成伪随机数</li>
+<li>pkcs7:   PSCS#7协议数据管理</li>
+<li>ca:      CA管理(例如对证书进行签名)</li>
+<li>……..</li>
+</ul>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1goe0dqpfj9j31790u0n53.jpg" alt="openssl 命令模块" title="">
+            </p>
+
+<h4 id="openssl-s-client-模块"><a href="#openssl-s-client-模块" class="headerlink" title="openssl s_client 模块"></a>openssl s_client 模块</h4><p>s_client为一个SSL/TLS客户端程序，与s_server对应，它不仅能与s_server进行通信，也能与任何使用ssl协议的其他服务程序进行通信。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gorqrlbdctj30u010a7hq.jpg" alt="openssl s_client" title="">
+            </p>
+
+<p>使用s_client 获取百度的公钥:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 ~]# openssl s_client -connect www.baidu.com:443 -msg</span><br><span class="line">CONNECTED(00000003)</span><br><span class="line">depth=2 C = BE, O = GlobalSign nv-sa, OU = Root CA, CN = GlobalSign Root CA</span><br><span class="line">verify return:1</span><br><span class="line">depth=1 C = BE, O = GlobalSign nv-sa, CN = GlobalSign Organization Validation CA - SHA256 - G2</span><br><span class="line">verify return:1</span><br><span class="line">depth=0 C = CN, ST = beijing, L = beijing, OU = service operation department, O = "Beijing Baidu Netcom Science Technology Co., Ltd", CN = baidu.com</span><br><span class="line">verify return:1</span><br><span class="line">---</span><br><span class="line">Certificate chain</span><br><span class="line"> 0 s:/C=CN/ST=beijing/L=beijing/OU=service operation department/O=Beijing Baidu Netcom Science Technology Co., Ltd/CN=baidu.com</span><br><span class="line">   i:/C=BE/O=GlobalSign nv-sa/CN=GlobalSign Organization Validation CA - SHA256 - G2</span><br><span class="line"> 1 s:/C=BE/O=GlobalSign nv-sa/CN=GlobalSign Organization Validation CA - SHA256 - G2</span><br><span class="line">   i:/C=BE/O=GlobalSign nv-sa/OU=Root CA/CN=GlobalSign Root CA</span><br><span class="line">---</span><br><span class="line">Server certificate</span><br><span class="line">-----BEGIN CERTIFICATE-----</span><br><span class="line">MIIKLjCCCRagAwIBAgIMclh4Nm6fVugdQYhIMA0GCSqGSIb3DQEBCwUAMGYxCzAJ</span><br><span class="line">BgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTwwOgYDVQQDEzNH</span><br><span class="line">bG9iYWxTaWduIE9yZ2FuaXphdGlvbiBWYWxpZGF0aW9uIENBIC0gU0hBMjU2IC0g</span><br><span class="line">RzIwHhcNMjAwNDAyMDcwNDU4WhcNMjEwNzI2MDUzMTAyWjCBpzELMAkGA1UEBhMC</span><br><span class="line">Q04xEDAOBgNVBAgTB2JlaWppbmcxEDAOBgNVBAcTB2JlaWppbmcxJTAjBgNVBAsT</span><br><span class="line">HHNlcnZpY2Ugb3BlcmF0aW9uIGRlcGFydG1lbnQxOTA3BgNVBAoTMEJlaWppbmcg</span><br><span class="line">QmFpZHUgTmV0Y29tIFNjaWVuY2UgVGVjaG5vbG9neSBDby4sIEx0ZDESMBAGA1UE</span><br><span class="line">AxMJYmFpZHUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwamw</span><br><span class="line">rkca0lfrHRUfblyy5PgLINvqAN8p/6RriSZLnyMv7FewirhGQCp+vNxaRZdPrUEO</span><br><span class="line">vCCGSwxdVSFH4jE8V6fsmUfrRw1y18gWVHXv00URD0vOYHpGXCh0ro4bvthwZnuo</span><br><span class="line">k0ko0qN2lFXefCfyD/eYDK2G2sau/Z/w2YEympfjIe4EkpbkeBHlxBAOEDF6Speg</span><br><span class="line">68ebxNqJN6nDN9dWsX9Sx9kmCtavOBaxbftzebFoeQOQ64h7jEiRmFGlB5SGpXhG</span><br><span class="line">eY9Ym+k1Wafxe1cxCpDPJM4NJOeSsmrp5pY3Crh8hy900lzoSwpfZhinQYbPJqYI</span><br><span class="line">jqVJF5JTs5Glz1OwMQIDAQABo4IGmDCCBpQwDgYDVR0PAQH/BAQDAgWgMIGgBggr</span><br><span class="line">BgEFBQcBAQSBkzCBkDBNBggrBgEFBQcwAoZBaHR0cDovL3NlY3VyZS5nbG9iYWxz</span><br><span class="line">aWduLmNvbS9jYWNlcnQvZ3Nvcmdhbml6YXRpb252YWxzaGEyZzJyMS5jcnQwPwYI</span><br><span class="line">KwYBBQUHMAGGM2h0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9nc29yZ2FuaXph</span><br><span class="line">dGlvbnZhbHNoYTJnMjBWBgNVHSAETzBNMEEGCSsGAQQBoDIBFDA0MDIGCCsGAQUF</span><br><span class="line">BwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAIBgZn</span><br><span class="line">gQwBAgIwCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmds</span><br><span class="line">b2JhbHNpZ24uY29tL2dzL2dzb3JnYW5pemF0aW9udmFsc2hhMmcyLmNybDCCA04G</span><br><span class="line">A1UdEQSCA0UwggNBggliYWlkdS5jb22CDGJhaWZ1YmFvLmNvbYIMd3d3LmJhaWR1</span><br><span class="line">LmNughB3d3cuYmFpZHUuY29tLmNugg9tY3QueS5udW9taS5jb22CC2Fwb2xsby5h</span><br><span class="line">dXRvggZkd3ouY26CCyouYmFpZHUuY29tgg4qLmJhaWZ1YmFvLmNvbYIRKi5iYWlk</span><br><span class="line">dXN0YXRpYy5jb22CDiouYmRzdGF0aWMuY29tggsqLmJkaW1nLmNvbYIMKi5oYW8x</span><br><span class="line">MjMuY29tggsqLm51b21pLmNvbYINKi5jaHVhbmtlLmNvbYINKi50cnVzdGdvLmNv</span><br><span class="line">bYIPKi5iY2UuYmFpZHUuY29tghAqLmV5dW4uYmFpZHUuY29tgg8qLm1hcC5iYWlk</span><br><span class="line">dS5jb22CDyoubWJkLmJhaWR1LmNvbYIRKi5mYW55aS5iYWlkdS5jb22CDiouYmFp</span><br><span class="line">ZHViY2UuY29tggwqLm1pcGNkbi5jb22CECoubmV3cy5iYWlkdS5jb22CDiouYmFp</span><br><span class="line">ZHVwY3MuY29tggwqLmFpcGFnZS5jb22CCyouYWlwYWdlLmNugg0qLmJjZWhvc3Qu</span><br><span class="line">Y29tghAqLnNhZmUuYmFpZHUuY29tgg4qLmltLmJhaWR1LmNvbYISKi5iYWlkdWNv</span><br><span class="line">bnRlbnQuY29tggsqLmRsbmVsLmNvbYILKi5kbG5lbC5vcmeCEiouZHVlcm9zLmJh</span><br><span class="line">aWR1LmNvbYIOKi5zdS5iYWlkdS5jb22CCCouOTEuY29tghIqLmhhbzEyMy5iYWlk</span><br><span class="line">dS5jb22CDSouYXBvbGxvLmF1dG+CEioueHVlc2h1LmJhaWR1LmNvbYIRKi5iai5i</span><br><span class="line">YWlkdWJjZS5jb22CESouZ3ouYmFpZHViY2UuY29tgg4qLnNtYXJ0YXBwcy5jboIN</span><br><span class="line">Ki5iZHRqcmN2LmNvbYIMKi5oYW8yMjIuY29tggwqLmhhb2thbi5jb22CDyoucGFl</span><br><span class="line">LmJhaWR1LmNvbYIRKi52ZC5iZHN0YXRpYy5jb22CEmNsaWNrLmhtLmJhaWR1LmNv</span><br><span class="line">bYIQbG9nLmhtLmJhaWR1LmNvbYIQY20ucG9zLmJhaWR1LmNvbYIQd24ucG9zLmJh</span><br><span class="line">aWR1LmNvbYIUdXBkYXRlLnBhbi5iYWlkdS5jb20wHQYDVR0lBBYwFAYIKwYBBQUH</span><br><span class="line">AwEGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFJbeYfG9HBYpUxzAzH07gwBA5hp8MB0G</span><br><span class="line">A1UdDgQWBBSeyXnX6VurihbMMo7GmeafIEI1hzCCAX4GCisGAQQB1nkCBAIEggFu</span><br><span class="line">BIIBagFoAHYAXNxDkv7mq0VEsV6a1FbmEDf71fpH3KFzlLJe5vbHDsoAAAFxObU8</span><br><span class="line">ugAABAMARzBFAiBphmgxIbNZXaPWiUqXRWYLaRST38KecoekKIof5fXmsgIhAMkZ</span><br><span class="line">tF8XyKCu/nZll1e9vIlKbW8RrUr/74HpmScVRRsBAHYAb1N2rDHwMRnYmQCkURX/</span><br><span class="line">dxUcEdkCwQApBo2yCJo32RMAAAFxObU85AAABAMARzBFAiBURWwwTgXZ+9IV3mhm</span><br><span class="line">E0EOzbg901DLRszbLIpafDY/XgIhALsvEGqbBVrpGxhKoTVlz7+GWom8SrfUeHcn</span><br><span class="line">4+9Dn7xGAHYA9lyUL9F3MCIUVBgIMJRWjuNNExkzv98MLyALzE7xZOMAAAFxObU8</span><br><span class="line">qwAABAMARzBFAiBFBYPxKEdhlf6bqbwxQY7tskgdoFulPxPmdrzS5tNpPwIhAKnK</span><br><span class="line">qwzch98lINQYzLAV52+C8GXZPXFZNfhfpM4tQ6xbMA0GCSqGSIb3DQEBCwUAA4IB</span><br><span class="line">AQC83ALQ2d6MxeLZ/k3vutEiizRCWYSSMYLVCrxANdsGshNuyM8B8V/A57c0Nzqo</span><br><span class="line">CPKfMtX5IICfv9P/bUecdtHL8cfx24MzN+U/GKcA4r3a/k8pRVeHeF9ThQ2zo1xj</span><br><span class="line">k/7gJl75koztdqNfOeYiBTbFMnPQzVGqyMMfqKxbJrfZlGAIgYHT9bd6T985IVgz</span><br><span class="line">tRVjAoy4IurZenTsWkG7PafJ4kAh6jQaSu1zYEbHljuZ5PXlkhPO9DwW1WIPug6Z</span><br><span class="line">rlylLTTYmlW3WETOATi70HYsZN6NACuZ4t1hEO3AsF7lqjdA2HwTN10FX2HuaUvf</span><br><span class="line">5OzP+PKupV9VKw8x8mQKU6vr</span><br><span class="line">-----END CERTIFICATE-----</span><br><span class="line">subject=/C=CN/ST=beijing/L=beijing/OU=service operation department/O=Beijing Baidu Netcom Science Technology Co., Ltd/CN=baidu.com</span><br><span class="line">issuer=/C=BE/O=GlobalSign nv-sa/CN=GlobalSign Organization Validation CA - SHA256 - G2</span><br><span class="line">---</span><br><span class="line">No client certificate CA names sent</span><br><span class="line">Peer signing digest: SHA256</span><br><span class="line">Server Temp Key: ECDH, P-256, 256 bits</span><br><span class="line">---</span><br><span class="line">SSL handshake has read 4392 bytes and written 415 bytes</span><br><span class="line">---</span><br><span class="line">New, TLSv1/SSLv3, Cipher is ECDHE-RSA-AES128-GCM-SHA256</span><br><span class="line">Server public key is 2048 bit</span><br><span class="line">Secure Renegotiation IS supported</span><br><span class="line">Compression: NONE</span><br><span class="line">Expansion: NONE</span><br><span class="line">No ALPN negotiated</span><br><span class="line">SSL-Session:</span><br><span class="line">    Protocol  : TLSv1.2</span><br><span class="line">    Cipher    : ECDHE-RSA-AES128-GCM-SHA256</span><br><span class="line">    Session-ID: A9961C486ACB6F5924E86E822E48559DBD572EE990D790C845CBE512FE62B069</span><br><span class="line">    Session-ID-ctx: </span><br><span class="line">    Master-Key: 8D0DC84049E24BDBB3B45B1A73375F04E4D65E51D59F17EBAD513C68D14B65E5B9218317050827352392808C9DFBC3DA</span><br><span class="line">    Key-Arg   : None</span><br><span class="line">    Krb5 Principal: None</span><br><span class="line">    PSK identity: None</span><br><span class="line">    PSK identity hint: None</span><br><span class="line">    TLS session ticket:</span><br><span class="line">    0000 - 45 aa 4e e0 47 04 bf ef-18 a2 10 48 8e d6 ec 94   E.N.G......H....</span><br><span class="line">    0010 - 89 f4 c8 dc cc 86 5b 2b-fe f9 95 e6 97 14 28 45   ......[+......(E</span><br><span class="line">    0020 - 1c 3f 6e ad 7c 2d f5 d8-55 a5 5a 43 83 e0 af 80   .?n.|-..U.ZC....</span><br><span class="line">    0030 - 7f a4 49 5a cd d0 ea f3-0c 18 f7 e1 36 7c 17 28   ..IZ........6|.(</span><br><span class="line">    0040 - 56 9a 9d 0c 6a 9f e7 c5-18 cf 28 c1 ba e5 b0 8b   V...j.....(.....</span><br><span class="line">    0050 - 95 5a 83 27 95 9d ba 3e-2b 96 89 f2 3c 54 52 b0   .Z.'...&gt;+...&lt;TR.</span><br><span class="line">    0060 - 76 b0 75 6f 03 67 32 77-0b 62 f8 bc 7d 75 07 68   v.uo.g2w.b..&#125;u.h</span><br><span class="line">    0070 - 65 fd bb 88 80 83 d2 5b-80 2e 50 97 56 a0 94 5e   e......[..P.V..^</span><br><span class="line">    0080 - e6 4e 37 f6 e8 96 1c d2-cf fd 8b 74 0d 6b eb 98   .N7........t.k..</span><br><span class="line">    0090 - 64 0c 4e 88 30 26 17 03-11 58 30 60 75 b5 c6 5f   d.N.0&amp;...X0`u.._</span><br><span class="line"></span><br><span class="line">    Start Time: 1616261167</span><br><span class="line">    Timeout   : 300 (sec)</span><br><span class="line">    Verify return code: 0 (ok)</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="openssl-verify-模块"><a href="#openssl-verify-模块" class="headerlink" title="openssl verify 模块"></a>openssl verify 模块</h4><p>openssl verify 用于验证证书是否合法，还可以用于验证子证书是否是父证书签的.</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gorr0rglykj31uw0bkdip.jpg" alt="openssl verify" title="">
+            </p>
+
+<p>验证子证书是否由父证书签发的:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 openssl2]# openssl verify rootCA.crt</span><br><span class="line">rootCA.crt: C = CN, ST = Fujian, L = Fuzhou, O = Root CA, CN = Root CA</span><br><span class="line">error 18 at 0 depth lookup:self signed certificate</span><br><span class="line">OK</span><br><span class="line">[root@node1 openssl2]# openssl verify -CAfile rootCA.crt harbor.crt</span><br><span class="line">harbor.crt: OK</span><br></pre></td></tr></table></figure>
+
+<h4 id="openssl-genrsa-模块"><a href="#openssl-genrsa-模块" class="headerlink" title="openssl genrsa 模块"></a>openssl genrsa 模块</h4><p>openssl genrsa用于生成私钥(只生成私钥)</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gorr4i3cuaj317e0h2tcz.jpg" alt="openssl genrsa" title="">
+            </p>
+
+<p>-out filename: 将生成的私钥保存至filename文件,若未指定输出文件,则为标准输出。<br>-des:生成的密钥使用des方式进行加密。<br>-des3:生成的密钥使用des3方式进行加密。<br>-passout args:加密私钥文件时,传递密码的格式,如果要加密私钥文件时单未指定该项,则提示输入密码。传递密码的args的格式,可从密码、环境变量、文件、终端等输入。<br>      a. pass:password:password表示传递的明文密码<br>      b. env:var:从环境变量var获取密码值<br>      c .file:filename:filename文件中的第一行为要传递的密码。若filename同时传递给”-passin”和”-passout”选项，则filename的第一行为”-passin”的值，第二行为”-passout”的值<br>      d. stdin:从标准输入中获取要传递的密码</p>
+<p>numbits: 指定要生成的私钥的长度,默认为1024。该项必须为命令行的最后一项参数。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 输入密码的方式</span></span><br><span class="line">openssl genrsa -des3 -out rootCA.key 2048</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 环境变量的方式</span></span><br><span class="line">export passwd=admin</span><br><span class="line">openssl genrsa -des3 -out rootCA.key -passout env:passwd 2048</span><br></pre></td></tr></table></figure>
+
+<h4 id="openssl-rsa-模块"><a href="#openssl-rsa-模块" class="headerlink" title="openssl rsa 模块"></a>openssl rsa 模块</h4><p>rsa模块用于生成的密码的管理，包括查看秘钥的信息，更改秘钥的密码等</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 去除genrsa生成的密码(每次都要输入密码怪麻烦的~)</span></span><br><span class="line">openssl rsa -in rootCA.key -out rootCA.key</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看私钥的信息</span></span><br><span class="line">openssl rsa -in rootCA.key -noout -text</span><br></pre></td></tr></table></figure>
+
+<h4 id="openssl-req-模块"><a href="#openssl-req-模块" class="headerlink" title="openssl req 模块"></a>openssl req 模块</h4><p>req大致有3个功能：生成证书请求文件、验证证书请求文件和创建根CA。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gorsowumboj31460u0k2v.jpg" alt="openssl req" title="">
+            </p>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看csr的信息</span></span><br><span class="line">openssl req -in harbor.csr -noout -text</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看csr 的subject 信息</span></span><br><span class="line">openssl req -new -in harbor.csr -subject -noout</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 验证csr 是否合法</span></span><br><span class="line">openssl req -in harbor.csr -verify</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建csr</span></span><br><span class="line">openssl req -new -key harbor.key -out harbor.csr</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建csr和私钥(</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -newkey选项和-new选项类似，只不过-newkey选项可以直接指定私钥的算法和长度，所以它主要用在openssl req自动创建私钥。</span></span><br><span class="line">openssl req -newkey rsa:2038 -keyout harbor.key -out harbor.csr</span><br></pre></td></tr></table></figure>
+
+<h4 id="openssl-x509-模块"><a href="#openssl-x509-模块" class="headerlink" title="openssl x509 模块"></a>openssl x509 模块</h4><p>x509 模块主要的功能有 签署证书请求文件、生成自签名证书、转换证书格式等。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gort5xzo7tj30yu0u019a.jpg" alt="openssl x509" title="">
+            </p>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看公钥信息</span></span><br><span class="line">openssl x509 -in harbor.crt -noout -text</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看公钥颁发者信息/所有者信息</span></span><br><span class="line">openssl x509 -in harbor.crt -text -issuer/-subjet</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成公钥</span></span><br><span class="line">openssl x509 -req -in harbor.csr -signkey harbor.key -out harbor.crt</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 签署CA证书</span></span><br><span class="line">openssl x509 -req -CA rootCA.crt -CAkey rootCA.key -in sub.csr -out sub.crt -days 365 -CAcreateserial</span><br></pre></td></tr></table></figure>
+
+<h4 id="openssl-ca-模块"><a href="#openssl-ca-模块" class="headerlink" title="openssl ca 模块"></a>openssl ca 模块</h4><p>ca命令能够签发证书请求文件生成证书</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gortfb0gl3j311u0u013u.jpg" alt="openssl ca" title="">
+            </p>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl ca -config openssl.cnf -days 365 -create_serial -in harbor.csr -out harbor.crt  -extensions ca_ext -extensions req_ext -notext</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建一个自签名证书"><a href="#创建一个自签名证书" class="headerlink" title="创建一个自签名证书"></a>创建一个自签名证书</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建根证书</span></span><br><span class="line">openssl req -x509 -days 365 -newkey rsa:2048 -out rootCA.crt -keyout rootCA.key -nodes</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建子证书的私钥跟rsa</span></span><br><span class="line">openssl genrsa -des3 -out sub.key 2048</span><br><span class="line">openssl rsa -in sub.key -out sub.key #去除私钥的密码</span><br><span class="line">openssl req -new -key sub.key -out sub.csr</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用根证书签名子证书</span></span><br><span class="line">openssl x509 -req -CA rootCA.crt -CAkey rootCA.key -in sub.csr -out sub.crt -days 365 -set_serial 123 #-set_serial 用于设置sub.crt 的SN序列号</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 验证子证书</span></span><br><span class="line">openssl verify -CAfile rootCA.crt sub.crt</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看子证书的公钥信息(可以看到issuer为根证书的信息)</span></span><br><span class="line">openssl x509 -in sub.crt -noout -text</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建带SAN的自签名证书"><a href="#创建带SAN的自签名证书" class="headerlink" title="创建带SAN的自签名证书"></a>创建带SAN的自签名证书</h3><h4 id="什么叫SAN"><a href="#什么叫SAN" class="headerlink" title="什么叫SAN"></a>什么叫SAN</h4><p>SAN(Subject Alternative Name) 是 SSL 标准 x509 中定义的一个扩展。使用了 SAN 字段的 SSL 证书，可以扩展此证书支持的域名，使得一个证书可以支持多个不同域名的解析。(下面是百度证书中的SAN信息)</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1goqrfszbjkj31f30u07qz.jpg" alt="百度SAN" title="">
+            </p>
+
+<h4 id="如何创建带SAN的自签证书"><a href="#如何创建带SAN的自签证书" class="headerlink" title="如何创建带SAN的自签证书"></a>如何创建带SAN的自签证书</h4><p>​    上个步骤中，创建的自签名证书由于没有带SAN信息，所以无法在浏览器中使用(一般作为中间证书使用)，如果要在浏览器中使用，必须带有SAN信息，</p>
+<p>​    在真实场景下，根证书自身就是可信的(内置在操作系统中), 然后由根证书签发中间证书，中间证书再签发最终的SAN证书, 所以一般的流程为先创建根证书，然后创建中间证书，由中间证书签发最终的证书。接下来将创建一个带SAN的自签名证书</p>
+<ol>
+<li><p>创建根证书</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl req -x509 -days 365 -newkey rsa:2048 -out rootCA.crt -keyout rootCA.key -nodes</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>生成中间证书的私钥和CSR。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl req -new -nodes -keyout intermediate.key -out intermediate.csr</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>添加san配置信息如下(只需要修改域名信息即可), 其中alt_names 保存域名信息(暂时保存为openssl.cnf)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">[ req ]</span><br><span class="line">default_bits       = 2048</span><br><span class="line">distinguished_name = req_distinguished_name</span><br><span class="line">req_extensions     = req_ext</span><br><span class="line"></span><br><span class="line">[ ca ]</span><br><span class="line">default_ca = intermediate_ca</span><br><span class="line"></span><br><span class="line">[ intermediate_ca ]</span><br><span class="line">dir = .</span><br><span class="line">private_key = $dir/rootCA.key</span><br><span class="line">certificate = $dir/rootCA.crt</span><br><span class="line">new_certs_dir = $dir/</span><br><span class="line">serial = $dir/crt.srl</span><br><span class="line">database = $dir/db/index</span><br><span class="line">default_md = sha256</span><br><span class="line">policy = policy_any</span><br><span class="line">email_in_dn = no</span><br><span class="line"></span><br><span class="line">[ req_distinguished_name ]</span><br><span class="line">countryName                 = Country Name (2 letter code)</span><br><span class="line">stateOrProvinceName         = State or Province Name (full name)</span><br><span class="line">localityName                = Locality Name (eg, city)</span><br><span class="line">organizationName            = Organization Name (eg, company)</span><br><span class="line">commonName                  = Common Name (eg, your name or your server\'s hostname)</span><br><span class="line">emailAddress                = Email Address</span><br><span class="line"></span><br><span class="line">[ policy_any ]</span><br><span class="line">domainComponent = optional</span><br><span class="line">countryName = optional</span><br><span class="line">stateOrProvinceName = optional</span><br><span class="line">localityName = optional</span><br><span class="line">organizationName = optional</span><br><span class="line">organizationalUnitName = optional</span><br><span class="line">commonName = optional</span><br><span class="line">emailAddress = optional</span><br><span class="line"></span><br><span class="line">[ ca_ext ]</span><br><span class="line">keyUsage                = critical,keyCertSign,cRLSign</span><br><span class="line"><span class="meta">#</span><span class="bash"> 注意这里设置了CA:<span class="literal">true</span>，表明使用该配置生成的证书是CA证书，可以用于签发用户证书</span></span><br><span class="line">basicConstraints        = critical,CA:true</span><br><span class="line">subjectKeyIdentifier    = hash</span><br><span class="line">authorityKeyIdentifier  = keyid:always</span><br><span class="line"></span><br><span class="line">[ req_ext ]</span><br><span class="line">subjectAltName          = @alt_names</span><br><span class="line"></span><br><span class="line">[alt_names]</span><br><span class="line"><span class="meta">#</span><span class="bash"> 填写域名</span></span><br><span class="line">DNS.1   = hello.com</span><br><span class="line">DNS.2   = san.com</span><br><span class="line">DNS.3   = harbor.com</span><br><span class="line">DNS.4   = *.baidu.com</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建数据库</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir db</span><br><span class="line">touch db/index</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>生成证书的私钥和CSR</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl req -newkey rsa:2048 -nodes -out harbor.csr -keyout harbor.key -config openssl.cnf</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1goqs6p3em4j31de0h8goq.jpg" alt="csr" title="">
+            </p>
+
+<p>验证CSR中是否包含文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl req -in harbor.csr -noout -text</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1goqs8wu6t8j30zf0u07ik.jpg" alt="验证csr" title="">
+            </p>
+
+<ol start="6">
+<li>生成公钥</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl ca -config openssl.cnf -days 365 -create_serial -in harbor.csr -out harbor.crt  -extensions ca_ext -extensions req_ext -notext</span><br></pre></td></tr></table></figure>
+
+<p>验证公钥是否包含SAN</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -in harbor.crt -noout -text</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gorpma0xcvj30uk0u0wub.jpg" alt="验证公钥" title="">
+            </p>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://blog.csdn.net/baidu_36649389/article/details/54379935" target="_blank" rel="noopener">https://blog.csdn.net/baidu_36649389/article/details/54379935</a>  //openssl 命令</li>
+<li><a href="https://my.oschina.net/sskxyz/blog/1554093?utm_source=debugrun&utm_medium=referral" target="_blank" rel="noopener">openssl SAN证书</a> //如何创建带SAN证书</li>
+<li><a href="https://geekflare.com/san-ssl-certificate/" target="_blank" rel="noopener">openssl SAN证书</a>  //英文版</li>
+<li><a href="https://blog.csdn.net/php_boy/article/details/6660697" target="_blank" rel="noopener">cakey.pem 找不到解决方法</a>  //创建SAN证书中，无法找到cakey.pem的解决方法</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/03/17/docker-dockerfile/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">dockerfile 最佳实践</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/03/09/linux-ceritificate/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">关于x509证书的梳理</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

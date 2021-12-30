@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>docker 镜像是怎样炼成的 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="docker">
+    <meta name="description" content="Docker 简介Docker 是一个构建，发布和运行应用程序的开放平台。Docker 以容器为资源分隔和调度的基本单位，容器封装了整个项目运行时所需要的所有环境，通过 Docker 你可以将应用程序与基础架构分离，像管理应用程序一样管理基础架构，以便快速完成项目的部署与交付(docker 本质还是一个进程，只不过这个进程被关进了小黑屋)。 docker 与传统的虚拟化技术区别传统虚拟机技术是虚拟">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker 镜像是怎样炼成的">
+<meta property="og:url" content="https://github.com/fafucoder/2021/07/28/docker-image/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="Docker 简介Docker 是一个构建，发布和运行应用程序的开放平台。Docker 以容器为资源分隔和调度的基本单位，容器封装了整个项目运行时所需要的所有环境，通过 Docker 你可以将应用程序与基础架构分离，像管理应用程序一样管理基础架构，以便快速完成项目的部署与交付(docker 本质还是一个进程，只不过这个进程被关进了小黑屋)。 docker 与传统的虚拟化技术区别传统虚拟机技术是虚拟">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt084pww6ij30zq0fg0u7.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt09h6g14oj31380ka40r.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsy8qkirb0j30zw0tiwh9.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsy8vzdj26j31dw0pc40n.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsx2adhgauj30y80783yq.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsx192u19nj30r80x440j.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsx1es0afuj31620ocgs4.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNgy1gsx2sg6azij316c0iewf3.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsy83q4f2aj30w006s0ss.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsy86pccjbj31fk0260su.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt2peemzakj312w0u0jv1.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gsz7qvscwmj31qq0ggtei.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gszacahe66j31gs03cdgi.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt1jxsria5j31lv0u0jwe.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt1mm3241qj30wa0sqdj2.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt0ant3ao0j61750u00ts02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt0b8ajmpzj617k0lsdiq02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt0bmp76u7j315i0asmz3.jpg">
+<meta property="article:published_time" content="2021-07-28T12:10:35.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.324Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt084pww6ij30zq0fg0u7.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">docker 镜像是怎样炼成的</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">docker 镜像是怎样炼成的</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-07-28T12:10:35.000Z" itemprop="datePublished" class="page-time">
+  2021-07-28
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/docker/">docker</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-docker-image"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">docker 镜像是怎样炼成的</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-07-28 20:10:35" datetime="2021-07-28T12:10:35.000Z"  itemprop="datePublished">2021-07-28</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/docker/">docker</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="Docker-简介"><a href="#Docker-简介" class="headerlink" title="Docker 简介"></a>Docker 简介</h2><p>Docker 是一个构建，发布和运行应用程序的开放平台。Docker 以容器为资源分隔和调度的基本单位，容器封装了整个项目运行时所需要的所有环境，通过 Docker 你可以将应用程序与基础架构分离，像管理应用程序一样管理基础架构，以便快速完成项目的部署与交付(docker 本质还是一个进程，只不过这个进程被关进了小黑屋)。</p>
+<h3 id="docker-与传统的虚拟化技术区别"><a href="#docker-与传统的虚拟化技术区别" class="headerlink" title="docker 与传统的虚拟化技术区别"></a>docker 与传统的虚拟化技术区别</h3><p>传统虚拟机技术是虚拟出一套硬件后，在其上运行一个完整操作系统，进而在该系统上运行所需应用进程；而 Docker 容器内的应用进程则是直接运行于宿主的内核，容器内没有自己的内核，而且也没有进行硬件虚拟，因此要比传统虚拟机更为轻便。</p>
+<blockquote>
+<p>关于什么是Hypervisor,  <a href="https://zh.wikipedia.org/wiki/Hypervisor" target="_blank" rel="noopener">维基百科</a>是这样说的：Hypervisor，又称虚拟机监控器（英语：virtual machine monitor，缩写为 VMM），是用来创建与运行<a href="https://zh.wikipedia.org/wiki/虛擬機器" target="_blank" rel="noopener">虚拟机</a>的软件、固件或硬件。</p>
+</blockquote>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt084pww6ij30zq0fg0u7.jpg" alt="docker vs 虚拟化" title="">
+            </p>
+
+<h3 id="Docker-架构与核心概念"><a href="#Docker-架构与核心概念" class="headerlink" title="Docker 架构与核心概念"></a>Docker 架构与核心概念</h3><p>Docker 使用 client-server 架构， Docker 客户端将命令发送给 Docker 守护进程，后者负责构建，运行和分发 Docker 容器。 Docker 客户端和守护程序使用 REST API，通过 UNIX 套接字或网络接口进行通信。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt09h6g14oj31380ka40r.jpg" alt="docker 架构" title="">
+            </p>
+
+<h3 id="docker常见命令"><a href="#docker常见命令" class="headerlink" title="docker常见命令"></a>docker常见命令</h3><p>Docker 提供了大量命令用于管理镜像、容器和服务，命令的统一使用格式为：<code>docker [OPTIONS] COMMAND</code></p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsy8qkirb0j30zw0tiwh9.jpg" alt="docker command" title="">
+            </p>
+
+<h4 id="1-基础命令"><a href="#1-基础命令" class="headerlink" title="1. 基础命令"></a>1. 基础命令</h4><ul>
+<li><strong>docker version</strong>：用于查看 docker 的版本信息</li>
+<li><strong>docker info</strong>：用于查看 docker 的配置信息</li>
+<li><strong>docker help</strong>：用于查看帮助信息</li>
+</ul>
+<h4 id="2-镜像相关命令"><a href="#2-镜像相关命令" class="headerlink" title="2. 镜像相关命令"></a>2. 镜像相关命令</h4><ul>
+<li><strong>docker search 镜像名</strong>：从官方镜像仓库 Docker Hub 查找指定名称的镜像。常用参数为 <code>--no-trunc</code>，代表显示完整的镜像信息。</li>
+<li><strong>docker images</strong>:   列出所有顶层镜像的相关信息。</li>
+<li><strong>docker pull  镜像名 [:TAG]</strong>：从官方仓库下载镜像，<code>:TAG</code> 为镜像版本，不加则默认下载最新版本。</li>
+<li><strong>docker rmi 镜像名或ID [:TAG]</strong>:  删除指定版本的镜像，不加 <code>:TAG</code> 则默认删除镜像的最新版本。</li>
+<li><strong>docker inspect 镜像名或ID [:TAG]</strong>: 查看镜像的详细信息</li>
+<li><strong>docker push 镜像名或ID [:TAG]</strong>: 推送镜像到镜像仓库</li>
+<li><strong>docker image save</strong>: 保存镜像(为tar包)</li>
+<li><strong>docker image load</strong>: 加载镜像(从tar包或者标准输入)</li>
+</ul>
+<h4 id="3-容器相关命令"><a href="#3-容器相关命令" class="headerlink" title="3. 容器相关命令"></a>3. 容器相关命令</h4><ul>
+<li><strong>docker run [OPTIONS] IMAGE [COMMAND] [ARG…]</strong>: 新建并启动容器</li>
+<li><strong>docker ps [OPTIONS]</strong>: 列出当前所有正在运行的容器。</li>
+<li><strong>docker start|restart|stop|kill 容器名或ID</strong>: start 命令用于启动已有的容器，restart 用于重启正在运行的容器，stop 用于停止正在运行的容器，kill  用于强制停止容器</li>
+<li><strong>docker rm 容器名或ID</strong>: 删除已停止的容器</li>
+<li><strong>docker insepct 容器名或ID</strong>: 查看容器或者镜像的详细信息</li>
+<li><strong>docker exec -it 容器名或ID sh|/bin/bash</strong>: 进入正在运行的容器，与容器主进程交互</li>
+<li><strong>docker logs 容器名或ID</strong>: 查看容器日志</li>
+<li><strong>docker commit container imageName:tag</strong>: 从容器创建一个新的镜像</li>
+</ul>
+<p>下面这张图是docker 容器的状态流转图，方便助记:</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsy8vzdj26j31dw0pc40n.jpg" alt="docker 命令流转图" title="">
+            </p>
+
+<h2 id="镜像是怎样炼成的"><a href="#镜像是怎样炼成的" class="headerlink" title="镜像是怎样炼成的"></a>镜像是怎样炼成的</h2><h3 id="从OCI规范说起"><a href="#从OCI规范说起" class="headerlink" title="从OCI规范说起"></a>从OCI规范说起</h3><p>OCI 即Open Container Initiative, linux基金会与2015年6月成立的组织，旨在围绕容器格式和运行时制定一个开放的工业化标准。目前 OCI 主要有三个规范：运行时规范 <a href="https://github.com/opencontainers/runtime-spec">runtime-spec</a> ，镜像规范 <a href="https://www.github.com/opencontainers/image-spec" target="_blank" rel="noopener">image-spec</a> 以及不常见的镜像仓库规范 <a href="https://github.com/opencontainers/distribution-spec">distribution-spec</a> 。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsx2adhgauj30y80783yq.jpg" alt="oci spec" title="">
+            </p>
+
+<h4 id="Image-Spec"><a href="#Image-Spec" class="headerlink" title="Image Spec"></a>Image Spec</h4><p>OCI 规范中的镜像规范(image-spec) 决定了我们的镜像按照什么标准来构建，以及构建完镜像之后如何存放，接着下文提到的 Dockerfile 则决定了镜像的 layer 内容以及镜像的一些元数据信息。一个镜像规范 image-spec 和一个 Dockerfile 就指导着我们构建一个镜像，那么接下来我们就简单了解一下这个镜像规范，看看镜像是长什么样子的，对镜像有个大体的主观认识。官方的image spec主要由以下文件组成:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">├── annotations.md         # 注解规范</span><br><span class="line">├── config.md              # image config 文件规范</span><br><span class="line">├── considerations.md      # 注意事项</span><br><span class="line">├── conversion.md          # 转换为 OCI 运行时</span><br><span class="line">├── descriptor.md          # OCI Content Descriptors 内容描述</span><br><span class="line">├── image-index.md         # manifest list 文件</span><br><span class="line">├── image-layout.md        # 镜像的布局</span><br><span class="line">├── implementations.md     # 使用 OCI 规范的项目</span><br><span class="line">├── layer.md               # 镜像层 layer 规范</span><br><span class="line">├── manifest.md            # manifest 规范</span><br><span class="line">├── media-types.md         # 文件类型</span><br><span class="line">├── README.md              # README 文档</span><br><span class="line">├── spec.md                # OCI 镜像规范的概览</span><br></pre></td></tr></table></figure>
+
+<h5 id="Layer"><a href="#Layer" class="headerlink" title="Layer"></a>Layer</h5><p><a href="https://github.com/opencontainers/image-spec/blob/master/layer.md">文件系统</a>：以 layer （镜像层）保存的文件系统，每个 layer 保存了和上层之间变化的部分，layer 应该保存哪些文件，怎么表示增加、修改和删除的文件等。</p>
+<h5 id="Image-config"><a href="#Image-config" class="headerlink" title="Image config"></a>Image config</h5><p><a href="https://github.com/opencontainers/image-spec/blob/master/config.md">image config</a> 文件: 保存了文件系统的层级信息（每个层级的 hash 值，以及历史信息），以及容器运行时需要的一些信息（比如环境变量、工作目录、命令参数、mount 列表），指定了镜像在某个特定平台和系统的配置(比较接近我们使用 <code>docker inspect &lt;image_id&gt;</code> 看到的内容,  通过docker save一个镜像后解压，里面会有config信息)。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"architecture"</span>: <span class="string">"amd64"</span>,</span><br><span class="line">  <span class="attr">"config"</span>: &#123;</span><br><span class="line">    <span class="attr">"Env"</span>: [</span><br><span class="line">      <span class="string">"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"</span>,</span><br><span class="line">      <span class="string">"DOCKER_VERSION=20.10.6"</span>,</span><br><span class="line">      <span class="string">"DOCKER_TLS_CERTDIR=/certs"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"Entrypoint"</span>: [</span><br><span class="line">      <span class="string">"docker-entrypoint.sh"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"Cmd"</span>: [</span><br><span class="line">      <span class="string">"sh"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"OnBuild"</span>: <span class="literal">null</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"created"</span>: <span class="string">"2021-07-22T07:20:09.896531Z"</span>,</span><br><span class="line">  <span class="attr">"history"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T19:19:39.267885491Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop) ADD file:8ec69d882e7f29f0652d537557160e638168550f738d0d49f90a7ef96bf31787 in / "</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T19:19:39.643236135Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop)  CMD [\"/bin/sh\"]"</span>,</span><br><span class="line">      <span class="attr">"empty_layer"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:16:58.64055643Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c apk add --no-cache \t\tca-certificates \t\topenssh-client"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:16:59.651022704Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c [ ! -e /etc/nsswitch.conf ] &amp;&amp; echo 'hosts: files dns' &gt; /etc/nsswitch.conf"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:16:59.839384238Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop)  ENV DOCKER_VERSION=20.10.6"</span>,</span><br><span class="line">      <span class="attr">"empty_layer"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:17:06.162866201Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c set -eux; \t\tapkArch=\"$(apk --print-arch)\"; \tcase \"$apkArch\" in \t\t'x86_64') \t\t\turl='https://download.docker.com/linux/static/stable/x86_64/docker-20.10.6.tgz'; \t\t\t;; \t\t'armhf') \t\t\turl='https://download.docker.com/linux/static/stable/armel/docker-20.10.6.tgz'; \t\t\t;; \t\t'armv7') \t\t\turl='https://download.docker.com/linux/static/stable/armhf/docker-20.10.6.tgz'; \t\t\t;; \t\t'aarch64') \t\t\turl='https://download.docker.com/linux/static/stable/aarch64/docker-20.10.6.tgz'; \t\t\t;; \t\t*) echo &gt;&amp;2 \"error: unsupported architecture ($apkArch)\"; exit 1 ;; \tesac; \t\twget -O docker.tgz \"$url\"; \t\ttar --extract \t\t--file docker.tgz \t\t--strip-components 1 \t\t--directory /usr/local/bin/ \t; \trm docker.tgz; \t\tdockerd --version; \tdocker --version"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:17:06.643076836Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop) COPY file:abb137d24130e7fa2bdd38694af607361ecb688521e60965681e49460964a204 in /usr/local/bin/modprobe "</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:17:06.854234992Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop) COPY file:5b18768029dab8174c9d5957bb39560bde5ef6cba50fbbca222731a0059b449b in /usr/local/bin/ "</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:17:07.047323417Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop)  ENV DOCKER_TLS_CERTDIR=/certs"</span>,</span><br><span class="line">      <span class="attr">"empty_layer"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:17:08.025897909Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c mkdir /certs /certs/client &amp;&amp; chmod 1777 /certs /certs/client"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:17:08.214397968Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop)  ENTRYPOINT [\"docker-entrypoint.sh\"]"</span>,</span><br><span class="line">      <span class="attr">"empty_layer"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-04-14T20:17:08.435794313Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"/bin/sh -c #(nop)  CMD [\"sh\"]"</span>,</span><br><span class="line">      <span class="attr">"empty_layer"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"created"</span>: <span class="string">"2021-07-22T07:20:09.896531Z"</span>,</span><br><span class="line">      <span class="attr">"created_by"</span>: <span class="string">"RUN /bin/sh -c apk add curl # buildkit"</span>,</span><br><span class="line">      <span class="attr">"comment"</span>: <span class="string">"buildkit.dockerfile.v0"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">"os"</span>: <span class="string">"linux"</span>,</span><br><span class="line">  <span class="attr">"rootfs"</span>: &#123;</span><br><span class="line">    <span class="attr">"type"</span>: <span class="string">"layers"</span>,</span><br><span class="line">    <span class="attr">"diff_ids"</span>: [</span><br><span class="line">      <span class="string">"sha256:b2d5eeeaba3a22b9b8aa97261957974a6bd65274ebd43e1d81d0a7b8b752b116"</span>,</span><br><span class="line">      <span class="string">"sha256:91e3b96418079299100f88ca50988325e1f397f49d9c49c30b511e947a49bcd3"</span>,</span><br><span class="line">      <span class="string">"sha256:563ea45970c143d16be5c97173d2720cc31f38e2892aa0bd9075e5bede9dc334"</span>,</span><br><span class="line">      <span class="string">"sha256:9e9604462a57778a1d4b47a01039ee53fe29bd0e332f3f95a2cd20098fec4504"</span>,</span><br><span class="line">      <span class="string">"sha256:241588b2373ed654409b0d0881a92b801f8749cb21e3c5ed10d1d82d0a4434de"</span>,</span><br><span class="line">      <span class="string">"sha256:4bc13ba6e7d2ba7a0ff8df8f3ddab9893741d0a51f73659e2d0cf731510fb385"</span>,</span><br><span class="line">      <span class="string">"sha256:b82f54db960be856743e9edecf13f04e8e650586b5bf6cc829b3efafdcc6aca5"</span>,</span><br><span class="line">      <span class="string">"sha256:dd1b694543daae59c44b849b4ae37e82c722b8008a9b2a740ebc698702be7d0c"</span></span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="manifest"><a href="#manifest" class="headerlink" title="manifest"></a>manifest</h5><p><a href="https://github.com/opencontainers/image-spec/blob/master/manifest.md">manifest 文件</a> ：镜像的 config 文件索引，有哪些 layer，额外的 annotation 信息等。manifest 文件是存放在 registry 中，当我们拉取镜像的时候，会根据该文件拉取相应的 layer。</p>
+<blockquote>
+<p>manifest 是一个 JSON 文件，其定义包括两个部分，分别是Config 和 Layers。Config 是一个 JSON 对象，Layers 是一个由 JSON 对象组成的数组。Config 与 Layers 中的每一个对象的结构相同，都包括三个字段，分别是 digest、mediaType 和 size。其中 digest 可以理解为是这一对象的 ID。mediaType 表明了这一内容的类型。size 是这一内容的大小。</p>
+<p>容器镜像的 Config 有着固定的 mediaType <code>application/vnd.oci.image.config.v1+json</code>。一个 Config 的示例配置如下，它记录了关于容器镜像的配置，可以理解为是镜像的元数据。通常它会被镜像仓库用来在 UI 中展示信息，以及区分不同操作系统的构建等。</p>
+<p>而容器镜像的 Layers 是由多层 mediaType 为 <code>application/vnd.oci.image.layer.v1.*</code>（其中最常见的是 <code>application/vnd.oci.image.layer.v1.tar+gzip</code>) 的内容组成的。众所周知，容器镜像是分层构建的，每一层就对应着 Layers 中的一个对象。</p>
+<p>容器镜像的 Config，和 Layers 中的每一层，都是以 Blob 的方式存储在镜像仓库中的，它们的 digest 作为 Key 存在。因此，在请求到镜像的 Manifest 后，Docker 会利用 digest 并行下载所有的 Blobs，其中就包括 Config 和所有的 Layers。</p>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"schemaVersion"</span>: <span class="number">2</span>,</span><br><span class="line">  <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.distribution.manifest.v2+json"</span>,</span><br><span class="line">  <span class="attr">"config"</span>: &#123;</span><br><span class="line">    <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.container.image.v1+json"</span>,</span><br><span class="line">    <span class="attr">"size"</span>: <span class="number">4203</span>,</span><br><span class="line">    <span class="attr">"digest"</span>: <span class="string">"sha256:08bdaf2f88f90320cd3e92a469969efb1f066c6d318631f94e7864828abd7c75"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"layers"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.image.rootfs.diff.tar.gzip"</span>,</span><br><span class="line">      <span class="attr">"size"</span>: <span class="number">2811969</span>,</span><br><span class="line">      <span class="attr">"digest"</span>: <span class="string">"sha256:540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9bcbba"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.image.rootfs.diff.tar.gzip"</span>,</span><br><span class="line">      <span class="attr">"size"</span>: <span class="number">2050156</span>,</span><br><span class="line">      <span class="attr">"digest"</span>: <span class="string">"sha256:5a38b3726f4b24fa93b80450be63ad67fd3239c2f3b83695118d7b1a88447d84"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.image.rootfs.diff.tar.gzip"</span>,</span><br><span class="line">      <span class="attr">"size"</span>: <span class="number">154</span>,</span><br><span class="line">      <span class="attr">"digest"</span>: <span class="string">"sha256:e5fa5deb334027202841b051d10e7c7137fa3b63e97734309cedf6b48804df5f"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.image.rootfs.diff.tar.gzip"</span>,</span><br><span class="line">      <span class="attr">"size"</span>: <span class="number">70247077</span>,</span><br><span class="line">      <span class="attr">"digest"</span>: <span class="string">"sha256:c521bbbd9945cde2415eae95c3a2a604ea5ca18eb86ab5cadeb589d3b8a13185"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.image.rootfs.diff.tar.gzip"</span>,</span><br><span class="line">      <span class="attr">"size"</span>: <span class="number">545</span>,</span><br><span class="line">      <span class="attr">"digest"</span>: <span class="string">"sha256:59707d521c45c42bbb7dbbef463d5d3800859f20122fb54894f0c79d9b435483"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.image.rootfs.diff.tar.gzip"</span>,</span><br><span class="line">      <span class="attr">"size"</span>: <span class="number">1015</span>,</span><br><span class="line">      <span class="attr">"digest"</span>: <span class="string">"sha256:26abe223b186967eef77715b2c6efd147f3a203a0c7b19e61a8947dab4236397"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"mediaType"</span>: <span class="string">"application/vnd.docker.image.rootfs.diff.tar.gzip"</span>,</span><br><span class="line">      <span class="attr">"size"</span>: <span class="number">150</span>,</span><br><span class="line">      <span class="attr">"digest"</span>: <span class="string">"sha256:9d806bc203610fb061281b581a0b2522c9fcbd15e55c55ac0c496c9b1dbe63b0"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h5><p>看完 <a href="https://www.github.com/opencontainers/image-spec" target="_blank" rel="noopener">image-spec</a> 里面提到的各种 id 相信你又很多疑惑，在此总结一下这些 id 的作用(看完还是很懵逼)：</p>
+<table>
+<thead>
+<tr>
+<th align="left">image-id</th>
+<th align="left">image config 的 sha256 哈希值，在本地镜像存储中由它唯一标识一个镜像</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">image digest</td>
+<td align="left">在 registry 中的 image manifest 的 sha256 哈希值，在 registry 中由它唯一标识一个镜像</td>
+</tr>
+<tr>
+<td align="left">diff_ids</td>
+<td align="left">镜像每一层的 id ，是对本地镜像中 layer 的 tar 包的 sha256 哈希值</td>
+</tr>
+<tr>
+<td align="left">layer digest</td>
+<td align="left">镜像在 registry 存储中的 id ，是对远程 layer的 tar 包的 sha256 哈希值</td>
+</tr>
+</tbody></table>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsx192u19nj30r80x440j.jpg" alt="image id" title="">
+            </p>
+
+<p>镜像的 image config 中的 <code>rootfs</code> 字段记录了每一层 layer 的 id，而镜像的 layer id 则是 layer tar 包的 sha256 值，如果镜像的 layer 改变，则这个 layer id 会改变，而记录它的 image config 内容也会改变，image config 内容变了，image config 文件的 sha256 值也就会改变，这样就可以由 image id 和 image digest 唯一标识一个镜像，达到防治篡改的安全目的。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsx1es0afuj31620ocgs4.jpg" alt="diff_ids" title="">
+            </p>
+
+<h4 id="Runtime-Spec"><a href="#Runtime-Spec" class="headerlink" title="Runtime Spec"></a>Runtime Spec</h4><p>容器运行时(Runtime Spec) 决定了根据镜像怎么运行一个容器，规范指定了容器的配置、执行环境和生命周期。其中容器的配置包含了创建和运行容器所需的元数据，包括要运行的进程、环境变量、资源限制和要使用的沙箱功能等。官方的Spec主要内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">├── bundle.md              # 将容器编码为文件系统包的格式，一组以某种方式组织的文件</span><br><span class="line">├── config.md              # 容器运行所需的元数据。包括要运行的进程、要注入的环境变量、要使用的沙盒功能等</span><br><span class="line">├── runtime.md             # 容器的生命周期</span><br><span class="line">├── README.md              # README 文档</span><br><span class="line">├── spec.md                # OCI 运行时规范的概览</span><br></pre></td></tr></table></figure>
+
+<h5 id="Runtime"><a href="#Runtime" class="headerlink" title="Runtime"></a>Runtime</h5><p>runtime文件： 规定了state文件包含的内容，以及容器从创建到停止的事件。总结容器运行时主要做一下几方面工作：</p>
+<ul>
+<li>容器镜像管理</li>
+<li>容器生命周期管理</li>
+<li>容器创建</li>
+<li>容器资源管理</li>
+</ul>
+<blockquote>
+<p>市面上常见的容器运行时有runc, rkt, lxc, containerd等。</p>
+</blockquote>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gsx2sg6azij316c0iewf3.jpg" alt="runtime" title="">
+            </p>
+
+<h3 id="关于Rootfs与Bootfs"><a href="#关于Rootfs与Bootfs" class="headerlink" title="关于Rootfs与Bootfs"></a>关于Rootfs与Bootfs</h3><p>一个典型的 Linux 系统要能运行的话，它至少需要两个文件系统, rootfs和bootfs.</p>
+<h4 id="Bootfs"><a href="#Bootfs" class="headerlink" title="Bootfs"></a>Bootfs</h4><p>Bootfs 包含BootLoader(引导加载程序)和kernel(内核)。回忆下操作系统的启动过程，当按下电脑的开机键之后，电脑首先进行加电自检(检查硬件是否有问题), 接着就是GRUB引导，然后是内核加载，内核加载完成后进行init初始化(内核启动第一个用户空间程序)，bootfs的作用就是把引导程序和把/boot文件系统加载进内核的过程，当内核都会被加载进内存后，此时 bootfs 会被卸载掉从而释放出所占用的内存。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsy83q4f2aj30w006s0ss.jpg" alt="bootfs" title="">
+            </p>
+
+<h4 id="Rootfs"><a href="#Rootfs" class="headerlink" title="Rootfs"></a>Rootfs</h4><p>rootfs就是root文件系统，包含的就是典型的Linux系统中的/dev, /proc, /bin, /etc等标准目录和文件。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsy86pccjbj31fk0260su.jpg" alt="rootfs" title="">
+            </p>
+
+<p>Docker镜像是由文件系统叠加而成。最低端是bootfs，并使用宿主机的bootfs（docker中操作系统启动几秒钟，原因就是，通过docker镜像启动的操作系统，底层使用的是docker宿主机的bootfs不需要重新加载bootfs), 第二层是root文件系统rootfs 称为base image(基础镜像)。然后可以再往上叠加其它镜像文件，每一层就是一个layer(每一层都是只读的)。 当从一个镜像启动容器时，docker会使用联合文件系统把多个不同位置的目录(layer)联合挂载（union mount）到同一个目录下，然后会在最顶层加载一个读写文件系统作为容器。(联合文件系统下一个章节会说明)</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt2peemzakj312w0u0jv1.jpg" alt="加载过程" title="">
+            </p>
+
+<h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><p>众所周知 docker 镜像需要一个 Dockerfile 来构建而成，当我们对 OCI 镜像规范和Rootfs,Bootfs有了个大致的了解之后，我们接下来就拿着 Dockerfile 这个 ”图纸“ 去一步步构建镜像。</p>
+<p>下面是 <a href="https://github.com/nodejs/docker-node/blob/main/12/alpine3.13/Dockerfile">Nodejs 12.22.4</a> 版本的Dockerfile:</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> alpine:<span class="number">3.13</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> NODE_VERSION <span class="number">12.22</span>.<span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> addgroup -g 1000 node \</span></span><br><span class="line"><span class="bash">    &amp;&amp; adduser -u 1000 -G node -s /bin/sh -D node \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apk add --no-cache \</span></span><br><span class="line"><span class="bash">        libstdc++ \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apk add --no-cache --virtual .build-deps \</span></span><br><span class="line"><span class="bash">        curl \</span></span><br><span class="line"><span class="bash">    &amp;&amp; ARCH= &amp;&amp; alpineArch=<span class="string">"<span class="variable">$(apk --print-arch)</span>"</span> \</span></span><br><span class="line"><span class="bash">      &amp;&amp; <span class="keyword">case</span> <span class="string">"<span class="variable">$&#123;alpineArch##*-&#125;</span>"</span> <span class="keyword">in</span> \</span></span><br><span class="line"><span class="bash">        x86_64) \</span></span><br><span class="line"><span class="bash">          ARCH=<span class="string">'x64'</span> \</span></span><br><span class="line"><span class="bash">          CHECKSUM=<span class="string">"2fa5020bab6501cd3e6fb90dae0cd19a64df80bb8e8bf184af4f562df5a08b4f"</span> \</span></span><br><span class="line"><span class="bash">          ;; \</span></span><br><span class="line"><span class="bash">        *) ;; \</span></span><br><span class="line"><span class="bash">      <span class="keyword">esac</span> \</span></span><br><span class="line"><span class="bash">  &amp;&amp; <span class="keyword">if</span> [ -n <span class="string">"<span class="variable">$&#123;CHECKSUM&#125;</span>"</span> ]; <span class="keyword">then</span> \</span></span><br><span class="line"><span class="bash">    <span class="built_in">set</span> -eu; \</span></span><br><span class="line"><span class="bash">    curl -fsSLO --compressed <span class="string">"https://unofficial-builds.nodejs.org/download/release/v<span class="variable">$NODE_VERSION</span>/node-v<span class="variable">$NODE_VERSION</span>-linux-<span class="variable">$ARCH</span>-musl.tar.xz"</span>; \</span></span><br><span class="line"><span class="bash">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$CHECKSUM</span>  node-v<span class="variable">$NODE_VERSION</span>-linux-<span class="variable">$ARCH</span>-musl.tar.xz"</span> | sha256sum -c - \</span></span><br><span class="line"><span class="bash">      &amp;&amp; tar -xJf <span class="string">"node-v<span class="variable">$NODE_VERSION</span>-linux-<span class="variable">$ARCH</span>-musl.tar.xz"</span> -C /usr/<span class="built_in">local</span> --strip-components=1 --no-same-owner \</span></span><br><span class="line"><span class="bash">      &amp;&amp; ln -s /usr/<span class="built_in">local</span>/bin/node /usr/<span class="built_in">local</span>/bin/nodejs; \</span></span><br><span class="line"><span class="bash">  <span class="keyword">else</span> \</span></span><br><span class="line"><span class="bash">    <span class="built_in">echo</span> <span class="string">"Building from source"</span> \</span></span><br><span class="line"><span class="bash">    <span class="comment"># backup build</span></span></span><br><span class="line">    &amp;&amp; apk <span class="keyword">add</span><span class="bash"> --no-cache --virtual .build-deps-full \</span></span><br><span class="line"><span class="bash">        binutils-gold \</span></span><br><span class="line"><span class="bash">        g++ \</span></span><br><span class="line"><span class="bash">        gcc \</span></span><br><span class="line"><span class="bash">        gnupg \</span></span><br><span class="line"><span class="bash">        libgcc \</span></span><br><span class="line"><span class="bash">        linux-headers \</span></span><br><span class="line"><span class="bash">        make \</span></span><br><span class="line"><span class="bash">        python2 \</span></span><br><span class="line"><span class="bash">    <span class="comment"># gpg keys listed at https://github.com/nodejs/node#release-keys</span></span></span><br><span class="line">    &amp;&amp; for key in \</span><br><span class="line">      <span class="number">4</span>ED778F539E3634C779C87C6D7062848A1AB005C \</span><br><span class="line">      <span class="number">94</span>AE36675C464D64BAFA68DD7434390BDBE9B9C5 \</span><br><span class="line">      <span class="number">74</span>F12602B6F1C4E913FAA37AD3A89613643B6201 \</span><br><span class="line">      <span class="number">71</span>DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \</span><br><span class="line">      <span class="number">8</span>FCCA13FEF1D0C2E91008E09770F7A9A5AE15600 \</span><br><span class="line">      C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \</span><br><span class="line">      C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C \</span><br><span class="line">      DD8F2338BAE7501E3DD5AC78C273792F7D83545D \</span><br><span class="line">      A48C2BEE680E841632CD4E44F07496B3EB3C1762 \</span><br><span class="line">      <span class="number">108</span>F52B48DB57BB0CC439B2997B01419BD92F80A \</span><br><span class="line">      B9E2F5981AA6E0CD28160D9FF13993A75599653C \</span><br><span class="line">    ; do \</span><br><span class="line">      gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys <span class="string">"$key"</span> || \</span><br><span class="line">      gpg --batch --keyserver keyserver.ubuntu.com --recv-keys <span class="string">"$key"</span> ; \</span><br><span class="line">    done \</span><br><span class="line">    &amp;&amp; curl -fsSLO --compressed <span class="string">"https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION.tar.xz"</span> \</span><br><span class="line">    &amp;&amp; curl -fsSLO --compressed <span class="string">"https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"</span> \</span><br><span class="line">    &amp;&amp; gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \</span><br><span class="line">    &amp;&amp; grep <span class="string">" node-v$NODE_VERSION.tar.xz\$"</span> SHASUMS256.txt | sha256sum -c - \</span><br><span class="line">    &amp;&amp; tar -xf <span class="string">"node-v$NODE_VERSION.tar.xz"</span> \</span><br><span class="line">    &amp;&amp; cd <span class="string">"node-v$NODE_VERSION"</span> \</span><br><span class="line">    &amp;&amp; ./configure \</span><br><span class="line">    &amp;&amp; make -j$(getconf _NPROCESSORS_ONLN) V= \</span><br><span class="line">    &amp;&amp; make install \</span><br><span class="line">    &amp;&amp; apk del .build-deps-full \</span><br><span class="line">    &amp;&amp; cd .. \</span><br><span class="line">    &amp;&amp; rm -Rf <span class="string">"node-v$NODE_VERSION"</span> \</span><br><span class="line">    &amp;&amp; rm <span class="string">"node-v$NODE_VERSION.tar.xz"</span> SHASUMS256.txt.asc SHASUMS256.txt; \</span><br><span class="line">  fi \</span><br><span class="line">  &amp;&amp; rm -f <span class="string">"node-v$NODE_VERSION-linux-$ARCH-musl.tar.xz"</span> \</span><br><span class="line">  &amp;&amp; apk del .build-deps \</span><br><span class="line">  <span class="comment"># smoke tests</span></span><br><span class="line">  &amp;&amp; node --version \</span><br><span class="line">  &amp;&amp; npm --version</span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> YARN_VERSION <span class="number">1.22</span>.<span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \</span></span><br><span class="line"><span class="bash">  &amp;&amp; <span class="keyword">for</span> key <span class="keyword">in</span> \</span></span><br><span class="line"><span class="bash">    6A010C5166006599AA17F08146C2130DFD2497F5 \</span></span><br><span class="line"><span class="bash">  ; <span class="keyword">do</span> \</span></span><br><span class="line"><span class="bash">    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys <span class="string">"<span class="variable">$key</span>"</span> || \</span></span><br><span class="line"><span class="bash">    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys <span class="string">"<span class="variable">$key</span>"</span> ; \</span></span><br><span class="line"><span class="bash">  <span class="keyword">done</span> \</span></span><br><span class="line"><span class="bash">  &amp;&amp; curl -fsSLO --compressed <span class="string">"https://yarnpkg.com/downloads/<span class="variable">$YARN_VERSION</span>/yarn-v<span class="variable">$YARN_VERSION</span>.tar.gz"</span> \</span></span><br><span class="line"><span class="bash">  &amp;&amp; curl -fsSLO --compressed <span class="string">"https://yarnpkg.com/downloads/<span class="variable">$YARN_VERSION</span>/yarn-v<span class="variable">$YARN_VERSION</span>.tar.gz.asc"</span> \</span></span><br><span class="line"><span class="bash">  &amp;&amp; gpg --batch --verify yarn-v<span class="variable">$YARN_VERSION</span>.tar.gz.asc yarn-v<span class="variable">$YARN_VERSION</span>.tar.gz \</span></span><br><span class="line"><span class="bash">  &amp;&amp; mkdir -p /opt \</span></span><br><span class="line"><span class="bash">  &amp;&amp; tar -xzf yarn-v<span class="variable">$YARN_VERSION</span>.tar.gz -C /opt/ \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ln -s /opt/yarn-v<span class="variable">$YARN_VERSION</span>/bin/yarn /usr/<span class="built_in">local</span>/bin/yarn \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ln -s /opt/yarn-v<span class="variable">$YARN_VERSION</span>/bin/yarnpkg /usr/<span class="built_in">local</span>/bin/yarnpkg \</span></span><br><span class="line"><span class="bash">  &amp;&amp; rm yarn-v<span class="variable">$YARN_VERSION</span>.tar.gz.asc yarn-v<span class="variable">$YARN_VERSION</span>.tar.gz \</span></span><br><span class="line"><span class="bash">  &amp;&amp; apk del .build-deps-yarn \</span></span><br><span class="line"><span class="bash">  <span class="comment"># smoke test</span></span></span><br><span class="line">  &amp;&amp; yarn --version</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> docker-entrypoint.sh /usr/<span class="built_in">local</span>/bin/</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> [<span class="string">"docker-entrypoint.sh"</span>]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [ <span class="string">"node"</span> ]</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Docker-build-原理"><a href="#Docker-build-原理" class="headerlink" title="Docker build 原理"></a>Docker build 原理</h4><p>使用docker build 构建镜像的流程大概如下:</p>
+<ol>
+<li><p>执行 <code>docker build -t &lt;imageName:Tag&gt; .</code>可以使用 <code>-f</code>参数来指定 Dockerfile 文件；</p>
+</li>
+<li><p>docker 客户端会将构建命令后面指定的路径(<code>.</code>)下的所有文件(打包成一个 tar 包)，发送给 Docker 服务端;</p>
+</li>
+<li><p>docker 服务端收到客户端发送的 tar 包，然后解压，接下来根据 Dockerfile 里面的指令进行镜像的分层构建；</p>
+</li>
+<li><p>docker 下载 FROM 语句中指定的基础镜像，然后将基础镜像的 layer 联合挂载为一层，并在上面创建一个空目录；</p>
+</li>
+<li><p>接着启动一个临时的容器并在 chroot 中启动一个 bash，运行 <code>RUN</code> 语句中的命令</p>
+</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gsz7qvscwmj31qq0ggtei.jpg" alt="lsns" title="">
+            </p>
+
+<p>(使用docker ps 查看临时的镜像):</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gszacahe66j31gs03cdgi.jpg" alt="docker ps" title="">
+            </p>
+
+<ol start="6">
+<li><p>一条 <code>RUN</code> 命令结束后，会把上层目录压缩，形成新镜像中的新的一层；</p>
+</li>
+<li><p>如果 Dockerfile 中包含其它命令，就以之前构建的层次为基础，从第二步开始重复创建新层，直到完成所有语句后退出；</p>
+</li>
+<li><p>构建完成之后为该镜像打上 tag；</p>
+</li>
+</ol>
+<h4 id="Base-Image"><a href="#Base-Image" class="headerlink" title="Base Image"></a>Base Image</h4><p>当我们在写 Dockerfile 的时候都需要用 <code>FROM</code> 语句来指定一个基础镜像，这些基础镜像并不是无中生有，也需要一个 Dockerfile 来构建成镜像。例如上面的Nodejs Dockerfile指定了<code>apline:3.13</code>作为基础镜像。下面我们拿 <a href="https://hub.docker.com/_/debian" target="_blank" rel="noopener">debian:buster</a> 这个基础镜像的 <a href="https://github.com/debuerreotype/docker-debian-artifacts/blob/18cb4d0418be1c80fb19141b69ac2e0600b2d601/buster/Dockerfile">Dockerfile</a> 来看一下基础镜像是如何炼成的(官方镜像例如ubuntu, centos是如何炼成的可以参考 <a href="https://github.com/docker-library/official-images">docker library official images</a>)。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> scratch</span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> rootfs.tar.xz /</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">"bash"</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p>一个基础镜像的 Dockerfile 一般仅有三行。第一行 <code>FROM scratch</code> 中的<code>scratch</code> 这个镜像并不真实的存在。在 Dockerfile 中 <code>FROM scratch</code> 指令并不进行任何操作，也就是不会创建一个镜像层；接着第二行的 <code>ADD rootfs.tar.xz /</code> 会自动把 <code>rootfs.tar.xz</code> 解压到 <code>/</code> 目录下，由此产生的一层镜像就是最终构建的镜像真实的 layer 内容；第三行 <code>CMD [&quot;bash&quot;]</code> 指定这镜像在启动容器的时候执行的应用程序，一般基础镜像的 CMD 默认为 bash 或者 sh 。</p>
+<p><code>ADD rootfs.tar.xz /</code> 中，这个 <code>rootfs.tar.xz</code> 就是我们经过一系列骚操作（一般是发行版源码编译）搓出来的根文件系统，这个操作比较复杂(我太菜了，说不清楚哈~)，感兴趣可以去看一下构建 debian 基础镜像的 Jenkins 流水线任务 <a href="https://doi-janky.infosiftr.net/job/tianon/job/debuerreotype/" target="_blank" rel="noopener">debuerreotype</a>，上面有构建这个 <code>rootfs.tar.xz</code> 完整过程，或者参考 Debian 官方的 <a href="https://github.com/debuerreotype/docker-debian-artifacts">docker-debian-artifacts</a> 这个 repo 里的 shell 脚本。</p>
+<p>需要额外注意一点，在这里往镜像里添加 <code>rootfs.tar.xz</code> 时使用的是 <code>ADD</code> 而不是 <code>COPY</code> ，因为在 Dockerfile 中的 ADD 指令 src 文件如果是个 tar 包，在构建的时候 docker 会帮我们把 tar 包解开到指定目录，使用 copy 指令则不会解开 tar 包。另外一点区别就是 ADD 指令是添加一个文件，这个文件可以是构建上下文环境中的文件，也可以是个 URL，而 COPY 则只能添加构建上下文中的文件。</p>
+<p>当我们把这个 <code>rootfs.tar.xz</code> 解开后里面就是一个 Linux 的根文件系统，不同于我们使用 ISO 安装系统的那个根文件系统，这个根文件系统是经过一系列的裁剪，去掉了一些在容器运行中不必要的文件，使之更加轻量适用于容器运行的场景。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@todo</span><br><span class="line"></span><br><span class="line">使用dockerfile 创建一个镜像~</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="镜像是怎样存放的"><a href="#镜像是怎样存放的" class="headerlink" title="镜像是怎样存放的"></a>镜像是怎样存放的</h2><h3 id="本地存储"><a href="#本地存储" class="headerlink" title="本地存储"></a>本地存储</h3><p>当我们构建完一个镜像之后，镜像就存储在了我们 docker 本地存储目录，默认情况下为 <code>/var/lib/docker</code> ，下面就探寻一下镜像是以什么样的目录结构存放的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 docker]# tree -L 1</span><br><span class="line">.</span><br><span class="line">├── buildkit</span><br><span class="line">├── containers</span><br><span class="line">├── image</span><br><span class="line">├── network</span><br><span class="line">├── overlay2</span><br><span class="line">├── plugins</span><br><span class="line">├── runtimes</span><br><span class="line">├── swarm</span><br><span class="line">├── tmp</span><br><span class="line">├── trust</span><br><span class="line">└── volumes</span><br></pre></td></tr></table></figure>
+
+<p>容器的元数据存放在 image 目录下，容器的 layer 数据则存放在 overlay2 目录下。</p>
+<h4 id="Image-目录"><a href="#Image-目录" class="headerlink" title="Image 目录"></a>Image 目录</h4><p>image目录下的overlay2 代表着本地 docker 存储使用的是 overlay2 存储驱动，目前最新版本的 docker 默认优先采用 <strong>overlay2</strong> 作为存储驱动，对于已支持该驱动的 Linux 发行版，不需要任何进行任何额外的配置，可使用 lsmod 命令查看当前系统内核是否支持 overlay2 。overlay2目录下的层级结构如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 overlay2]<span class="comment"># tree -L 4 </span></span><br><span class="line">.</span><br><span class="line">├── distribution</span><br><span class="line">│   ├── diffid-by-digest</span><br><span class="line">│   │   └── sha256</span><br><span class="line">│   │       ├── 12008541203a024dab3a30542c87421e5a27dbb601b9c6f029b3827af138ccb3</span><br><span class="line">│   │       ├── 1f41b2f2bf94740d411c54b48be7f5e9dfbe14f29d1a5cf64f39150d75f39740</span><br><span class="line">│   │       ├── 26abe223b186967eef77715b2c6efd147f3a203a0c7b19e61a8947dab4236397</span><br><span class="line">│   │       ├── 28549a15ba3eb287d204a7c67fdb84e9d7992c7af1ca3809b6d8c9e37ebc9877</span><br><span class="line">│   │       ├── 33847f680f63fb1b343a9fc782e267b5abdbdb50d65d4b9bd2a136291d67cf75</span><br><span class="line">│   │       ├── 363ab70c2143bc121f037ba432cede225b7053200abba2a7a4ca24c2915a3998</span><br><span class="line">│   │       ├── 42ec49ed44205e453626b369a55e9d55e714214b6382663499a030a9293079af</span><br><span class="line">│   │       ├── 4afb39f216bd4e336f9b78584bae0f6bcb77150107471d8d67d3b8abfbdea46a</span><br><span class="line">│   │       ├── 540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9bcbba</span><br><span class="line">│   └── v2metadata-by-diffid</span><br><span class="line">│       └── sha256</span><br><span class="line">│           ├── 04d694391e96c105b671692a9135fa5e61a5498a5c55b07df0dd4ae8186fe776</span><br><span class="line">│           ├── 0ba2ba6b57851cc6f3c2508b39e4d3d86321598a87f496146d4e5f33aee91c2c</span><br><span class="line">│           ├── 1a86ff1d449f9522c0af1515d11082885b2f198b5ae99673920382d45c929e28</span><br><span class="line">│           ├── 2788d2f5dd8f8427ca7fa6124ca8fdf034ba358e0db75d533f448e0292966a5b</span><br><span class="line">│           ├── 2f4625690283453c620cbf5e13855148d73941df5c2f774eb03d54328c36edc8</span><br><span class="line">│           ├── 322e305537da267d4135a26993d7696e53201988a3059d33e2fabb83a4c81cf8</span><br><span class="line">│           ├── 3764c3e89288ef5786f440a66a5981593ddceb8b273ec9465f45c1758d64ced3</span><br><span class="line">│           ├── 3b6deb83ca3702881214614853644c4109ae6a217e3c0b0042d0a0e60725c69b</span><br><span class="line">├── imagedb</span><br><span class="line">│   ├── content</span><br><span class="line">│   │   └── sha256</span><br><span class="line">│   │       ├── 1fd8e1b0bb7ef6cc63e0094e2fb5a35259bdce7041ef5e7e4c99694ded1041d7</span><br><span class="line">│   │       └── 69593048aa3acfee0f75f20b77acb549de2472063053f6730c4091b53f2dfb02</span><br><span class="line">│   └── metadata</span><br><span class="line">│       └── sha256</span><br><span class="line">├── layerdb</span><br><span class="line">│   ├── mounts</span><br><span class="line">│   │   └── 72d706b5c93d78590875cce887c94351060eec659e281ae39113e0a887b003e2</span><br><span class="line">│   │       ├── init-id</span><br><span class="line">│   │       ├── mount-id</span><br><span class="line">│   │       └── parent</span><br><span class="line">│   ├── sha256</span><br><span class="line">│   │   ├── 518ebede9dd4e553bcee3157e2f935affbf857abaa6ac3856d7fbfa8e0402d1d</span><br><span class="line">│   │   │   ├── cache-id</span><br><span class="line">│   │   │   ├── diff</span><br><span class="line">│   │   │   ├── parent</span><br><span class="line">│   │   │   ├── size</span><br><span class="line">│   │   │   └── tar-split.json.gz</span><br><span class="line">│   │   ├── 5b8c72934dfc08c7d2bd707e93197550f06c0751023dabb3a045b723c5e7b373</span><br><span class="line">│   │   │   ├── cache-id</span><br><span class="line">│   │   │   ├── diff</span><br><span class="line">│   │   │   ├── size</span><br><span class="line">│   │   │   └── tar-split.json.gz</span><br><span class="line">│   │   ├── 8f346dcd27d6735db3fd6792708d9fc93424e8c68be6e89f432766d932beea0a</span><br><span class="line">│   │   │   ├── cache-id</span><br><span class="line">│   │   │   ├── diff</span><br><span class="line">│   │   │   ├── parent</span><br><span class="line">│   │   │   ├── size</span><br><span class="line">│   │   │   └── tar-split.json.gz</span><br><span class="line">│   │   ├── 9a5d14f9f5503e55088666beef7e85a8d9625d4fa7418e2fe269e9c54bcb853c</span><br><span class="line">│   │   │   ├── cache-id</span><br><span class="line">│   │   │   ├── diff</span><br><span class="line">│   │   │   ├── size</span><br><span class="line">│   │   │   └── tar-split.json.gz</span><br><span class="line">│   │   ├── d3abebe503aa4a993321a26a0ac46b20c45540640bbd55cb1e007a8ec6ce046e</span><br><span class="line">│   │   │   ├── cache-id</span><br><span class="line">│   │   │   ├── diff</span><br><span class="line">│   │   │   ├── parent</span><br><span class="line">│   │   │   ├── size</span><br><span class="line">│   │   │   └── tar-split.json.gz</span><br><span class="line">│   │   └── ebc8eb4880594e292509a2a504a4ffb957a0935c7682d20849800e3024e8507c</span><br><span class="line">│   │       ├── cache-id</span><br><span class="line">│   │       ├── diff</span><br><span class="line">│   │       ├── parent</span><br><span class="line">│   │       ├── size</span><br><span class="line">│   │       └── tar-split.json.gz</span><br><span class="line">│   └── tmp</span><br><span class="line">└── repositories.json</span><br></pre></td></tr></table></figure>
+
+<h5 id="repositories-json-文件"><a href="#repositories-json-文件" class="headerlink" title="repositories.json 文件"></a>repositories.json 文件</h5><p>repositories.json 就是存储镜像元数据信息，主要是 image name 和 image id 的对应，digest 和 image id 的对应。当 pull 完一个镜像的时候 docker 会更新这个文件。当我们 docker run 一个容器的时候也用到这个文件去索引本地是否存在该镜像，没有镜像的话就自动去 pull 这个镜像。</p>
+<h5 id="distribution文件夹"><a href="#distribution文件夹" class="headerlink" title="distribution文件夹"></a>distribution文件夹</h5><p>存放着 layer 的 diff_id 和 digest 的对应关系:</p>
+<p>diffid-by-digest :存放 <code>digest</code> 到 <code>diffid</code> 的对应关系</p>
+<p>v2metadata-by-diffid : 存放 <code>diffid</code> 到 <code>digest</code> 的对应关系</p>
+<h5 id="layerdb"><a href="#layerdb" class="headerlink" title="layerdb"></a>layerdb</h5><p>layerdb 存放在layer的原始数据。 需要注意的是：tar-split.json.gz 文件是 layer tar 包的 split 文件，记录了 layer 解压后的文件在 tar 包中的位置（偏移量），通过这个文件可以还原 layer 的 tar 包，在 docker save 导出 image 的时候会用到，由根据它可以开倒车把解压的 layer 还原回 tar 包。详情可参考 <a href="https://github.com/vbatts/tar-split">tar-split</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">layerdb&#x2F;</span><br><span class="line">├── mounts</span><br><span class="line">├── sha256</span><br><span class="line">│   ├── 518ebede9dd4e553bcee3157e2f935affbf857abaa6ac3856d7fbfa8e0402d1d</span><br><span class="line">│   │   ├── cache-id   # docker 下载镜像时随机生成的 id</span><br><span class="line">│   │   ├── diff       # 存放 layer 的 diffid</span><br><span class="line">│   │   ├── parent     # 放当前 layer 的父 layer 的 diffid，最底层的 layer 没有这个文件</span><br><span class="line">│   │   ├── size       # 该 layer 的大小</span><br><span class="line">│   │   └── tar-split.json.gz</span><br></pre></td></tr></table></figure>
+
+<h4 id="Overlay2-目录"><a href="#Overlay2-目录" class="headerlink" title="Overlay2 目录"></a>Overlay2 目录</h4><p>overley2目录下存放的是每个layer解压后的内容，使用tree命令查看可以知道，镜像 layer 的内容都存放在一个 <code>diff</code> 的文件夹下，diff 的上级目录就是以镜像 layer 的 digest 为名的目录。其中还有个 <code>l</code> 文件夹，下面有一坨坨的硬链接文件指向上级目录的 layer 目录。这个 l 其实就是 link 的缩写，l 下的文件都是一些比 digest 文件夹名短一些的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">overlay2</span><br><span class="line">├── 259cf6934509a674b1158f0a6c90c60c133fd11189f98945c7c3a524784509ff</span><br><span class="line">│   └── diff</span><br><span class="line">│       ├── bin</span><br><span class="line">│       ├── dev</span><br><span class="line">│       ├── etc</span><br><span class="line">│       ├── home</span><br><span class="line">│       ├── lib</span><br><span class="line">│       ├── media</span><br><span class="line">│       ├── mnt</span><br><span class="line">│       ├── opt</span><br><span class="line">│       ├── proc</span><br><span class="line">│       ├── root</span><br><span class="line">│       ├── run</span><br><span class="line">│       ├── sbin</span><br><span class="line">│       ├── srv</span><br><span class="line">│       ├── sys</span><br><span class="line">│       ├── tmp</span><br><span class="line">│       ├── usr</span><br><span class="line">│       └── var</span><br><span class="line">├── 27f9e9b74a88a269121b4e77330a665d6cca4719cb9a58bfc96a2b88a07af805</span><br><span class="line">│   ├── diff</span><br><span class="line">│   └── work</span><br><span class="line">├── a0df3cc902cfbdee180e8bfa399d946f9022529d12dba3bc0b13fb7534120015</span><br><span class="line">│   ├── diff</span><br><span class="line">│   │   └── bin</span><br><span class="line">│   └── work</span><br><span class="line">├── b2fbebb39522cb6f1f5ecbc22b7bec5e9bc6ecc25ac942d9e26f8f94a028baec</span><br><span class="line">│   ├── diff</span><br><span class="line">│   │   ├── etc</span><br><span class="line">│   │   ├── lib</span><br><span class="line">│   │   ├── usr</span><br><span class="line">│   │   └── var</span><br><span class="line">│   └── work</span><br><span class="line">├── be8c12f63bebacb3d7d78a09990dce2a5837d86643f674a8fd80e187d8877db9</span><br><span class="line">│   ├── diff</span><br><span class="line">│   │   └── etc</span><br><span class="line">│   └── work</span><br><span class="line">├── e8f6e78aa1afeb96039c56f652bb6cd4bbd3daad172324c2172bad9b6c0a968d</span><br><span class="line">│   └── diff</span><br><span class="line">│       ├── bin</span><br><span class="line">│       ├── dev</span><br><span class="line">│       ├── etc</span><br><span class="line">│       ├── home</span><br><span class="line">│       ├── lib</span><br><span class="line">│       ├── media</span><br><span class="line">│       ├── mnt</span><br><span class="line">│       ├── proc</span><br><span class="line">│       ├── root</span><br><span class="line">│       ├── run</span><br><span class="line">│       ├── sbin</span><br><span class="line">│       ├── srv</span><br><span class="line">│       ├── sys</span><br><span class="line">│       ├── tmp</span><br><span class="line">│       ├── usr</span><br><span class="line">│       └── var</span><br><span class="line">└── l</span><br><span class="line">    ├── 526XCHXRJMZXRIHN4YWJH2QLPY -&gt; ../b2fbebb39522cb6f1f5ecbc22b7bec5e9bc6ecc25ac942d9e26f8f94a028baec/diff</span><br><span class="line">    ├── 5RZOXYR35NSGAWTI36CVUIRW7U -&gt; ../be8c12f63bebacb3d7d78a09990dce2a5837d86643f674a8fd80e187d8877db9/diff</span><br><span class="line">    ├── LBWRL4ZXGBWOTN5JDCDZVNOY7H -&gt; ../a0df3cc902cfbdee180e8bfa399d946f9022529d12dba3bc0b13fb7534120015/diff</span><br><span class="line">    ├── MYRYBGZRI4I76MJWQHN7VLZXLW -&gt; ../27f9e9b74a88a269121b4e77330a665d6cca4719cb9a58bfc96a2b88a07af805/diff</span><br><span class="line">    ├── PCIS4FYUJP4X2D4RWB7ETFL6K2 -&gt; ../259cf6934509a674b1158f0a6c90c60c133fd11189f98945c7c3a524784509ff/diff</span><br><span class="line">    └── XK5IA4BWQ2CIS667J3SXPXGQK5 -&gt; ../e8f6e78aa1afeb96039c56f652bb6cd4bbd3daad172324c2172bad9b6c0a968d/diff</span><br></pre></td></tr></table></figure>
+
+<h3 id="Registry-存储"><a href="#Registry-存储" class="headerlink" title="Registry 存储"></a>Registry 存储</h3><p>当我们执行<code>docker push</code>命令之后，就把镜像存储到远程Registry仓库中了，镜像在远程仓库中是如何存储的呢，这就回到了 OCI 规范中的镜像仓库规范 <a href="https://github.com/opencontainers/distribution-spec">distribution-spec</a>，该规范就定义着容器镜像如何存储在远端（即 registry）上。我们可以把 registry 看作镜像的仓库，使用该规范可以帮助我们把这些镜像按照约定俗成的格式来存放。</p>
+<p>想要分析一下镜像是如何存放在 registry 上的，我们在本地使用 docker run 来起 registry 的容器即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name registry -p 5000:5000 -v &#x2F;var&#x2F;lib&#x2F;registry:&#x2F;var&#x2F;lib&#x2F;registry registry</span><br></pre></td></tr></table></figure>
+
+<p>当我们在本地启动一个 registry 容器之后，容器内默认的存储位置为 <code>/var/lib/registry</code> ，所以我们在启动的时候加了参数 <code>-v /var/lib/registry:/var/lib/registry</code> 将本机的路径挂载到容器内。</p>
+<p>接着我们往registry推送busybox镜像</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker pull busybox:latest</span><br><span class="line">docker tag busybox:latest localhost:5000&#x2F;busybox:latest</span><br><span class="line">docker push localhost:5000&#x2F;busybox:latest</span><br></pre></td></tr></table></figure>
+
+<p>然后我们进入/var/lib/registry目录，使用 tree 命令查看一下这个目录的存储结构。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 v2]# pwd</span><br><span class="line">&#x2F;var&#x2F;lib&#x2F;registry&#x2F;docker&#x2F;registry&#x2F;v2</span><br><span class="line">[root@centos3 v2]# tree</span><br><span class="line">.</span><br><span class="line">├── blobs</span><br><span class="line">│   └── sha256</span><br><span class="line">│       ├── 08</span><br><span class="line">│       │   └── 08bdaf2f88f90320cd3e92a469969efb1f066c6d318631f94e7864828abd7c75</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── 26</span><br><span class="line">│       │   └── 26abe223b186967eef77715b2c6efd147f3a203a0c7b19e61a8947dab4236397</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── 54</span><br><span class="line">│       │   └── 540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9bcbba</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── 59</span><br><span class="line">│       │   └── 59707d521c45c42bbb7dbbef463d5d3800859f20122fb54894f0c79d9b435483</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── 5a</span><br><span class="line">│       │   └── 5a38b3726f4b24fa93b80450be63ad67fd3239c2f3b83695118d7b1a88447d84</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── 63</span><br><span class="line">│       │   └── 63cb2df6dfe1fb041b952ddb9f75c69569331fa39577bc41a3e56cf8f79f7e2e</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── 69</span><br><span class="line">│       │   └── 69593048aa3acfee0f75f20b77acb549de2472063053f6730c4091b53f2dfb02</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── 9d</span><br><span class="line">│       │   └── 9d806bc203610fb061281b581a0b2522c9fcbd15e55c55ac0c496c9b1dbe63b0</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── b7</span><br><span class="line">│       │   └── b71f96345d44b237decc0c2d6c2f9ad0d17fde83dad7579608f1f0764d9686f2</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── c5</span><br><span class="line">│       │   └── c521bbbd9945cde2415eae95c3a2a604ea5ca18eb86ab5cadeb589d3b8a13185</span><br><span class="line">│       │       └── data</span><br><span class="line">│       ├── dc</span><br><span class="line">│       │   └── dca71257cd2e72840a21f0323234bb2e33fea6d949fa0f21c5102146f583486b</span><br><span class="line">│       │       └── data</span><br><span class="line">│       └── e5</span><br><span class="line">│           └── e5fa5deb334027202841b051d10e7c7137fa3b63e97734309cedf6b48804df5f</span><br><span class="line">│               └── data</span><br><span class="line">└── repositories</span><br><span class="line">    ├── busybox</span><br><span class="line">    │   ├── _layers</span><br><span class="line">    │   │   └── sha256</span><br><span class="line">    │   │       ├── 69593048aa3acfee0f75f20b77acb549de2472063053f6730c4091b53f2dfb02</span><br><span class="line">    │   │       │   └── link</span><br><span class="line">    │   │       └── b71f96345d44b237decc0c2d6c2f9ad0d17fde83dad7579608f1f0764d9686f2</span><br><span class="line">    │   │           └── link</span><br><span class="line">    │   ├── _manifests</span><br><span class="line">    │   │   ├── revisions</span><br><span class="line">    │   │   │   └── sha256</span><br><span class="line">    │   │   │       └── dca71257cd2e72840a21f0323234bb2e33fea6d949fa0f21c5102146f583486b</span><br><span class="line">    │   │   │           └── link</span><br><span class="line">    │   │   └── tags</span><br><span class="line">    │   │       └── latest</span><br><span class="line">    │   │           ├── current</span><br><span class="line">    │   │           │   └── link</span><br><span class="line">    │   │           └── index</span><br><span class="line">    │   │               └── sha256</span><br><span class="line">    │   │                   └── dca71257cd2e72840a21f0323234bb2e33fea6d949fa0f21c5102146f583486b</span><br><span class="line">    │   │                       └── link</span><br><span class="line">    │   └── _uploads</span><br><span class="line">    └── docker</span><br><span class="line">        ├── _layers</span><br><span class="line">        │   └── sha256</span><br><span class="line">        │       ├── 08bdaf2f88f90320cd3e92a469969efb1f066c6d318631f94e7864828abd7c75</span><br><span class="line">        │       │   └── link</span><br><span class="line">        │       ├── 26abe223b186967eef77715b2c6efd147f3a203a0c7b19e61a8947dab4236397</span><br><span class="line">        │       │   └── link</span><br><span class="line">        │       ├── 540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9bcbba</span><br><span class="line">        │       │   └── link</span><br><span class="line">        │       ├── 59707d521c45c42bbb7dbbef463d5d3800859f20122fb54894f0c79d9b435483</span><br><span class="line">        │       │   └── link</span><br><span class="line">        │       ├── 5a38b3726f4b24fa93b80450be63ad67fd3239c2f3b83695118d7b1a88447d84</span><br><span class="line">        │       │   └── link</span><br><span class="line">        │       ├── 9d806bc203610fb061281b581a0b2522c9fcbd15e55c55ac0c496c9b1dbe63b0</span><br><span class="line">        │       │   └── link</span><br><span class="line">        │       ├── c521bbbd9945cde2415eae95c3a2a604ea5ca18eb86ab5cadeb589d3b8a13185</span><br><span class="line">        │       │   └── link</span><br><span class="line">        │       └── e5fa5deb334027202841b051d10e7c7137fa3b63e97734309cedf6b48804df5f</span><br><span class="line">        │           └── link</span><br><span class="line">        ├── _manifests</span><br><span class="line">        │   ├── revisions</span><br><span class="line">        │   │   └── sha256</span><br><span class="line">        │   │       └── 63cb2df6dfe1fb041b952ddb9f75c69569331fa39577bc41a3e56cf8f79f7e2e</span><br><span class="line">        │   │           └── link</span><br><span class="line">        │   └── tags</span><br><span class="line">        │       └── latest</span><br><span class="line">        │           ├── current</span><br><span class="line">        │           │   └── link</span><br><span class="line">        │           └── index</span><br><span class="line">        │               └── sha256</span><br><span class="line">        │                   └── 63cb2df6dfe1fb041b952ddb9f75c69569331fa39577bc41a3e56cf8f79f7e2e</span><br><span class="line">        │                       └── link</span><br><span class="line">        └── _uploads</span><br></pre></td></tr></table></figure>
+
+<p>(有点看不懂，且看下面的层级结构图):</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt1jxsria5j31lv0u0jwe.jpg" alt="目录结构" title="">
+            </p>
+
+<h4 id="blobs-目录"><a href="#blobs-目录" class="headerlink" title="blobs 目录"></a>blobs 目录</h4><p><code>blobs</code> 目录用来存放镜像的三种文件： layer 的真实数据，镜像的 manifest 文件，镜像的 image config 文件。这些文件都是以 <code>data</code> 为名的文件存放在于该文件 <code>sha256</code> 相对应的目录下.对于 layer 来讲，这是个 <code>data</code> 文件的格式是 <code>vnd.docker.image.rootfs.diff.tar.gzip</code> ，我们可以使用 <code>tar -xvf</code> 命令将这个 layer 解开。当我们使用 docker pull 命令拉取镜像的时候，也是去下载这个 <code>data</code>文件，下载完成之后会有一个 <code>docker-untar</code>的进程将这个 <code>data</code>文件解开存放在<code>/var/lib/docker/overlay2/${digest}/diff</code> 目录下。</p>
+<h4 id="repositories-目录"><a href="#repositories-目录" class="headerlink" title="repositories 目录"></a>repositories 目录</h4><p>repositories 目录存放着各个镜像的manifest和layer信息，每个镜像版本都有_layers, _manifests,  _uploads这三个文件夹。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 busybox]# pwd</span><br><span class="line">&#x2F;var&#x2F;lib&#x2F;registry&#x2F;docker&#x2F;registry&#x2F;v2&#x2F;repositories&#x2F;busybox</span><br><span class="line">[root@centos3 busybox]# ls</span><br><span class="line">_layers  _manifests  _uploads</span><br></pre></td></tr></table></figure>
+
+<h5 id="upload文件夹"><a href="#upload文件夹" class="headerlink" title="_upload文件夹"></a>_upload文件夹</h5><p> _uploads 文件夹是个临时的文件夹，主要用来存放 push 镜像过程中的文件数据，当镜像 <code>layer</code> 上传完成之后会清空该文件夹。其中的 <code>data</code> 文件上传完毕后会移动到 <code>blobs</code> 目录下。</p>
+<h5 id="manifest-文件夹"><a href="#manifest-文件夹" class="headerlink" title="_manifest 文件夹"></a>_manifest 文件夹</h5><p><code>_manifests</code> 文件夹是镜像上传完成之后由 registry 来生成的，并且该目录下的文件都是一个名为 <code>link</code>的文本文件，它的值指向 blobs 目录下与之对应的目录。在_manifests<code>文件夹下包含着镜像的</code>tags<code>和</code>revisions` 信息，每一个镜像的每一个 tag 对应着于 tag 名相同的目录，</p>
+<p>每个 <code>tag</code>目录下面有 <code>current</code> 目录和 <code>index</code> 目录， <code>current</code> 目录下的 link 文件保存了该 tag 目前的 manifest 文件的 sha256 编码，对应在 <code>blobs</code> 中的 <code>sha256</code> 目录下的 <code>data</code> 文件，而 <code>index</code> 目录则列出了该 <code>tag</code> 历史上传的所有版本的 <code>sha256</code> 编码信息。<code>_revisions</code> 目录里存放了该 <code>repository</code> 历史上上传版本的所有 sha256 编码信息。</p>
+<p>当我们 <code>pull</code> 镜像的时候如果不指定镜像的 <code>tag</code>名，默认就是 latest，registry 会从 HTTP 请求中解析到这个 tag 名，然后根据 tag 名目录下的 current link 文件找到该镜像的  manifest 的位置返回给客户端，客户端接着去请求这个 manifest 文件，最后客户端根据这个 manifest 文件来 pull 相应的镜像 layer 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 busybox]# find .&#x2F;_manifests&#x2F; -type f</span><br><span class="line">.&#x2F;_manifests&#x2F;revisions&#x2F;sha256&#x2F;dca71257cd2e72840a21f0323234bb2e33fea6d949fa0f21c5102146f583486b&#x2F;link</span><br><span class="line">.&#x2F;_manifests&#x2F;tags&#x2F;latest&#x2F;index&#x2F;sha256&#x2F;dca71257cd2e72840a21f0323234bb2e33fea6d949fa0f21c5102146f583486b&#x2F;link</span><br><span class="line">.&#x2F;_manifests&#x2F;tags&#x2F;latest&#x2F;current&#x2F;link</span><br><span class="line"></span><br><span class="line">[root@centos3 busybox]# cat .&#x2F;_manifests&#x2F;tags&#x2F;latest&#x2F;index&#x2F;sha256&#x2F;dca71257cd2e72840a21f0323234bb2e33fea6d949fa0f21c5102146f583486b&#x2F;link</span><br><span class="line">sha256:dca71257cd2e72840a21f0323234bb2e33fea6d949fa0f21c5102146f583486b</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>registry 存储目录里并不会存储与该 registry 相关的信息，比如我们 push 镜像的时候需要给镜像加上 <code>localhost:5000</code> 这个前缀，这个前缀并不会存储在 registry 存储中。假如要迁移一个很大的 registry 镜像仓库，镜像的数量在 5k 以上。最便捷的办法就是打包这个 registry 存储目录，将这个 tar 包 rsync 到另一台机器即可。需要强调一点，打包 registry 存储目录的时候不需要进行压缩，直接 <code>tar -cvf</code> 即可。因为 registry 存储的镜像 layer 已经是个 <code>tar.gzip</code> 格式的文件，再进行压缩的话效果甚微而且还浪费 CPU 时间得不偿失。</p>
+</blockquote>
+<h2 id="镜像是怎么搬运的"><a href="#镜像是怎么搬运的" class="headerlink" title="镜像是怎么搬运的"></a>镜像是怎么搬运的</h2><p>当我们知道镜像是如何存储了之后，我们就该了解镜像是如何传输的了。</p>
+<h3 id="docker-pull"><a href="#docker-pull" class="headerlink" title="docker pull"></a>docker pull</h3><p>理解 docker pull 一个镜像的流程最好的办法是查看 OCI registry 规范中的这段文档 <a href="https://github.com/opencontainers/distribution-spec/blob/master/spec.md#pulling-an-image">pulling-an-image</a>, 下面流程图是镜像传输的流程:</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt1mm3241qj30wa0sqdj2.jpg" alt="docker pull" title="">
+            </p>
+
+<p>ocker pull 就和我们使用 git clone 一样效果，将远程的镜像仓库拉取到本地来给容器运行时使用，结合上图大致的流程如下：</p>
+<ul>
+<li>第一步应该是使用<code>~/.docker/config.json</code> 中的 auth 认证信息在 registry 那里进行鉴权授权，拿到一个 token，后面的所有的 HTTP 请求中都要包含着该 token 才能有权限进行操作</li>
+<li>dockerd 守护进程解析 docker 客户端参数，接着向 registry 请求 manifest 文件</li>
+<li>dockerd 得到 <code>manifest</code> 后，读取里面 image config 文件的 <code>digest</code>，这个 sha256 值就是 image 的 <code>ID</code></li>
+<li>根据 <code>ID</code> 在本地的 <code>repositories.json</code>中查找找有没有存在同样 <code>ID</code> 的 image，有的话就不用下载了</li>
+<li>如果没有，那么会给 registry 服务器发请求拿到 image config 文件</li>
+<li>根据 image config 文件中的 <code>diff_ids</code>在本地找对应的 layer 是否存在</li>
+<li>如果 layer 不存在，则根据 <code>manifest</code> 里面 layer 的 <code>sha256</code> 和 <code>media type</code> 去服务器拿相应的 layer（相当去拿压缩格式的包）</li>
+<li>dockerd 守护进程并行下载各 layer </li>
+<li>拿到后进行解压，并检查解压(gzip -d)后 tar 包的 sha256 是否和 image config 中的 <code>diff_id</code> 相同，不相同就翻车了</li>
+<li>等所有的 layer 都下载完成后，整个 image 的 layer 就下载完成，接着开始进行解压(tar -xf) layer 的 tar 包。</li>
+<li>dockerd 起一个单独的进程 <code>docker-untar</code> 来 gzip 解压缩已经下载完成的 layer 文件</li>
+<li>验证 image config 中的 RootFS.diffids 是否与解压后hash 相同</li>
+</ul>
+<h3 id="docker-push"><a href="#docker-push" class="headerlink" title="docker push"></a>docker push</h3><p>doker push 的流程恰好和 docker pull 拉取镜像到本地的流程相反。docker pull 一个镜像的时候往往需要先获取镜像 的 manifest 文件，然后根据这个文件中的 layer 信息取相应的 layer。doker push 一个镜像，需要先将镜像的各个 layer 推送到 registry ，当所有的镜像 layer 上传完毕之后最后再 push Image manifest 到 registry。大体的流程如下:</p>
+<ul>
+<li>第一步和 pull 一个镜像一样也是进行鉴权授权，拿到一个 token</li>
+<li>向 registry 发送 <code>POST /v2/&lt;name&gt;/blobs/uploads/</code>请求，registry 返回一个上传镜像 layer 时要应到的 URL</li>
+<li>客户端通过 <code>HEAD /v2/&lt;name&gt;/blobs/&lt;digest&gt;</code> 请求检查 registry 中是否已经存在镜像的 layer</li>
+<li>客户端通过URL 使用 POST 方法来实时上传 layer 数据，上传镜像 layer 分为 <code>Monolithic Upload</code> （整体上传）和<code>Chunked Upload</code>（分块上传）两种方式</li>
+<li>镜像的 layer 上传完成之后，客户端向 registry 发送一个 PUT HTTP 请求告知该 layer 已经上传完毕。</li>
+<li>当所有的 layer 上传完之后，再将 manifest 推送上去</li>
+</ul>
+<blockquote>
+<p>此处应该安利下skopeo, skopeo对跨registry传输的镜像场景下非常实用， 免去了像 docker pull –&gt; docker tag –&gt; docker push 这样的流程，感兴趣的同学可以去了解下~</p>
+</blockquote>
+<h2 id="镜像是怎样食用的"><a href="#镜像是怎样食用的" class="headerlink" title="镜像是怎样食用的"></a>镜像是怎样食用的</h2><p>当我们拿到一个镜像之后, 容器运行时通过一个叫 <a href="https://github.com/opencontainers/runtime-spec/blob/master/bundle.md">OCI runtime filesytem bundle</a> 的标准格式将 OCI 镜像通过工具转换为 bundle ，然后 OCI 容器引擎能够识别这个 bundle 来运行容器。</p>
+<blockquote>
+<p>filesystem bundle 是个目录，用于给 runtime 提供启动容器必备的配置文件和文件系统。标准的容器 bundle 包含以下内容：</p>
+<ul>
+<li>config.json: 该文件包含了容器运行的配置信息，该文件必须存在 bundle 的根目录，且名字必须为 config.json</li>
+<li>容器的根目录，可以由 config.json 中的 root.path 指定</li>
+</ul>
+</blockquote>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt0ant3ao0j61750u00ts02.jpg" alt="oci bundle" title="">
+            </p>
+
+<p>当我们启动一个容器之后使用 tree 命令来分析一下 overlay2目录 就会发现，较之前的目录，容器启动之后 overlay2 目录下多了一个 <code>merged</code> 的文件夹，该文件夹就是容器内看到的。docker 通过 overlayfs (联合文件系统)联合挂载的技术将镜像的多层 layer 挂载为一层，这层的内容就是容器里所看到的，也就是 merged 文件夹。</p>
+<h3 id="什么是联合文件系统"><a href="#什么是联合文件系统" class="headerlink" title="什么是联合文件系统"></a>什么是联合文件系统</h3><p>联合挂载是一种文件系统，它可以在不修改其原始（物理）源的情况下创建多个目录，并把内容合并为一个文件的错觉。联合挂载或联合文件系统是文件系统；但不是文件系统类型，而是一个包含许多实现的概念。docker 支持多种文件系统，现在默认使用overlay2作为默认的存储驱动程序(version &gt; 18.06)，如果是老版本则默认使用aufs作为存储驱动程序(version &lt;=18.06), 下面就介绍几种常见的联合文件系统：</p>
+<h4 id="UnionFS"><a href="#UnionFS" class="headerlink" title="UnionFS"></a>UnionFS</h4><p>UnionFS 其实是一种为 Linux 操作系统设计的用于把多个文件系统『联合』到同一个挂载点的文件系统服务。 现在UnionFS 似乎不再积极开发，其最新提交是从 2014 年 8 月开始的。您可以在其网站<a href="https://unionfs.filesystems.org/上阅读更多有关它的信息。" target="_blank" rel="noopener">https://unionfs.filesystems.org/上阅读更多有关它的信息。</a></p>
+<h4 id="AUFS"><a href="#AUFS" class="headerlink" title="AUFS"></a>AUFS</h4><p>AUFS 即 Advanced UnionFS 其实就是 UnionFS 的升级版, 它能够将将单个 Linux 主机上的多个目录分层并将它们呈现为单个目录。这些目录在 AUFS 术语中称为<em>分支</em>，在 Docker 术语中称为<em>层</em>，关于AUFS如何工作的在 <a href="https://docs.docker.com/storage/storagedriver/aufs-driver/" target="_blank" rel="noopener">docker 官方文档 </a> 里有说明</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt0b8ajmpzj617k0lsdiq02.jpg" alt="aufs" title="">
+            </p>
+
+<h4 id="OverlayFS"><a href="#OverlayFS" class="headerlink" title="OverlayFS"></a>OverlayFS</h4><p>OverlayFS也是一个现代<em>联合文件系统</em>，类似于 AUFS，但速度更快，实现更简单。Docker 为 OverlayFS 提供了两个存储驱动程序：原始的<code>overlay</code>和更新更稳定的<code>overlay2</code>。</p>
+<p>OverlayFS 由低层和高层的目录组成，下层目录称之为<code>lowerdir</code>, 上层称之为<code>upperdir</code>, 文件系统中低层的目录是只读的，而高层的文件系统则是可读可写的。</p>
+<p>下图显示了 Docker 镜像和 Docker 容器是如何分层的。图像层是<code>lowerdir</code>，容器层是<code>upperdir</code>。<code>merged</code> 为镜像和容器中所有图层的合并视图。关于AUFS如何工作的在 <a href="https://docs.docker.com/storage/storagedriver/overlayfs-driver/" target="_blank" rel="noopener">docker 官方文档 </a> 里有说明</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt0bmp76u7j315i0asmz3.jpg" alt="overlay" title="">
+            </p>
+
+<p>当我们使用<code>docker inspect</code>命令的时候可以看到镜像(容器)的的层信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 nginx]# docker inspect nginx | jq .[0].GraphDriver.Data</span><br><span class="line">&#123;</span><br><span class="line">  &quot;LowerDir&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;26b544d41358c2c6818f5ec30855b997a85b7d7d5291bf3115def847626971a3&#x2F;diff:&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;452f96de6d70b17221a06b9b81af3cb5b5b855231c018826f030dbc9393e1867&#x2F;diff:&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;6a10e6330e511ef9f6ea94301366d3b303da6b751a9703fc223a73869aa98912&#x2F;diff:&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;7c28defbbc32d0bd94dc675639a8e26ffd9e16903d1c69cce6a109d495bb230c&#x2F;diff:&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;32680ffbf919dbc1d2a4a626ce4bba1203dc0c3ec649dfb44f9c15657514e0e8&#x2F;diff&quot;,</span><br><span class="line">  &quot;MergedDir&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;be030cc6ed9cfa5c9e7ba78d6d62a16842e09940f615617c0ed284bc80c8f3ce&#x2F;merged&quot;,</span><br><span class="line">  &quot;UpperDir&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;be030cc6ed9cfa5c9e7ba78d6d62a16842e09940f615617c0ed284bc80c8f3ce&#x2F;diff&quot;,</span><br><span class="line">  &quot;WorkDir&quot;: &quot;&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;be030cc6ed9cfa5c9e7ba78d6d62a16842e09940f615617c0ed284bc80c8f3ce&#x2F;work&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>LowerDir: 是只读镜像层的目录，以冒号分隔</li>
+<li>MergedDir：镜像和容器中所有图层的合并视图</li>
+<li>UpperDir：写入更改的读写层</li>
+<li>WorkDir：Linux OverlayFS 用于准备合并视图的工作目录</li>
+</ul>
+</blockquote>
+<h4 id="ZFS"><a href="#ZFS" class="headerlink" title="ZFS"></a>ZFS</h4><p> ZFS 是由 Sun Microsystems（现在是 Oracle）创建的联合文件系统。它有一些有趣的功能，如分层校验和、快照和备份/复制的本机处理或本机数据压缩和重复数据删除。但是，由 Oracle 维护，它具有非 OSS 友好许可 (CDDL)，因此不能作为 Linux 内核的一部分提供。但是，您可以在 Linux (ZoL)项目上使用 ZFS，Docker 文档中将其描述为健康和成熟的……，但尚未准备好用于生产。关于ZFS如何工作的在 <a href="https://docs.docker.com/storage/storagedriver/zfs-driver/" target="_blank" rel="noopener">docker 官方文档 </a> 里有说明</p>
+<h4 id="Btrfs"><a href="#Btrfs" class="headerlink" title="Btrfs"></a>Btrfs</h4><p> Btrfs是多家公司（包括 SUSE、WD 或 Facebook ）的联合项目，在 GPL 许可下发布，是 Linux 内核的一部分。Btrfs 是 Fedora 33 的默认文件系统。它还具有一些有用的功能，例如块级操作、碎片整理、可写快照等等。Btrfs 作为下一代写时复制文件系统，非常适合 Docker。关于Btrfs如何工作的在 <a href="https://docs.docker.com/storage/storagedriver/btrfs-driver/" target="_blank" rel="noopener">docker 官方文档 </a> 里有说明</p>
+<h3 id="动手实验部分"><a href="#动手实验部分" class="headerlink" title="动手实验部分"></a>动手实验部分</h3><h5 id="docker-overlay2创建联合挂载"><a href="#docker-overlay2创建联合挂载" class="headerlink" title="docker overlay2创建联合挂载"></a>docker overlay2创建联合挂载</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除所有镜像</span></span><br><span class="line"><span class="comment"># docker image prune -af</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取nginx镜像(使用degist模式以保证layer都一致)</span></span><br><span class="line">docker pull nginx@sha256:8f335768880da6baf72b70c701002b45f4932acae8d574dedfddaf967fc3ac90</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看GraphDriver</span></span><br><span class="line">docker inspect nginx@sha256:8f335768880da6baf72b70c701002b45f4932acae8d574dedfddaf967fc3ac90 | jq .[0].GraphDriver.Data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建nginx文件夹</span></span><br><span class="line">mkdir -p /root/nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 联合挂载, lowerdir, uppperdir, workdir 使用 GraphDriver.Data中的数据</span></span><br><span class="line">mount -t overlay -o \</span><br><span class="line">lowerdir=/var/lib/docker/overlay2/26b544d41358c2c6818f5ec30855b997a85b7d7d5291bf3115def847626971a3/diff:/var/lib/docker/overlay2/452f96de6d70b17221a06b9b81af3cb5b5b855231c018826f030dbc9393e1867/diff:/var/lib/docker/overlay2/6a10e6330e511ef9f6ea94301366d3b303da6b751a9703fc223a73869aa98912/diff:/var/lib/docker/overlay2/7c28defbbc32d0bd94dc675639a8e26ffd9e16903d1c69cce6a109d495bb230c/diff:/var/lib/docker/overlay2/32680ffbf919dbc1d2a4a626ce4bba1203dc0c3ec649dfb44f9c15657514e0e8/diff,\</span><br><span class="line">upperdir=/var/lib/docker/overlay2/be030cc6ed9cfa5c9e7ba78d6d62a16842e09940f615617c0ed284bc80c8f3ce/diff,\</span><br><span class="line">workdir=/var/lib/docker/overlay2/be030cc6ed9cfa5c9e7ba78d6d62a16842e09940f615617c0ed284bc80c8f3ce/work \</span><br><span class="line">overlay /root/nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 取消挂载并删除目录</span></span><br><span class="line"><span class="comment"># umount overlay</span></span><br><span class="line"><span class="comment"># rm -rf /root/nginx</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="手动创建overlay2联合挂载"><a href="#手动创建overlay2联合挂载" class="headerlink" title="手动创建overlay2联合挂载"></a>手动创建overlay2联合挂载</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建文件夹</span></span><br><span class="line"><span class="built_in">cd</span> /root &amp;&amp; rm -rf overlay2 &amp;&amp; mkdir overlay2 &amp;&amp; <span class="built_in">cd</span> <span class="variable">$_</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建layer1</span></span><br><span class="line">mkdir -p layer1/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"layer1"</span> &gt; layer1/bin/bash</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"layer1"</span> &gt; layer1/layer1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建layer2</span></span><br><span class="line">mkdir -p layer2/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"layer2"</span> &gt; layer2/bin/bash</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"layer2"</span> &gt; layer2/layer2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建layer3</span></span><br><span class="line">mkdir -p layer3/etc</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"layer3"</span> &gt; layer3/etc/cat</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"layer3"</span> &gt; layer3/layer3</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mkdir -p layer4 &amp;&amp; \</span><br><span class="line">mkdir -p workdir &amp;&amp; \</span><br><span class="line">mkdir -p merged</span><br><span class="line"></span><br><span class="line">mount -t overlay -o \</span><br><span class="line">lowerdir=/root/overlay2/layer1:/root/overlay2/layer2:/root/overlay2/layer3,\</span><br><span class="line">upperdir=/root/overlay2/layer4,\</span><br><span class="line">workdir=/root/overlay2/workdir \</span><br><span class="line">overlay1 /root/overlay2/merged</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 overlay2]<span class="comment"># ls</span></span><br><span class="line">layer1  layer2  layer3  layer4  merged  workdir</span><br><span class="line"></span><br><span class="line"><span class="comment"># 切换到merged层并且创建layer文件</span></span><br><span class="line">[root@centos3 overlay2]<span class="comment"># cd merged/</span></span><br><span class="line">[root@centos3 merged]<span class="comment"># echo "hello world" &gt; layer</span></span><br><span class="line">[root@centos3 merged]<span class="comment"># cat layer</span></span><br><span class="line">hello world</span><br><span class="line"></span><br><span class="line"><span class="comment"># layer会复制一份到layer4</span></span><br><span class="line">[root@centos3 merged]<span class="comment"># cd ../layer4</span></span><br><span class="line">[root@centos3 layer4]<span class="comment"># ls</span></span><br><span class="line">layer</span><br><span class="line">[root@centos3 layer4]<span class="comment"># cat layer </span></span><br><span class="line">hello world</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除layer文件，layer4下的文件也会删除</span></span><br><span class="line">[root@centos3 layer4]<span class="comment"># cd - </span></span><br><span class="line">[root@centos3 merged]<span class="comment"># rm layer</span></span><br><span class="line">rm: remove regular file ‘layer’? y</span><br><span class="line">[root@centos3 overlay2]<span class="comment"># cd layer4</span></span><br><span class="line">[root@centos3 layer4]<span class="comment"># ls</span></span><br><span class="line">[root@centos3 layer4]<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="使用runc-运行联合挂载的目录"><a href="#使用runc-运行联合挂载的目录" class="headerlink" title="使用runc 运行联合挂载的目录"></a>使用runc 运行联合挂载的目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 拉取busybox镜像(使用degist模式以保证layer都一致)</span></span><br><span class="line">docker pull busybox@sha256:0f354ec1728d9ff32edcd7d1b8bbdfc798277ad36120dc3dc683be44524c8b60</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看GraphDriver</span></span><br><span class="line">docker inspect nginx@sha256:8f335768880da6baf72b70c701002b45f4932acae8d574dedfddaf967fc3ac90 | jq .[0].GraphDriver.Data</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建busybox文件夹, 一定要在rootfs文件夹下，因为runc的config.json默认配置是rootfs</span></span><br><span class="line">mkdir -p /root/busybox/rootfs &amp;&amp; mkdir -p /root/busybox/workdir &amp;&amp; /root/busybox/upperdir</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 联合挂载 lowerdir 使用 GraphDriver.Data中upperdir中的数据</span></span><br><span class="line">mount -t overlay -o \</span><br><span class="line">lowerdir=/var/lib/docker/overlay2/f3640f23bac0bbbac072f3609bba70cd50a3160a8820828d9047173686fe170d/diff,\</span><br><span class="line">upperdir=/root/busybox/upperdir,\</span><br><span class="line">workdir=/root/busybox/workdir \</span><br><span class="line">busybox /root/busybox/rootfs</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 切换到busybox目录下</span></span><br><span class="line">cd /root/busybox</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建config.json</span></span><br><span class="line">runc spec</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过runc运行busybox</span></span><br><span class="line">runc run mybusybox</span><br></pre></td></tr></table></figure>
+
+<h4 id="通过runc-运行容器"><a href="#通过runc-运行容器" class="headerlink" title="通过runc 运行容器"></a>通过runc 运行容器</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建目录</span></span><br><span class="line">mkdir -p /root/mybusybox/rootfs &amp;&amp; <span class="built_in">cd</span> /root/mybusybox</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成rootfs</span></span><br><span class="line">docker <span class="built_in">export</span> $(docker create busybox) | tar -C rootfs -xvf -</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成config.json文件</span></span><br><span class="line">runc spec</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行容器</span></span><br><span class="line">runc run mybusybox1</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><p><a href="https://blog.k8s.li/Exploring-container-image.html" target="_blank" rel="noopener">深入浅出容器镜像的一生🤔</a>  // 木子李的博客，上面的内容基本拷贝的木子李的~</p>
+<p><a href="https://docs.docker.com/storage/storagedriver/" target="_blank" rel="noopener">关于存储驱动程序 </a>  //docker 官方文档,推荐阅读</p>
+<p><a href="https://www.jianshu.com/p/dd463368a3c9" target="_blank" rel="noopener">虚拟化技术与Hypervisor回顾</a> //理解一下虚拟化也不错</p>
+<p><a href="https://blog.fleeto.us/post/how-are-docker-images-built" target="_blank" rel="noopener">镜像是怎样炼成的</a>   // 伪架构师的博客</p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495888&idx=1&sn=39ed455b12cc2e3ad18f5f72c8e6cc21&chksm=ea77c468dd004d7e42aa4a9c095822e41fd3fa01a08156181615fb66f724bc0d03ff228a39bd&mpshare=1&scene=23&srcid=0725WOb425c0NjJIJh8vjO0F&sharer_sharetime=1627183441694&sharer_shareid=2c5557b062e3783c43cbfcd88042eb27%2523rd" target="_blank" rel="noopener">深入研究Docker联合文件系统</a> //linux云计算网络</p>
+<p><a href="https://cizixs.com/2017/11/05/oci-and-runc/" target="_blank" rel="noopener">OCI 和 runc：容器标准化和 docker</a> //关于OCI的解读，以及如何通过runc 起一个容器，值得一看，推荐阅读</p>
+<p><a href="https://www.alibabacloud.com/blog/open-container-initiative-oci-specifications_594397" target="_blank" rel="noopener">开放容器计划 (OCI) 规范</a> // 阿里国际站上的博客，关于OCI的解读，图不错(英文的)</p>
+<p><a href="https://www.shangyang.me/2016/12/20/docker-basics/" target="_blank" rel="noopener">Docker 原理篇（三）Docker 基础操作和基础概念</a> // 命令的状态流转图还不错，值得一看</p>
+<p><a href="https://juejin.cn/post/6844904039180681229" target="_blank" rel="noopener">Docker 原理与核心概念</a> //docker 的基本命令，命令的状态流转图也不错</p>
+<p><a href="https://windsock.io/explaining-docker-image-ids/" target="_blank" rel="noopener">https://windsock.io/explaining-docker-image-ids/</a>  // docker 镜像ID，英文的</p>
+<p><a href="https://segmentfault.com/a/1190000011294361" target="_blank" rel="noopener">https://segmentfault.com/a/1190000011294361</a>  //关于container -&gt; docker-shim的</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/" rel="tag">docker</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/08/11/docker-lifecycle/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">docker 优雅退出</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/07/19/linux-strace/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">linux strace命令</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

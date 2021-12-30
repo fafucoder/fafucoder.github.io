@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>kubernetes常见的网络插件 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="概述常见的容器网络方案可以从协议栈层级、穿越形态、隔离方式这三种形式进行划分。 协议栈层级:  第一种：协议栈二层。 第二种：协议栈三层（纯路由转发）。 第三种：协议栈二层加三层。  穿越形态： 按穿越的形态划分，这个与实际部署环境十分相关。穿越形态分为两种：Underlay、Overlay。  Underlay：在一个较好的一个可控的网络场景下，我们一般利用 Underlay。可以这样通俗的理解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes常见的网络插件">
+<meta property="og:url" content="https://github.com/fafucoder/2021/01/03/kubernetes-cni-plugins/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概述常见的容器网络方案可以从协议栈层级、穿越形态、隔离方式这三种形式进行划分。 协议栈层级:  第一种：协议栈二层。 第二种：协议栈三层（纯路由转发）。 第三种：协议栈二层加三层。  穿越形态： 按穿越的形态划分，这个与实际部署环境十分相关。穿越形态分为两种：Underlay、Overlay。  Underlay：在一个较好的一个可控的网络场景下，我们一般利用 Underlay。可以这样通俗的理解">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23bwzmruj31i70u0tc1.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23h7ejwij31910u0wg3.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23vi1k3jj314q0mcabk.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23xvdpxoj314u0mojt9.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw24xtymjmj314q0nqwg1.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw253xcpa9j311y0ny75q.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw26386mtij30zo0lkdh5.jpg">
+<meta property="article:published_time" content="2021-01-03T06:02:52.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.334Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23bwzmruj31i70u0tc1.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kubernetes常见的网络插件</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kubernetes常见的网络插件</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-01-03T06:02:52.000Z" itemprop="datePublished" class="page-time">
+  2021-01-03
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-cni-plugins"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kubernetes常见的网络插件</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-01-03 14:02:52" datetime="2021-01-03T06:02:52.000Z"  itemprop="datePublished">2021-01-03</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>常见的容器网络方案可以从协议栈层级、穿越形态、隔离方式这三种形式进行划分。</p>
+<p><strong>协议栈层级:</strong></p>
+<ul>
+<li>第一种：协议栈二层。</li>
+<li>第二种：协议栈三层（纯路由转发）。</li>
+<li>第三种：协议栈二层加三层。</li>
+</ul>
+<p><strong>穿越形态：</strong></p>
+<p>按穿越的形态划分，这个与实际部署环境十分相关。穿越形态分为两种：Underlay、Overlay。</p>
+<ul>
+<li>Underlay：在一个较好的一个可控的网络场景下，我们一般利用 Underlay。可以这样通俗的理解，无论下面是裸机还是虚拟机，只要网络可控，整个容器的网络便可直接穿过去 ，这就是 Underlay。</li>
+<li>Overlay：Overlay 在云化场景比较常见。Overlay 下面是受控的 VPC 网络，当出现不属于 VPC 管辖范围中的 IP 或者 MAC，VPC 将不允许此 IP/MAC 穿越。出现这种情况时，我们都利用 Overlay 方式来做。</li>
+</ul>
+<p><strong>隔离方式：</strong></p>
+<p>隔离方式与多种户型相关（用户与用户之间的隔离方式），隔离方式分为 FLAT、VLAN、VXLAN 三种：</p>
+<ul>
+<li>FLAT：纯扁平网络，无隔离；</li>
+<li>VLAN：VLAN 机房中使用偏多，但实际上存在一个问题？就是它总的租户数量受限。众所周知，VLAN 具有数量限制。</li>
+<li>VXLAN：VXLAN 是现下较为主流的一种隔离方式。因为它的规模性较好较大，且它基于 IP 穿越方式较好。</li>
+</ul>
+<h3 id="fannel"><a href="#fannel" class="headerlink" title="fannel"></a>fannel</h3><p>Kubernetes中解决网络跨主机通信的一个经典插件就是Flannel。flannel因为其简单的特性而广为熟知，在现在的flannel实现方案中，有三种方式，分别为udp模式，host-gw模式，vxlan模式</p>
+<h4 id="udp模式"><a href="#udp模式" class="headerlink" title="udp模式"></a>udp模式</h4><p>UDP是最早的实现方式，但是由于其性能原因，现已经被废弃，但是UDP模式是最直接，也最容易理解的跨主机实现方式。</p>
+<p>假如有两台Node，如下：</p>
+<ol>
+<li>Node01上有容器nginx01，其IP为172.20.1.107，其docker0的地址为172.20.1.1/24；</li>
+<li>Node02上有容器nginx02，其IP为172.20.2.133，其docker0的地址为172.20.2.1/24；</li>
+</ol>
+<p>那么现在nginx01要访问nginx02，其流程应该是怎么样的呢？</p>
+<ol>
+<li>首先从nginx01发送IP包，源IP是172.20.1.107，目的IP是172.20.2.133。</li>
+<li>由于目的IP并不在Node01上的docker0网桥里，所以会将包通过默认路由转发到docker0网桥所在的<a href="https://cloud.tencent.com/product/cdh?from=10680" target="_blank" rel="noopener">宿主机</a>上；</li>
+<li>它会通过本地的路由规则，转发到下一个目的IP，我们可以通过ip route查看本地的路由信息，通过路由信息可以看到它被转发到一个flannel0的设备中；</li>
+<li>flannel0设备会把这个IP包交给创建这个设备的应用程序，也就是Flannel进程（从内核状态向用户状态切换）；</li>
+<li>Flannel进程收到IP包后，将这个包封装在UDP中，就根据其目的地址将其转发给Node02（通过每个宿主机上监听的8285端口），这时候的源地址是Node01的地址，目的地址是Node02的地址；</li>
+<li>Node02收到包后，就会直接将其转发给flannel0设备，然后进行解包，匹配本地路由规则转发给docker0网桥，然后docker0网桥就扮演二层交换机的功能，将包转发到最终的目的地；</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23bwzmruj31i70u0tc1.jpg" alt="udp模式" title="">
+            </p>
+
+<blockquote>
+<p>注：<br> 1、flannel0是一个TUN设备，它的作用是在操作系统和应用程序之间传递IP包；<br> 2、Flannel是根据子网（Subnet）来查看IP地址对应的容器是运行在那个Node上；<br> 3、这些子网和Node的对应关系，是保存在Etcd中（仅限UDP模式）；<br> 4、UDP模式其实是一个三层的Overlay网络；它首先对发出的IP包进行UDP封装，然后接收端对包进行解封拿到原始IP，进而把这个包转发给目标容器。这就好比Flannel在不同的宿主机上的两容器之间打通了一条隧道，使得这个两个IP可以通信，而无需关心容器和宿主机的分布情况；</p>
+</blockquote>
+<p>UDP之所以被废弃是主要是由于其仅在发包的过程中就在用户态和内核态进行来回的数据交换，这样的性能代价是很高的.</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23h7ejwij31910u0wg3.jpg" alt="udp模式缺陷" title="">
+            </p>
+
+<h4 id="vxlan-模式"><a href="#vxlan-模式" class="headerlink" title="vxlan 模式"></a>vxlan 模式</h4><p>VXLAN：Virtual Extensible LAN（虚拟可扩展局域网），是Linux内核本身就支持的一种虚拟化网络技术，它可以完全在内核态实现上述的封装和解封装过程，减少用户态到内核态的切换次数，把核心的处理逻辑都放到内核态，其通过与前面相似的隧道技术，构建出覆盖网络或者叠加网络（Overlay Network）。</p>
+<p>其设计思想为在现有的三层网络下，叠加一层虚拟的并由内核VXLAN维护的二层网络，使得连接在这个二层网络上的主机可以像在局域网一样通信。</p>
+<p>为了能够在二层网络中打通隧道，VXLAN会在宿主机上设置一个特殊的网络设备作为隧道的两端，这个隧道就叫VTEP（Virtual Tunnel End Point 虚拟隧道端点）。而VTEP的作用跟上面的flanneld进程非常相似，只不过它进行封装和解封的对象是二层的数据帧，而且这个工作的执行流程全部在内核中完成。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23vi1k3jj314q0mcabk.jpg" alt="" title="">
+            </p>
+
+<p>我们可以看到每台Node上都有一个flannel.1的网卡，它就是VXLAN所需要的VTEP设备，它既有IP地址，也有MAC地址。 现在我们nginx01要访问nginx02，其流程如下：</p>
+<ol>
+<li>nginx01发送请求包会被转发到docker0；</li>
+<li>然后会通过路由转发到本机的flannel,1；</li>
+<li>flannel.1收到包后通过ARP记录找到目的MAC地址，并将其加原始包上，封装成二层数据帧（将源MAC地址和目的MAC地址封装在它们对应的IP头外部）；</li>
+<li>Linux内核把这个数据帧封装成普通的可传输的数据帧，通过宿主机的eth0进行传输（也就是在原有的数据帧上面加一个VXLAN头VNI，它是识别某个数据帧是不是归自己处理的的重要标识，而在flannel中，VNI的默认值就是1，这是由于宿主机上的VTEP设备名称叫flannel.1，这里的1就是VNI的值）；</li>
+<li>然后Linux内核会把这个数据帧封装到UDP包里发出去；</li>
+<li>Node02收到包后发现VNI为 1，Linux内核会对其进行解包，拿到里面的数据帧，然后根据VNI的值把它交给Node02上的flannel.1设备，然后继续进行接下来的处理；</li>
+</ol>
+<p>在这种场景下，flannel.1设备实际扮演的是一个网桥的角色，在二层网络进行UDP包的转发，在Linux内核中，网桥设备进行转发的依据是一个叫做FDB（Foewarding Database）的转发<a href="https://cloud.tencent.com/solution/database?from=10680" target="_blank" rel="noopener">数据库</a>，它的内容可以通过bridge fdb命令可以查看。</p>
+<h4 id="host-gw模式"><a href="#host-gw模式" class="headerlink" title="host-gw模式"></a>host-gw模式</h4><p>前面的两种模式都是二层网络的解决方案，对于三层网络，Flannel提供host-gw解决方案。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23xvdpxoj314u0mojt9.jpg" alt="host-gw模式" title="">
+            </p>
+
+<p>如上所示，如果我nginx01要访问nginx02，流程如下：</p>
+<ol>
+<li>转发请求包会被转发到cni0；</li>
+<li>到达本机后会匹配本机的路由，如上的路由信息，然后发现要到172.20.2.0/24的请求要经过eth0出去，并且吓一跳地址为172.16.1.130；</li>
+<li>到达Node2过后，通过路由规则到node02的cni0，再转发到nginx02；</li>
+</ol>
+<p>其工作流程比较简单，主要是会在节点上生成许多路由规则。 host-gw的工作原理就是将Flannel的所有子网的下一跳设置成该子网对应的宿主机的IP地址，也就是说Host会充当这条容器通信路径的网关，当然，Flannel子网和主机的信息会保存在Etcd中，flanneld进程只需要WATCH这个数据的变化，然后实时更新路由表。</p>
+<p>在这种模式下，就免除了额外的封包解包的性能损耗，在这种模式下，性能损耗大约在10%左右，而XVLAN隧道的机制，性能损耗大约在20%~30%。</p>
+<p>从上面可以知道，host-gw的工作核心为IP包在封装成帧发送出去的时候会在使用路由表中写下一跳来设置目的的MAC地址，这样它就会经过二层转发到达目的宿主机。这就要求集群宿主机必须是二层连通的。</p>
+<h3 id="calico"><a href="#calico" class="headerlink" title="calico"></a>calico</h3><p>Calico是Kubernetes生态系统中另一种流行的网络选择。虽然Flannel被公认为是最简单的选择，但Calico以其性能、灵活性而闻名。Calico的功能更为全面，不仅提供主机和pod之间的网络连接，还涉及<a href="https://cloud.tencent.com/product/ns?from=10680" target="_blank" rel="noopener">网络安全</a>和管理。在现有的calico插件中，也提供的三种模式，分别是BGP模式，RR模式和IPIP模式。下面主要说明BGP模式和IPIP模式。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw24xtymjmj314q0nqwg1.jpg" alt="calico" title="">
+            </p>
+
+<h4 id="IPIP模式"><a href="#IPIP模式" class="headerlink" title="IPIP模式"></a>IPIP模式</h4><p>Calico 的ipip模式和flannel的vxlan差不多，也是基于二层数据的封装和解封；也会创建一个虚拟网卡 <strong>tunl0</strong>。在前面提到过，Flannel host-gw 模式最主要的限制，就是要求集群宿主机之间是二层连通的。而这个限制对于 Calico 来说，也同样存在。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw253xcpa9j311y0ny75q.jpg" alt="ipip模式" title="">
+            </p>
+
+<p>如上所示, Pod 1 访问 Pod 2大致流程如下：</p>
+<ol>
+<li>数据包从容器1出到达Veth Pair另一端（宿主机上，以cali前缀开头）；</li>
+<li>进入IP隧道设备（tunl0），由Linux内核IPIP驱动封装在宿主机网络的IP包中（新的IP包目的地之是原IP包的下一跳地址，即192.168.31.63），这样，就成了Node1 到Node2的数据包；</li>
+<li>数据包经过路由器三层转发到Node2；</li>
+<li>Node2收到数据包后，网络协议栈会使用IPIP驱动进行解包，从中拿到原始IP包；</li>
+<li>然后根据路由规则，根据路由规则将数据包转发给cali设备，从而到达容器2。</li>
+</ol>
+<h4 id="BGP模式"><a href="#BGP模式" class="headerlink" title="BGP模式"></a>BGP模式</h4><p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw26386mtij30zo0lkdh5.jpg" alt="bgp模式" title="">
+            </p>
+
+<p>如上所示，Pod 1 访问 Pod 2大致流程如下：</p>
+<ol>
+<li>数据包从容器1出到达Veth Pair另一端（宿主机上，以cali前缀开头）；</li>
+<li>宿主机根据路由规则，将数据包转发给下一跳（网关）；</li>
+<li>到达Node2，根据路由规则将数据包转发给cali设备，从而到达容器2</li>
+</ol>
+<p>其中，这里最核心的“下一跳”路由规则，就是由 Calico 的 Felix 进程负责维护的。这些路由规则信息，则是通过 BGP Client 也就是 BIRD 组件，使用 BGP 协议传输而来的。</p>
+<p>不难发现，Calico 项目实际上将集群里的所有节点，都当作是边界路由器来处理，它们一起组成了一个全连通的网络，互相之间通过 BGP 协议交换路由规则。这些节点，我们称为 BGP Peer。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>k8s的容器虚拟化网络方案大体分为两种： 基于隧道方案和基于路由方案</p>
+<p><strong>一、隧道方案</strong></p>
+<p>flannel的 vxlan模式、calico的ipip模式都是隧道方案。隧道模式分为两个过程：分配网段和封包/解包两个过程</p>
+<ol>
+<li>分配网络:  宿主机利用etcd（etcd中维护ip）会为当前主机上运行的容器分配一个虚拟ip，并且宿主机上运行一个代理网络进程agent，代理出入的数据包。</li>
+<li>封包/解包: 宿主上的agent进程会改变容器的发出的数据包的源ip和目的ip，目的宿主机上的agent收到数据包进行拆包然后送到目的容器。</li>
+</ol>
+<p><strong>二、路由方案</strong></p>
+<p>flannel的host-gw模式，calico的bgp模式都是路由方案。路由方案也分为两个过程：分配网段、广播路由两个阶段</p>
+<ol>
+<li>分配网段:  类似隧道模式，每台宿主上的agent会从etcd中为每个容器分配一个虚ip。</li>
+<li>广播路由:  agent会在宿主机上增加一套路由规则，凡是目的地址是该容器的ip的就发往容器的虚拟网卡上，同时会通过BGP广播协议将自己的虚拟ip发往集群中其他node节点，其他的node节点收到广播同样在本机创建一条路由规则：该虚拟ip的数据包发至他的宿主机ip上。</li>
+</ol>
+<p><strong>优缺点对比:</strong></p>
+<ol>
+<li>由于隧道模式存在封包和拆包的过程而路由模式没有，所以路由模式性能高于隧道模式；</li>
+<li>隧道模式通过agent代理工作在ip层而路由模型工作在mac层下；</li>
+<li>路由模式会因为路由表膨胀性能下降；</li>
+</ol>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://aijishu.com/a/1060000000081891" target="_blank" rel="noopener">https://aijishu.com/a/1060000000081891</a>   // fannel网络性能测试</li>
+<li><a href="https://blog.csdn.net/u010230794/article/details/103608777" target="_blank" rel="noopener">https://blog.csdn.net/u010230794/article/details/103608777</a>  // 总结的参考处</li>
+<li><a href="https://cloud.tencent.com/developer/article/1602843" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1602843</a>   // kubernetes中常用网络插件之Flannel</li>
+<li><a href="https://zhdya.okay686.cn/2019/12/22/K8S%E9%9B%86%E7%BE%A4%E7%BD%91%E8%B7%AFCalico%E7%BD%91%E7%BB%9C%E7%BB%84%E4%BB%B6%E5%AE%9E%E8%B7%B5(BGP%E3%80%81RR%E3%80%81IPIP)/" target="_blank" rel="noopener">https://zhdya.okay686.cn/2019/12/22/K8S%E9%9B%86%E7%BE%A4%E7%BD%91%E8%B7%AFCalico%E7%BD%91%E7%BB%9C%E7%BB%84%E4%BB%B6%E5%AE%9E%E8%B7%B5(BGP%E3%80%81RR%E3%80%81IPIP)/</a>   // Calico网络组件实践(BGP、RR、IPIP)</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/01/16/golang-channel/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">golang channel解析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/12/14/kubernetes-etcd/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">etcd 获取 kubernetes 中的数据</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

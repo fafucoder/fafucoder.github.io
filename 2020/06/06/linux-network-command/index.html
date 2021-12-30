@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux网络相关命令十全大补丸 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="网卡相关网卡相关的命令包括查看网卡状态，更改网卡ip等，主要命令包括ip， ifconfig等。 ifconfig 和ipethtool等，ifconfig属于net-tool包里面的一个命令 ， ip 是iproute2包 包含的命令，ip命令更为强大 ifconfig命令显示的信息比较好看，个人更喜欢使用ifconfig查看网卡信息等， iproute2跟net-tool的对照表如下所示:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux网络相关命令十全大补丸">
+<meta property="og:url" content="https://github.com/fafucoder/2020/06/06/linux-network-command/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="网卡相关网卡相关的命令包括查看网卡状态，更改网卡ip等，主要命令包括ip， ifconfig等。 ifconfig 和ipethtool等，ifconfig属于net-tool包里面的一个命令 ， ip 是iproute2包 包含的命令，ip命令更为强大 ifconfig命令显示的信息比较好看，个人更喜欢使用ifconfig查看网卡信息等， iproute2跟net-tool的对照表如下所示:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/fafucoder/2020/06/06/linux-network-command/linux-netowrk-command/net-tools.png">
+<meta property="article:published_time" content="2020-06-06T11:19:10.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.344Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/fafucoder/2020/06/06/linux-network-command/linux-netowrk-command/net-tools.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux网络相关命令十全大补丸</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux网络相关命令十全大补丸</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-06-06T11:19:10.000Z" itemprop="datePublished" class="page-time">
+  2020-06-06
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-network-command"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux网络相关命令十全大补丸</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-06-06 19:19:10" datetime="2020-06-06T11:19:10.000Z"  itemprop="datePublished">2020-06-06</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="网卡相关"><a href="#网卡相关" class="headerlink" title="网卡相关"></a>网卡相关</h3><p>网卡相关的命令包括查看网卡状态，更改网卡ip等，主要命令包括ip， ifconfig等。</p>
+<h4 id="ifconfig-和ip"><a href="#ifconfig-和ip" class="headerlink" title="ifconfig 和ip"></a>ifconfig 和ip</h4><p>ethtool等，ifconfig属于net-tool包里面的一个命令 ， ip 是iproute2包 包含的命令，ip命令更为强大 ifconfig命令显示的信息比较好看，个人更喜欢使用ifconfig查看网卡信息等， iproute2跟net-tool的对照表如下所示:</p>
+<p class="img-lightbox">
+                <img src="linux-netowrk-command/net-tools.png" alt="网络工具" title="">
+            </p>
+
+<p>ip 跟 ifconfig命令对照表如下:</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>ip</th>
+<th>ifconfig</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>显示所有的网卡</td>
+<td>ip a/ip link show</td>
+<td>ifconfig -a</td>
+<td></td>
+</tr>
+<tr>
+<td>启用或停用网卡</td>
+<td>ip link set eth1 down/up</td>
+<td>ifconfig eth1 down/up</td>
+<td></td>
+</tr>
+<tr>
+<td>显示网卡详细信息</td>
+<td>ip link show eth1</td>
+<td>ifconfig eth1</td>
+<td></td>
+</tr>
+<tr>
+<td>设置网卡混杂模式</td>
+<td>ip link set eth1 promisc on/off</td>
+<td>ifconfig eth1 promisc/-promisc</td>
+<td></td>
+</tr>
+<tr>
+<td>设置网卡MTU</td>
+<td>ip link set eth1 mtu 1400</td>
+<td>ifconfig eth1 mtu 1400</td>
+<td></td>
+</tr>
+<tr>
+<td>设置网卡所属命名空间</td>
+<td>ip link set eth1 netns pid/name</td>
+<td></td>
+<td>关于网络命名空间，ip提供了强大的netns命令， ip netns 可查看命令详情</td>
+</tr>
+<tr>
+<td>配置网卡ipv4地址</td>
+<td>ip addr add 10.0.0.1/24 dev eth1</td>
+<td>ifconfig eth1 10.0.0.1/24</td>
+<td>ip添加命令dev一定要加， ip add可以添加多个地址(ip addr add 10.0.0.1/24 broadcast 10.0.0.255 dev eth1, ) ip addr add 10.0.0.2/24 broadcast 10.0.0.255 dev eth1，ifconfig则不行</td>
+</tr>
+<tr>
+<td>修改网卡ipv4地址</td>
+<td>ip addr change 10.0.0.2/24 dev eth1</td>
+<td>ifconfig eth1 10.0.0.2/24</td>
+<td>ifconfig 添加跟修改命令一致</td>
+</tr>
+<tr>
+<td>移除网卡ipv4地址</td>
+<td>ip addr del 10.0.0.1/24 dev eth1</td>
+<td>ifconfig eth1 0</td>
+<td>ip 命令可以添加多个地址，所以删除需要对应的地址</td>
+</tr>
+<tr>
+<td>配置网卡ipv6地址</td>
+<td>ip -6 addr add 2002:0db5:0:f102::1/64 dev eth1</td>
+<td>ifconfig eth1 inet6 add 2002:0db5:0:f102::1/64</td>
+<td></td>
+</tr>
+<tr>
+<td>修改网卡ipv4地址</td>
+<td>ip -6 addr change 2002:0db5:0:f102::2/64 dev eth1</td>
+<td>ifconfig eth1 inet6 add 2002:0db5:0:f102::2/64</td>
+<td></td>
+</tr>
+<tr>
+<td>移除网卡ipv6地址</td>
+<td>ip -6 addr del 2002:0db5:0:f102::1/64 dev eth1</td>
+<td>ifconfig eth1 inet6 del 2002:0db5:0:f102::1/64</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>对比以上表格命令可以得出，要修改网卡地址使用的是ip addr, 要设置网卡的配置信息使用的是ip link</p>
+<p>网卡的命令空间操作使用 ip netns命令</p>
+<h4 id="ethtool"><a href="#ethtool" class="headerlink" title="ethtool"></a>ethtool</h4><p>ethtool命令主要是查看网卡详细信息,命令比较简单<code>ethtool -params eth</code>例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">root@node-2:&#x2F;home&#x2F;dawn# ethtool enp0s9</span><br><span class="line">Settings for enp0s9:</span><br><span class="line">        Supported ports: [ TP ]</span><br><span class="line">        Supported link modes:   10baseT&#x2F;Half 10baseT&#x2F;Full </span><br><span class="line">                                100baseT&#x2F;Half 100baseT&#x2F;Full </span><br><span class="line">                                1000baseT&#x2F;Full                      &#x2F;&#x2F;支持模式</span><br><span class="line">        Supported pause frame use: No</span><br><span class="line">        Supports auto-negotiation: Yes                              &#x2F;&#x2F;支持自动协商</span><br><span class="line">        Supported FEC modes: Not reported</span><br><span class="line">        Advertised link modes:  10baseT&#x2F;Half 10baseT&#x2F;Full </span><br><span class="line">                                100baseT&#x2F;Half 100baseT&#x2F;Full </span><br><span class="line">                                1000baseT&#x2F;Full </span><br><span class="line">        Advertised pause frame use: No</span><br><span class="line">        Advertised auto-negotiation: Yes</span><br><span class="line">        Advertised FEC modes: Not reported</span><br><span class="line">        Speed: 1000Mb&#x2F;s                                             &#x2F;&#x2F;速率</span><br><span class="line">        Duplex: Full                                                &#x2F;&#x2F;工作模式(全双工，半双工...)</span><br><span class="line">        Port: Twisted Pair</span><br><span class="line">        PHYAD: 0</span><br><span class="line">        Transceiver: internal</span><br><span class="line">        Auto-negotiation: on                                        &#x2F;&#x2F;自动协商打开</span><br><span class="line">        MDI-X: off (auto)</span><br><span class="line">        Supports Wake-on: umbg</span><br><span class="line">        Wake-on: d</span><br><span class="line">        Current message level: 0x00000007 (7)</span><br><span class="line">                               drv probe link</span><br><span class="line">        Link detected: yes</span><br></pre></td></tr></table></figure>
+
+<p>ethtool常见命令如下表：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-a</td>
+<td>查看网卡中接收模块RX、发送模块TX和Autonegotiate模块的状态：启动on 或 停用off。</td>
+<td>ethtool -a enp0s9</td>
+</tr>
+<tr>
+<td>-A</td>
+<td>修改网卡中 接收模块RX、发送模块TX和Autonegotiate模块的状态：启动on 或 停用off。</td>
+<td>ethtool -A enp0s9 rx off</td>
+</tr>
+<tr>
+<td>-i</td>
+<td>显示网卡驱动的信息，如驱动的名称、版本等。</td>
+<td>ethtool -i enp0s9</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>修改网卡的部分配置，包括网卡速度、单工/全双工模式、mac地址等</td>
+<td>ethtool -s enp0s9 advertise N</td>
+</tr>
+<tr>
+<td>-S</td>
+<td>显示NIC- and driver-specific 的统计参数，如网卡接收/发送的字节数、接收/发送的广播包个数等。</td>
+<td>ethtool -S enp0s9</td>
+</tr>
+</tbody></table>
+<h3 id="路由相关"><a href="#路由相关" class="headerlink" title="路由相关"></a>路由相关</h3><p>路由相关的命令包括防火墙，路由查看等， iptables之前已有记录，这里不做记录。</p>
+<h4 id="route"><a href="#route" class="headerlink" title="route"></a>route</h4><p>route属于net-tool包里的命令，ip route 是iproute2里面的命令。</p>
+<p>路由格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root@node-2:&#x2F;home&#x2F;dawn# route</span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         192.168.3.1     0.0.0.0         UG    100    0        0 enp0s3</span><br><span class="line">172.17.0.0      0.0.0.0         255.255.0.0     U     0      0        0 docker0</span><br><span class="line">192.168.3.0     0.0.0.0         255.255.255.0   U     0      0        0 enp0s3</span><br><span class="line">192.168.3.1     0.0.0.0         255.255.255.255 UH    100    0        0 enp0s3</span><br><span class="line">192.168.56.0    0.0.0.0         255.255.255.0   U     0      0        0 enp0s8</span><br><span class="line">192.168.57.0    0.0.0.0         255.255.255.0   U     0      0        0 enp0s9</span><br></pre></td></tr></table></figure>
+
+<p>各字段表示如下：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Destination</td>
+<td>目标网段或者主机</td>
+</tr>
+<tr>
+<td>Gateway</td>
+<td>网关地址，”*” 表示目标是本主机所属的网络，不需要路由</td>
+</tr>
+<tr>
+<td>Genmask</td>
+<td>网络掩码</td>
+</tr>
+<tr>
+<td>Flags</td>
+<td>标记。一些可能的标记如下：</td>
+</tr>
+<tr>
+<td></td>
+<td>U — 路由是活动的</td>
+</tr>
+<tr>
+<td></td>
+<td>H — 目标是一个主机</td>
+</tr>
+<tr>
+<td></td>
+<td>G — 路由指向网关</td>
+</tr>
+<tr>
+<td></td>
+<td>R — 恢复动态路由产生的表项</td>
+</tr>
+<tr>
+<td></td>
+<td>D — 由路由的后台程序动态地安装</td>
+</tr>
+<tr>
+<td></td>
+<td>M — 由路由的后台程序修改</td>
+</tr>
+<tr>
+<td></td>
+<td>! — 拒绝路由</td>
+</tr>
+<tr>
+<td>Metric</td>
+<td>路由距离，到达指定网络所需的中转数（linux 内核中没有使用）</td>
+</tr>
+<tr>
+<td>Ref</td>
+<td>路由项引用次数（linux 内核中没有使用）</td>
+</tr>
+<tr>
+<td>Use</td>
+<td>此路由项被路由软件查找的次数</td>
+</tr>
+<tr>
+<td>Iface</td>
+<td>该路由表项对应的输出接口</td>
+</tr>
+</tbody></table>
+<p>route 命令操作: <code>route  [add|del] [-net|-host] target [netmask Nm] [gw Gw] [[dev] If]</code></p>
+<p>route常见的操作包括添加路由表，删除路由表等， 操作如下表:</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>net-tool</th>
+<th>iproute2</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>显示所有路由</td>
+<td>route</td>
+<td>ip route</td>
+<td></td>
+</tr>
+<tr>
+<td>添加网络路由</td>
+<td>route add -net 192.168.55.0 netmask 255.255.255.0 eth3 / route add -net 192.168.1.0/24 eth1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>添加默认路由</td>
+<td>route add default gw 192.168.1.1</td>
+<td></td>
+<td>只能是gw 地址</td>
+</tr>
+<tr>
+<td>添加主机路由</td>
+<td>route add -host 192.168.1.2 dev eth0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>添加网络路由指定默认网关</td>
+<td>route add -net 10.20.30.48 netmask 255.255.255.248 gw 10.20.30.41</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>添加默认路由指定默认网关</td>
+<td>route add -host 10.20.30.148 gw 10.20.30.40</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>删除网络路由</td>
+<td>route del -net 10.20.30.40 netmask 255.255.255.248 eth0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>删除默认路由</td>
+<td>route del default gw 192.168.1.1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>删除主机路由</td>
+<td>route del -host 192.168.1.2 dev eth0</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>删除网络路由指定默认网关</td>
+<td>route del -net 10.20.30.48 netmask 255.255.255.248 gw 10.20.30.41</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>删除主机路由指定默认网关</td>
+<td>route del -host 10.20.30.148 gw 10.20.30.40</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="内核模块相关"><a href="#内核模块相关" class="headerlink" title="内核模块相关"></a>内核模块相关</h3><p>内核模块相关的命令包括查看相关模块是否加载，加载相关模块等</p>
+<h4 id="lsmod"><a href="#lsmod" class="headerlink" title="lsmod"></a>lsmod</h4><p>lsmod 列出内核已载入模块的状态,例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@node-2:&#x2F;home&#x2F;dawn# lsmod | grep vfio</span><br><span class="line">vfio_pci               45056  0</span><br><span class="line">vfio_virqfd            16384  1 vfio_pci</span><br><span class="line">irqbypass              16384  1 vfio_pci</span><br><span class="line">vfio_iommu_type1       24576  0</span><br><span class="line">vfio                   28672  2 vfio_iommu_type1,vfio_pci</span><br></pre></td></tr></table></figure>
+
+<p>linux 内核模块加载比较多， 一般配置grep 来检测指定模块是否加载</p>
+<h4 id="modprobe"><a href="#modprobe" class="headerlink" title="modprobe"></a>modprobe</h4><p>modprobe一般加载、去除linux内核模块， 例如<code>modprobe vfio</code>, 主要命令有</p>
+<ul>
+<li>modprobe vfio: 添加vfio模块</li>
+<li>modprobe -r vfio: 移除vfio模块</li>
+</ul>
+<h4 id="modinfo"><a href="#modinfo" class="headerlink" title="modinfo"></a>modinfo</h4><p>modinfo 用于查看内核模块信息, 例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">root@node-2:&#x2F;home&#x2F;dawn# modinfo vfio</span><br><span class="line">filename:       &#x2F;lib&#x2F;modules&#x2F;4.15.0-101-generic&#x2F;kernel&#x2F;drivers&#x2F;vfio&#x2F;vfio.ko</span><br><span class="line">softdep:        post: vfio_iommu_type1 vfio_iommu_spapr_tce</span><br><span class="line">alias:          devname:vfio&#x2F;vfio</span><br><span class="line">alias:          char-major-10-196</span><br><span class="line">description:    VFIO - User Level meta-driver</span><br><span class="line">author:         Alex Williamson &lt;alex.williamson@redhat.com&gt;</span><br><span class="line">license:        GPL v2</span><br><span class="line">version:        0.3</span><br><span class="line">srcversion:     53C6B01E26FFBE3618E4286</span><br><span class="line">depends:        </span><br><span class="line">retpoline:      Y</span><br><span class="line">intree:         Y</span><br><span class="line">name:           vfio</span><br><span class="line">vermagic:       4.15.0-101-generic SMP mod_unload </span><br><span class="line">signat:         PKCS#7</span><br><span class="line">signer:         </span><br><span class="line">sig_key:        </span><br><span class="line">sig_hashalgo:   md4</span><br><span class="line">parm:           enable_unsafe_noiommu_mode:Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the kernel.  If you do not know what this is for, step away. (default: false) (bool)</span><br></pre></td></tr></table></figure>
+
+<h4 id="lspci"><a href="#lspci" class="headerlink" title="lspci"></a>lspci</h4><p>lspci 用于在系统中显示有关pci总线的信息以及连接到它们的设备。</p>
+<p>默认情况下，它显示了一个简单的设备列表。使用下面描述的选项可以请求更详细的输出或其他程序用于解析的输出。</p>
+<p>如果要报告PCI设备驱动程序或lspci本身中的bug，请使用选项“lspci-vvx”或更好的“lspci-vvxxx”的输出(不过，可能会有警告)。</p>
+<p>例如查看物理网卡信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root@node-2:&#x2F;home&#x2F;dawn# lspci | grep Eth</span><br><span class="line">00:03.0 Ethernet controller: Intel Corporation 82540EM Gigabit Ethernet Controller (rev 02)</span><br><span class="line">00:08.0 Ethernet controller: Intel Corporation 82540EM Gigabit Ethernet Controller (rev 02)</span><br><span class="line">00:09.0 Ethernet controller: Intel Corporation 82540EM Gigabit Ethernet Controller (rev 02)</span><br><span class="line"></span><br><span class="line">root@node-2:&#x2F;home&#x2F;dawn# lspci -n -s 00:09.0</span><br><span class="line">00:09.0 0200: 8086:100e (rev 02)</span><br></pre></td></tr></table></figure>
+
+<p>lspci 常见参数如下表:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+<th>如何使用</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-n</td>
+<td>显示pci设备的厂商和设备代码</td>
+<td>lspci -n -s 00:09.0</td>
+<td>一般配置-s参数使用显示pci设备的设备驱动代码</td>
+</tr>
+<tr>
+<td>-nn</td>
+<td>更加详细显示pci设备的厂商和设备代码</td>
+<td>lspci -nn -s 00:09.0</td>
+<td></td>
+</tr>
+<tr>
+<td>-m</td>
+<td>以向后兼容并且机器可读的方式转储设备信息</td>
+<td>lspci -m</td>
+<td></td>
+</tr>
+<tr>
+<td>-mm</td>
+<td>以机器可读的方式转储设备信息，以便脚本解析</td>
+<td>lspci -mm</td>
+<td></td>
+</tr>
+<tr>
+<td>-t</td>
+<td>以树形结构显示pci设备的层次关系，包含所有总线、桥梁、设备和它们之间的连接</td>
+<td>lspci -t</td>
+<td></td>
+</tr>
+<tr>
+<td>-v</td>
+<td>显示所有设备的详细信息</td>
+<td>lscpi -v</td>
+<td></td>
+</tr>
+<tr>
+<td>-vv</td>
+<td>以更加详细的方式显示设备信息</td>
+<td>lspci -vv</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="连通测试"><a href="#连通测试" class="headerlink" title="连通测试"></a>连通测试</h3><p>连通测试主要测试目的主机(服务器)是否可达，常见的有telnet，traceroute，tcpdump等</p>
+<h4 id="telnet"><a href="#telnet" class="headerlink" title="telnet"></a>telnet</h4><p>telnet 可用于查看远方服务器端口是否开放，目的主机是否可达等,例如：</p>
+<p>telnet 192.168.56.100 22</p>
+<h4 id="traceroute"><a href="#traceroute" class="headerlink" title="traceroute"></a>traceroute</h4><p>traceroute 用于跟踪到达目的主机过程中所经过的路径,例如:</p>
+<p>traceroute 192.168.56.100</p>
+<h4 id="tcpdump"><a href="#tcpdump" class="headerlink" title="tcpdump"></a>tcpdump</h4><p>tcpdump 用于监听网卡收包情况, tcpdump 常见命令如下表：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-i</td>
+<td>指定监听网络接口</td>
+<td>tcpdump -i eth0 (抓取eth0包)</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>不将网络接口设置成混杂模式</td>
+<td></td>
+</tr>
+<tr>
+<td>-c</td>
+<td>指定监听数据包数量，当收到指定的包的数目后，tcpdump就会停止</td>
+<td></td>
+</tr>
+<tr>
+<td>-n</td>
+<td>不把网络地址转换成名字</td>
+<td>tcpdump -ni em2 -vv -e</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>在输出行打印出数据链路层的头部信息</td>
+<td>tcpdump -ni em2 -vv -e</td>
+</tr>
+<tr>
+<td>-d</td>
+<td>将匹配信息包的代码以人们能够理解的汇编格式给出</td>
+<td></td>
+</tr>
+<tr>
+<td>-vv</td>
+<td>输出详细的报文信息</td>
+<td>tcpdump -ni em2 -vv -e</td>
+</tr>
+</tbody></table>
+<h4 id="tcpdump-expression"><a href="#tcpdump-expression" class="headerlink" title="tcpdump expression"></a>tcpdump expression</h4><p>tcpdump expression 用于tcpdump 数据包过滤，如果不过滤的话数据包很多，不好排查，因此需要用expression 进行数据包过滤.</p>
+<p>tcpdump利用正则表达式作为过滤报文的条件，如果数据包满足表达式的条件，则会被捕获。如果没有给出任何条件，则网络上所有的数据包将会被截获。表达式中常用关键字如下：</p>
+<p>(1) 指定参数类型的关键字，主要包括host，net，port等，如果没有指定类型，缺省的类型是host；例如：#tcpdump host 222.24.20.86 截获ip为222.24.20.86的主机收发的所有数据包</p>
+<p>(2) 指定数据报文传输方向的关键字，主要包括src , dst ,dst or src, dst and src，缺省为src or dst；例如：#tcpdump src net 222.24.20.1 截取源网络地址为 222.24.20.1 的所有数据包</p>
+<p>(3) 指定协议的关键字，主要包括fddi，ip，arp，rarp，tcp，udp等类型，默认监听所有协议的数据包；例如：#tucpdump arp 截获所有arp协议的数据包</p>
+<p>(4) 其他重要的关键字还有，gateway，broadcast，less，greater，三种逻辑运算（取非运算是 ‘not ‘,’! ‘； 与运算是 ‘and ‘,’&amp;&amp; ‘；或运算 是’or ‘,’|| ‘）等。这些关键字的巧妙组合，能灵活构造过滤条件，从而满足用户需要。例如：#tcpdump host ubuntu and src port (80 or 8080) 截取主机ubuntu上源端口为80或8080的所有数据包。</p>
+<p>expression 的整体结构 <code>expr relop expr</code> relop表示关系操作符，可以为&gt;, &lt; ,&gt;=,&lt;=, =, !=之一。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://blog.csdn.net/u011956172/article/details/54617516" target="_blank" rel="noopener">https://blog.csdn.net/u011956172/article/details/54617516</a>  //net-tool跟iproute2对照表</li>
+<li><a href="https://www.cnblogs.com/baiduboy/p/7278715.html" target="_blank" rel="noopener">https://www.cnblogs.com/baiduboy/p/7278715.html</a> //route指令详解</li>
+<li><a href="https://www.cnblogs.com/jacklikedogs/p/4659249.html" target="_blank" rel="noopener">https://www.cnblogs.com/jacklikedogs/p/4659249.html</a> //modprobe, lsmod命令使用</li>
+<li><a href="https://yq.aliyun.com/articles/653209" target="_blank" rel="noopener">https://yq.aliyun.com/articles/653209</a> lspci命令使用</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/06/14/linux-veth-pair/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">linux虚拟网络设备</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/06/06/kubernetes-kubectl/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">kubectl常用命令</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

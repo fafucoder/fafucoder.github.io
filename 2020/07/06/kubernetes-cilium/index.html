@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>kubernetes-cilium | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="cilium1.8 安装默认安装1234567891011121314helm install cilium cilium&#x2F;cilium \   --namespace kube-system \   --set global.nodeinit.enabled&#x3D;true \   --set global.kubeProxyReplacement&#x3D;partial \">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes-cilium">
+<meta property="og:url" content="https://github.com/fafucoder/2020/07/06/kubernetes-cilium/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="cilium1.8 安装默认安装1234567891011121314helm install cilium cilium&#x2F;cilium \   --namespace kube-system \   --set global.nodeinit.enabled&#x3D;true \   --set global.kubeProxyReplacement&#x3D;partial \">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-06T06:53:20.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.333Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kubernetes-cilium</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kubernetes-cilium</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-07-06T06:53:20.000Z" itemprop="datePublished" class="page-time">
+  2020-07-06
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-cilium"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kubernetes-cilium</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-07-06 14:53:20" datetime="2020-07-06T06:53:20.000Z"  itemprop="datePublished">2020-07-06</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="cilium1-8-安装"><a href="#cilium1-8-安装" class="headerlink" title="cilium1.8 安装"></a>cilium1.8 安装</h3><h4 id="默认安装"><a href="#默认安装" class="headerlink" title="默认安装"></a>默认安装</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">helm install cilium cilium&#x2F;cilium \</span><br><span class="line">   --namespace kube-system \</span><br><span class="line">   --set global.nodeinit.enabled&#x3D;true \</span><br><span class="line">   --set global.kubeProxyReplacement&#x3D;partial \</span><br><span class="line">   --set global.hostServices.enabled&#x3D;false \</span><br><span class="line">   --set global.externalIPs.enabled&#x3D;true \</span><br><span class="line">   --set global.nodePort.enabled&#x3D;true \</span><br><span class="line">   --set global.hostPort.enabled&#x3D;true \</span><br><span class="line">   --set global.pullPolicy&#x3D;IfNotPresent \</span><br><span class="line">   --set config.ipam&#x3D;kubernetes \</span><br><span class="line">   --set global.hubble.enabled&#x3D;true \</span><br><span class="line">   --set global.hubble.listenAddress&#x3D;&quot;:10000&quot; \</span><br><span class="line">   --set global.hubble.relay.enabled&#x3D;true \</span><br><span class="line">   --set global.hubble.ui.enabled&#x3D;true</span><br></pre></td></tr></table></figure>
+
+<h4 id="cni-chaining安装方式"><a href="#cni-chaining安装方式" class="headerlink" title="cni-chaining安装方式"></a>cni-chaining安装方式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">data:</span><br><span class="line">  cni-config: |-</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;name&quot;: &quot;generic-veth&quot;,</span><br><span class="line">      &quot;cniVersion&quot;: &quot;0.3.1&quot;,</span><br><span class="line">      &quot;plugins&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">          &quot;type&quot;: &quot;kube-ovn&quot;,</span><br><span class="line">          &quot;log_level&quot;: &quot;info&quot;,</span><br><span class="line">          &quot;datastore_type&quot;: &quot;kubernetes&quot;,</span><br><span class="line">          &quot;mtu&quot;: 1400,</span><br><span class="line">          &quot;ipam&quot;: &#123;</span><br><span class="line">                &quot;type&quot;: &quot;kube-ovn&quot;,</span><br><span class="line">                &quot;server_socket&quot;: &quot;&#x2F;run&#x2F;openvswitch&#x2F;kube-ovn-daemon.sock&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;policy&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;k8s&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;kubernetes&quot;: &#123;</span><br><span class="line">              &quot;kubeconfig&quot;: &quot;&#x2F;etc&#x2F;cni&#x2F;net.d&#x2F;01-kube-ovn.conflist&quot;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          &quot;type&quot;: &quot;cilium-cni&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: cni-configuration</span><br><span class="line">  namespace: kube-system</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">helm install cilium cilium&#x2F;cilium --version 1.8.1 \</span><br><span class="line">  --namespace&#x3D;kube-system \</span><br><span class="line">  --set global.cni.chainingMode&#x3D;generic-veth \</span><br><span class="line">  --set global.cni.customConf&#x3D;true \</span><br><span class="line">  --set global.cni.configMap&#x3D;cni-configuration \</span><br><span class="line">  --set global.tunnel&#x3D;disabled \</span><br><span class="line">  --set global.masquerade&#x3D;false</span><br><span class="line">  --set global.hubble.enabled&#x3D;true \</span><br><span class="line">  --set global.hubble.listenAddress&#x3D;&quot;:10000&quot; \</span><br><span class="line">  --set global.hubble.relay.enabled&#x3D;false \</span><br><span class="line">  --set global.hubble.ui.enabled&#x3D;true</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="安装prometheus"><a href="#安装prometheus" class="headerlink" title="安装prometheus"></a>安装prometheus</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">helm install cilium cilium&#x2F;cilium --version 1.8.1 \</span><br><span class="line">  --namespace&#x3D;kube-system \</span><br><span class="line">  --set global.cni.chainingMode&#x3D;generic-veth \</span><br><span class="line">  --set global.cni.customConf&#x3D;true \</span><br><span class="line">  --set global.cni.configMap&#x3D;cni-configuration \</span><br><span class="line">  --set global.tunnel&#x3D;disabled \</span><br><span class="line">  --set global.masquerade&#x3D;false \</span><br><span class="line">  --set global.hubble.enabled&#x3D;true \</span><br><span class="line">  --set global.hubble.listenAddress&#x3D;&quot;:4244&quot; \</span><br><span class="line">  --set global.hubble.relay.enabled&#x3D;true \</span><br><span class="line">  --set global.hubble.ui.enabled&#x3D;true \</span><br><span class="line">  --set global.kubeProxyReplacement&#x3D;strict \</span><br><span class="line">  --set global.k8sServiceHost&#x3D;172.24.37.57 \</span><br><span class="line">  --set global.k8sServicePort&#x3D;6443 \</span><br><span class="line">  --set global.prometheus.enabled&#x3D;true \</span><br><span class="line">  --set global.operatorPrometheus.enabled&#x3D;true \</span><br><span class="line">  --set global.hubble.enabled&#x3D;true \</span><br><span class="line">  --set global.hubble.metrics.enabled&#x3D;&quot;&#123;dns,drop,tcp,flow,port-distribution,icmp,http&#125;&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><h4 id="安装文档相关"><a href="#安装文档相关" class="headerlink" title="安装文档相关"></a>安装文档相关</h4><ul>
+<li><a href="https://blog.csdn.net/F8qG7f9YD02Pe/article/details/79815702" target="_blank" rel="noopener">https://blog.csdn.net/F8qG7f9YD02Pe/article/details/79815702</a></li>
+<li><a href="https://cilium.io/blog/2020/05/04/guest-blog-kubernetes-cilium/" target="_blank" rel="noopener">https://cilium.io/blog/2020/05/04/guest-blog-kubernetes-cilium/</a> </li>
+<li><a href="https://www.jianshu.com/p/090c3d32c2be" target="_blank" rel="noopener">https://www.jianshu.com/p/090c3d32c2be</a></li>
+</ul>
+<h4 id="tc相关"><a href="#tc相关" class="headerlink" title="tc相关"></a>tc相关</h4><ul>
+<li><a href="https://cloud.tencent.com/developer/article/1409664" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1409664</a></li>
+<li><a href="https://tonydeng.github.io/sdn-handbook/linux/tc.html" target="_blank" rel="noopener">https://tonydeng.github.io/sdn-handbook/linux/tc.html</a></li>
+</ul>
+<h4 id="bpf相关"><a href="#bpf相关" class="headerlink" title="bpf相关"></a>bpf相关</h4><ul>
+<li><a href="https://blog.csdn.net/pwl999/article/details/82884882" target="_blank" rel="noopener">https://blog.csdn.net/pwl999/article/details/82884882</a></li>
+</ul>
+<h4 id="xdp相关"><a href="#xdp相关" class="headerlink" title="xdp相关"></a>xdp相关</h4><ul>
+<li><a href="https://cloud.tencent.com/developer/article/1484793" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1484793</a></li>
+</ul>
+<h4 id="系列博客"><a href="#系列博客" class="headerlink" title="系列博客"></a>系列博客</h4><ul>
+<li><a href="https://davidlovezoe.club/wordpress/" target="_blank" rel="noopener">https://davidlovezoe.club/wordpress/</a></li>
+</ul>
+<h3 id="cilium-网卡收发包路径"><a href="#cilium-网卡收发包路径" class="headerlink" title="cilium 网卡收发包路径"></a>cilium 网卡收发包路径</h3><ul>
+<li><a href="https://mp.weixin.qq.com/s/Lus1ghqtYS_LxSHBO6XCCQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/Lus1ghqtYS_LxSHBO6XCCQ</a>   // 深入理解网卡的收发包路径</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/07/07/golang-build/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">golang build方法详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/06/14/linux-veth-pair/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">linux虚拟网络设备</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

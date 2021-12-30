@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux 虚拟网卡解析 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="虚拟网卡解析通过 ip link 命令可以创建多种类型的虚拟网络设备，在 man ip link中可以得知有以下类型的device: 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051bridge - Ethernet Bridge devicebond - Bo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux 虚拟网卡解析">
+<meta property="og:url" content="https://github.com/fafucoder/2021/02/03/linux-dummy/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="虚拟网卡解析通过 ip link 命令可以创建多种类型的虚拟网络设备，在 man ip link中可以得知有以下类型的device: 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051bridge - Ethernet Bridge devicebond - Bo">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalist17hj311k0himyy.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalkw01hjj30u00um4hp.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvbza8pj30ke0damz6.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvz30r9j30ki0e8ace.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalwp2p00j30ke0dc0ul.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb07ese2j312m0lm0z2.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb0wbvecj312q0kowkm.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbackzjkej311m0do75k.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbahpub4gj30ww0eqq42.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbaiuaxxij311g0bqta2.jpg">
+<meta property="article:published_time" content="2021-02-03T11:11:18.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.341Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalist17hj311k0himyy.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux 虚拟网卡解析</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux 虚拟网卡解析</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-02-03T11:11:18.000Z" itemprop="datePublished" class="page-time">
+  2021-02-03
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-dummy"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux 虚拟网卡解析</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-02-03 19:11:18" datetime="2021-02-03T11:11:18.000Z"  itemprop="datePublished">2021-02-03</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="虚拟网卡解析"><a href="#虚拟网卡解析" class="headerlink" title="虚拟网卡解析"></a>虚拟网卡解析</h3><p>通过 <code>ip link</code> 命令可以创建多种类型的虚拟网络设备，在 <code>man ip link</code>中可以得知有以下类型的device:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">bridge - Ethernet Bridge device</span><br><span class="line"></span><br><span class="line">bond - Bonding device can - Controller Area Network interface</span><br><span class="line"></span><br><span class="line">dummy - Dummy network interface</span><br><span class="line"></span><br><span class="line">hsr - High-availability Seamless Redundancy device</span><br><span class="line"></span><br><span class="line">ifb - Intermediate Functional Block device</span><br><span class="line"></span><br><span class="line">ipoib - IP over Infiniband device</span><br><span class="line"></span><br><span class="line">macvlan - Virtual interface base on link layer address (MAC)</span><br><span class="line"></span><br><span class="line">macvtap - Virtual interface based on link layer address (MAC) and TAP.</span><br><span class="line"></span><br><span class="line">vcan - Virtual Controller Area Network interface</span><br><span class="line"></span><br><span class="line">veth - Virtual ethernet interface</span><br><span class="line"></span><br><span class="line">vlan - 802.1q tagged virtual LAN interface</span><br><span class="line"></span><br><span class="line">vxlan - Virtual eXtended LAN</span><br><span class="line"></span><br><span class="line">ip6tnl - Virtual tunnel interface IPv4|IPv6 over IPv6</span><br><span class="line"></span><br><span class="line">ipip - Virtual tunnel interface IPv4 over IPv4</span><br><span class="line"></span><br><span class="line">sit - Virtual tunnel interface IPv6 over IPv4</span><br><span class="line"></span><br><span class="line">gre - Virtual tunnel interface GRE over IPv4</span><br><span class="line"></span><br><span class="line">gretap - Virtual L2 tunnel interface GRE over IPv4</span><br><span class="line"></span><br><span class="line">ip6gre - Virtual tunnel interface GRE over IPv6</span><br><span class="line"></span><br><span class="line">ip6gretap - Virtual L2 tunnel interface GRE over IPv6</span><br><span class="line"></span><br><span class="line">vti - Virtual tunnel interface</span><br><span class="line"></span><br><span class="line">nlmon - Netlink monitoring device</span><br><span class="line"></span><br><span class="line">ipvlan - Interface for L3 (IPv6/IPv4) based VLANs</span><br><span class="line"></span><br><span class="line">lowpan - Interface for 6LoWPAN (IPv6) over IEEE 802.15.4 / Bluetooth</span><br><span class="line"></span><br><span class="line">geneve - GEneric NEtwork Virtualization Encapsulation</span><br><span class="line"></span><br><span class="line">macsec - Interface for IEEE 802.1AE MAC Security (MACsec)</span><br><span class="line"></span><br><span class="line">vrf - Interface for L3 VRF domains</span><br></pre></td></tr></table></figure>
+
+<p>在kubernetes容器网络虚拟化中，常用的网卡类型包括macvlan, ipvlan, veth, ipip, vlan, macvtap, bridge等。通过 <code>ip link add</code>命令能够快速的创建一个虚拟网卡。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip link add ethx type dummy</span><br></pre></td></tr></table></figure>
+
+<h4 id="macvlan"><a href="#macvlan" class="headerlink" title="macvlan"></a>macvlan</h4><p>macvlan 本身是 linxu kernel 模块，其功能是允许在同一个物理网卡上配置多个 MAC 地址，即多个 interface，每个 interface 可以配置自己的 IP。<strong>macvlan 本质上是一种网卡虚拟化技术(最大优点是性能极好)</strong></p>
+<p>可以在linux命令行执行<code>lsmod | grep macvlan</code> 查看当前内核是否加载了该driver；如果没有查看到，可以通过<code>modprobe macvlan</code>来载入，然后重新查看。内核代码路径/drivers/net/macvlan.c</p>
+<p>Macvlan 允许你在主机的一个网络接口上配置多个虚拟的网络接口，这些网络 <code>interface</code> 有自己独立的 MAC 地址，也可以配置上 IP 地址进行通信。Macvlan 下的虚拟机或者容器网络和主机在同一个网段中，共享同一个广播域。Macvlan 和 <code>Bridge</code> 比较相似，但因为它省去了 Bridge 的存在，所以配置和调试起来比较简单，而且效率也相对高。除此之外，Macvlan 自身也完美支持 <code>VLAN</code>。</p>
+<p>macvlan的工作方式如下：</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalist17hj311k0himyy.jpg" alt="macvlan" title="">
+            </p>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalkw01hjj30u00um4hp.jpg" alt="macvlan工作原理" title="">
+            </p>
+
+<p>在macvlan中，实体网卡称为父接口(parent interface), 创建出来的虚拟网卡称为子接口(sub interface)，其中子接口无法与父接口通讯 (带有子接口 的 VM 或容器无法与 host 直接通讯, 这是因为在macvlan模式设计的时候为了安全而禁止了宿主机和容器直接通信)，如果vm或者容器需要与host通讯，就必须额外建立一个 <code>sub interface</code>给 host 用。</p>
+<h5 id="macvlan-模式"><a href="#macvlan-模式" class="headerlink" title="macvlan 模式"></a>macvlan 模式</h5><p>macvlan支持三种模式，bridge、vepa、private，在创建的时候设置<strong>mode XXX</strong>。</p>
+<p>Bridge模式：属于同一个parent接口的macvlan接口之间挂到同一个bridge上，可以二层互通（macvlan接口都无法与parent 接口互通）。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvbza8pj30ke0damz6.jpg" alt="bridge模式" title="">
+            </p>
+
+<p>VPEA模式：所有接口的流量都需要到外部switch才能够到达其他接口。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvz30r9j30ki0e8ace.jpg" alt="vpea mode" title="">
+            </p>
+
+<p>Private模式：接口只接受发送给自己MAC地址的报文。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalwp2p00j30ke0dc0ul.jpg" alt="private mode" title="">
+            </p>
+
+<h4 id="创建macvlan"><a href="#创建macvlan" class="headerlink" title="创建macvlan"></a>创建macvlan</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建macvlan 网卡</span></span><br><span class="line">ip link add link eth0 name mac1@eth0 type macvlan mode bridge</span><br><span class="line">ip link add link eth0 name mac2@eth0 type macvlan mode bridge</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建命名空间</span></span><br><span class="line">ip netns add ns1</span><br><span class="line">ip netns add ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 把虚拟网卡移入到命名空间</span></span><br><span class="line">ip link set mac1@eth0 netns ns1</span><br><span class="line">ip link set mac2@eth0 netns ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入netns为虚拟网卡分配ip地址</span></span><br><span class="line">ip netns exec ns1 ip addr add 192.168.0.100/24 dev mac1@eth0</span><br><span class="line">ip netns exec ns2 ip addr add 192.168.0.200/24 dev mac2@eth0</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置虚拟网卡状态为up</span></span><br><span class="line">ip netns exec ns1 ip link set mac1@eth0 up</span><br><span class="line">ip netns exec ns2 ip link set mac2@eth0 up</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建macvlan网卡，不移入到命名空间，并且添加路由</span></span><br><span class="line">ip link add link eth0 name mac3@eth0 type macvlan mode bridge</span><br><span class="line">ip addr add 192.168.0.150/24 dev mac3@eth0</span><br><span class="line">ip link set mac3@eth0 up</span><br><span class="line"></span><br><span class="line">ip route add 192.168.0.100/32 dev mac3@eth0</span><br><span class="line">ip route add 192.168.0.200/32 dev mac3@eth0</span><br></pre></td></tr></table></figure>
+
+<h5 id="验证macvlan"><a href="#验证macvlan" class="headerlink" title="验证macvlan"></a>验证macvlan</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看ip地址</span></span><br><span class="line">[root@master ~]# ip netns exec ns2 ifconfig</span><br><span class="line">mac2@eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.0.200  netmask 255.255.255.0  broadcast 0.0.0.0</span><br><span class="line">        inet6 fe80::1860:edff:fecd:43c1  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 1a:60:ed:cd:43:c1  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 5  bytes 322 (322.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 13  bytes 1006 (1006.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> ping ns1中的网卡</span></span><br><span class="line">[root@master ~]# ip netns exec ns2 ping -c 5 192.168.0.100</span><br><span class="line">PING 192.168.0.100 (192.168.0.100) 56(84) bytes of data.</span><br><span class="line">64 bytes from 192.168.0.100: icmp_seq=1 ttl=64 time=0.090 ms</span><br><span class="line">64 bytes from 192.168.0.100: icmp_seq=2 ttl=64 time=0.044 ms</span><br><span class="line">64 bytes from 192.168.0.100: icmp_seq=3 ttl=64 time=0.052 ms</span><br><span class="line">64 bytes from 192.168.0.100: icmp_seq=4 ttl=64 time=0.080 ms</span><br><span class="line">64 bytes from 192.168.0.100: icmp_seq=5 ttl=64 time=0.053 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.0.100 ping statistics ---</span><br><span class="line">5 packets transmitted, 5 received, 0% packet loss, time 4088ms</span><br><span class="line">rtt min/avg/max/mdev = 0.044/0.063/0.090/0.020 ms</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 无法ping通宿主机</span></span><br><span class="line">[root@master ~]# ip netns exec ns2 ping 192.168.0.171</span><br><span class="line">PING 192.168.0.171 (192.168.0.171) 56(84) bytes of data.</span><br><span class="line">^X^C</span><br><span class="line">--- 192.168.0.171 ping statistics ---</span><br><span class="line">4 packets transmitted, 0 received, 100% packet loss, time 3071ms</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 能够ping通宿主机上的mac3@eth0虚拟网卡</span></span><br><span class="line">[root@master ~]# ip netns exec ns2 ping -c 5 192.168.0.150</span><br><span class="line">PING 192.168.0.150 (192.168.0.150) 56(84) bytes of data.</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=1 ttl=64 time=0.063 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=2 ttl=64 time=0.071 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=3 ttl=64 time=0.062 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=4 ttl=64 time=0.079 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=5 ttl=64 time=0.090 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.0.150 ping statistics ---</span><br><span class="line">5 packets transmitted, 5 received, 0% packet loss, time 4104ms</span><br><span class="line">rtt min/avg/max/mdev = 0.062/0.073/0.090/0.010 ms</span><br></pre></td></tr></table></figure>
+
+<h5 id="macvlan-环境清理"><a href="#macvlan-环境清理" class="headerlink" title="macvlan 环境清理"></a>macvlan 环境清理</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns del ns1</span><br><span class="line">ip netns del ns2</span><br><span class="line">ip link del mac3@eth0</span><br></pre></td></tr></table></figure>
+
+<h4 id="ipvlan"><a href="#ipvlan" class="headerlink" title="ipvlan"></a>ipvlan</h4><p>IPVlan 和 macvlan 类似，都是从一个主机接口虚拟出多个虚拟网络接口。一个重要的区别就是<strong>所有的虚拟接口都有相同的 macv 地址，而拥有不同的 ip 地址。</strong>因为所有的虚拟接口要共享 mac 地址，所以有些需要注意的地方：</p>
+<p>DHCP 协议分配 ip 的时候一般会用 mac 地址作为机器的标识。这个情况下，客户端动态获取 ip 的时候需要配置唯一的 ClientID 字段，并且 DHCP server 也要正确配置使用该字段作为机器标识，而不是使用 mac 地址 </p>
+<p>Ipvlan 是 linux kernel 比较新的特性，linux kernel 3.19 开始支持 ipvlan，但是比较稳定推荐的版本是 &gt;=4.2</p>
+<h5 id="ipvlan模式"><a href="#ipvlan模式" class="headerlink" title="ipvlan模式"></a>ipvlan模式</h5><p>L2模式：ipvlan L2 模式和 macvlan bridge 模式工作原理很相似，父接口作为交换机来转发子接口的数据。同一个网络的子接口可以通过父接口来转发数据，而如果想发送到其他网络，报文则会通过父接口的路由转发出去。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb07ese2j312m0lm0z2.jpg" alt="L2 模式" title="">
+            </p>
+
+<p>L3模式：  ipvlan 有点像路由器的功能，它在各个虚拟网络和主机网络之间进行不同网络报文的路由转发工作。只要父接口相同，即使虚拟机/容器不在同一个网络，也可以互相 ping 通对方，因为 ipvlan 会在中间做报文的转发工作。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb0wbvecj312q0kowkm.jpg" alt="L3 模式" title="">
+            </p>
+
+<h5 id="创建ipvlan"><a href="#创建ipvlan" class="headerlink" title="创建ipvlan"></a>创建ipvlan</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建 ipvlan 虚拟网卡</span></span><br><span class="line">ip link add link eth0 ipvlan1@eth0 type ipvlan mode l3</span><br><span class="line">ip link add link eth0 ipvlan2@eth0 type ipvlan mode l3</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建命名空间</span></span><br><span class="line">ip netns add ns1</span><br><span class="line">ip netns add ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 把ipvlan 移入到命名空间</span></span><br><span class="line">ip link set ipvlan1@eth0 netns ns1</span><br><span class="line">ip link set ipvlan2@eth0 netns ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置虚拟网卡ip地址</span></span><br><span class="line">ip netns exec ns1 ip addr add 192.168.0.100/24 dev ipvlan1@eth0</span><br><span class="line">ip netns exec ns2 ip addr add 192.168.0.200/24 dev ipvlan2@eth0</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置虚拟网卡为up状态</span></span><br><span class="line">ip netns exec ns1 ip link set ipvlan1@eth0 up</span><br><span class="line">ip netns exec ns2 ip link set ipvlan2@eth0 up</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟网卡，放置在宿主机</span></span><br><span class="line">ip link add link eth0 ipvlan3@eth0 type ipvlan mode l3</span><br><span class="line">ip addr add 192.168.0.150/24 dev ipvlan3@eth0</span><br><span class="line">ip link set ipvlan3@eth0 up</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加路由</span></span><br><span class="line">ip route add 192.168.0.100/32 dev ipvlan3@eth0</span><br><span class="line">ip route add 192.168.0.200/32 dev ipvlan3@eth0</span><br></pre></td></tr></table></figure>
+
+<h5 id="验证ipvlan"><a href="#验证ipvlan" class="headerlink" title="验证ipvlan"></a>验证ipvlan</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看ip地址</span></span><br><span class="line">[root@master ~]# ip netns exec ns1 ifconfig</span><br><span class="line">ipvlan1@eth0: flags=4291&lt;UP,BROADCAST,RUNNING,NOARP,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.0.100  netmask 255.255.255.0  broadcast 0.0.0.0</span><br><span class="line">        inet6 fe80::16:3e00:10d:30c7  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:16:3e:0d:30:c7  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 3  bytes 336 (336.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 8  bytes 784 (784.0 B)</span><br><span class="line">        TX errors 0  dropped 5 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 能ping通 192.168.0.200</span></span><br><span class="line">[root@master ~]# ip netns exec ns1 ping -c 5 192.168.0.200</span><br><span class="line">PING 192.168.0.200 (192.168.0.200) 56(84) bytes of data.</span><br><span class="line">64 bytes from 192.168.0.200: icmp_seq=1 ttl=64 time=0.056 ms</span><br><span class="line">64 bytes from 192.168.0.200: icmp_seq=2 ttl=64 time=0.055 ms</span><br><span class="line">64 bytes from 192.168.0.200: icmp_seq=3 ttl=64 time=0.045 ms</span><br><span class="line">64 bytes from 192.168.0.200: icmp_seq=4 ttl=64 time=0.046 ms</span><br><span class="line">64 bytes from 192.168.0.200: icmp_seq=5 ttl=64 time=0.055 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.0.200 ping statistics ---</span><br><span class="line">5 packets transmitted, 5 received, 0% packet loss, time 4126ms</span><br><span class="line">rtt min/avg/max/mdev = 0.045/0.051/0.056/0.008 ms</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 无法ping通宿主机</span></span><br><span class="line">[root@master ~]# ip netns exec ns1 ping -c 5 192.168.0.171</span><br><span class="line">PING 192.168.0.171 (192.168.0.171) 56(84) bytes of data.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--- 192.168.0.171 ping statistics ---</span><br><span class="line">5 packets transmitted, 0 received, 100% packet loss, time 4080ms</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 能ping通宿主机上的ipvlan3@eth0</span></span><br><span class="line">[root@master ~]# ip netns exec ns1 ping -c 5 192.168.0.150</span><br><span class="line">PING 192.168.0.150 (192.168.0.150) 56(84) bytes of data.</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=1 ttl=64 time=0.100 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=2 ttl=64 time=0.088 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=3 ttl=64 time=0.067 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=4 ttl=64 time=0.091 ms</span><br><span class="line">64 bytes from 192.168.0.150: icmp_seq=5 ttl=64 time=0.088 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.0.150 ping statistics ---</span><br><span class="line">5 packets transmitted, 5 received, 0% packet loss, time 4122ms</span><br><span class="line">rtt min/avg/max/mdev = 0.067/0.086/0.100/0.016 ms</span><br></pre></td></tr></table></figure>
+
+<h5 id="ipvlan-环境清理"><a href="#ipvlan-环境清理" class="headerlink" title="ipvlan 环境清理"></a>ipvlan 环境清理</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ip netns del ns1</span><br><span class="line">ip netns del ns2</span><br><span class="line">ip link del ipvlan3@eth0</span><br></pre></td></tr></table></figure>
+
+<h4 id="macvtap"><a href="#macvtap" class="headerlink" title="macvtap"></a>macvtap</h4><p>MACVTAP 是对 MACVLAN的改进，把 MACVLAN 与 TAP 设备的特点综合一下，使用 MACVLAN 的方式收发数据包，但是收到的包不交给 network stack 处理，而是生成一个 /dev/tapX 文件，交给这个文件。由于 MACVLAN 是工作在 MAC 层的，所以 MACVTAP 也只能工作在 MAC 层。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbackzjkej311m0do75k.jpg" alt="macvtap" title="">
+            </p>
+
+<h4 id="tun"><a href="#tun" class="headerlink" title="tun"></a>tun</h4><p>Tun是Linux系统里的虚拟网络设备, TUN设备模拟网络层设备(network layer)，处理三层报文，IP报文等，用于将报文注入到网络协议栈</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbahpub4gj30ww0eqq42.jpg" alt="tun" title="">
+            </p>
+
+<p>应用程序(app)可以从物理网卡上读写报文，经过处理后通过TUN回送，或者从TUN读取报文处理后经物理网卡送出。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbaiuaxxij311g0bqta2.jpg" alt="tun" title="">
+            </p>
+
+<h4 id="dummy"><a href="#dummy" class="headerlink" title="dummy"></a>dummy</h4><p>dummy网卡是内核虚拟出来的网卡，没有实际的用途，要创建一个dummy类型的网卡只需要通过如下命令:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# ip link add mydummy type dummy</span><br><span class="line">[root@master ~]# ifconfig dummy</span><br><span class="line">dummy0: flags=130&lt;BROADCAST,NOARP&gt;  mtu 1500</span><br><span class="line">        ether 12:cf:8a:87:81:ed  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+
+<p>创建dummy网卡后可以为dummy网卡设置ip地址：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# ip addr add 192.168.200.200/24 dev mydummy</span><br><span class="line">[root@master ~]# ifconfig mydummy</span><br><span class="line">mydummy: flags=130&lt;BROADCAST,NOARP&gt;  mtu 1500</span><br><span class="line">        inet 192.168.200.200  netmask 255.255.255.0  broadcast 0.0.0.0</span><br><span class="line">        ether ae:de:93:50:84:2f  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://rehtt.com/index.php/archives/236" target="_blank" rel="noopener">macvlan网络模式下容器与宿主机互通</a></li>
+<li><a href="https://www.cnblogs.com/menkeyi/p/11374023.html" target="_blank" rel="noopener">macvlan和ipvlan</a></li>
+<li><a href="https://www.lijiaocn.com/%E6%8A%80%E5%B7%A7/2017/03/31/linux-net-devices.html" target="_blank" rel="noopener">Linux上的物理网卡与虚拟网络设备</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/02/08/golang-context/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">golang-context</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/02/02/datastruct-hash/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">哈希表： 散列查找</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

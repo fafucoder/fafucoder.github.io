@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>kubernetes网络接口插件cni | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="CNI配置cni的默认配置目录在&#x2F;etc&#x2F;cni&#x2F;cni.d&#x2F; cni的默认可执行目录在 &#x2F;opt&#x2F;cni&#x2F;bin 可以在kubelet中修改默认的路径, 在&#x2F;etc&#x2F;systemd&#x2F;system&#x2F;kubelet.service.d&#x2F;10-kubeadm.conf这个文件中的EnvironmentFile&#x3D;-&#x2F;var&#x2F;lib&#x2F;kubelet&#x2F;kubeadm-flags.env里有关于cni的配置，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes网络接口插件cni">
+<meta property="og:url" content="https://github.com/fafucoder/2020/02/02/kubernetes-cni/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="CNI配置cni的默认配置目录在&#x2F;etc&#x2F;cni&#x2F;cni.d&#x2F; cni的默认可执行目录在 &#x2F;opt&#x2F;cni&#x2F;bin 可以在kubelet中修改默认的路径, 在&#x2F;etc&#x2F;systemd&#x2F;system&#x2F;kubelet.service.d&#x2F;10-kubeadm.conf这个文件中的EnvironmentFile&#x3D;-&#x2F;var&#x2F;lib&#x2F;kubelet&#x2F;kubeadm-flags.env里有关于cni的配置，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwi5tc0cwtj30ts0ggjrs.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwi5j7vzo6j30xg0jkjsf.jpg">
+<meta property="article:published_time" content="2020-02-02T11:08:23.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.334Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwi5tc0cwtj30ts0ggjrs.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kubernetes网络接口插件cni</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kubernetes网络接口插件cni</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-02-02T11:08:23.000Z" itemprop="datePublished" class="page-time">
+  2020-02-02
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-cni"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kubernetes网络接口插件cni</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-02-02 19:08:23" datetime="2020-02-02T11:08:23.000Z"  itemprop="datePublished">2020-02-02</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="CNI配置"><a href="#CNI配置" class="headerlink" title="CNI配置"></a>CNI配置</h3><p>cni的默认配置目录在<code>/etc/cni/cni.d/</code></p>
+<p>cni的默认可执行目录在 <code>/opt/cni/bin</code></p>
+<p>可以在kubelet中修改默认的路径, 在/etc/systemd/system/kubelet.service.d/10-kubeadm.conf这个文件中的<code>EnvironmentFile=-/var/lib/kubelet/kubeadm-flags.env</code>里有关于cni的配置， 通过修改/kubeadm-flags.env可以修改cni的配置</p>
+<h3 id="CNI-Plugins"><a href="#CNI-Plugins" class="headerlink" title="CNI Plugins"></a>CNI Plugins</h3><p>CNI的插件库主要有:</p>
+<ul>
+<li><a href="https://github.com/containernetworking/cni">cni interfaces</a></li>
+<li><a href="https://github.com/containernetworking/plugins">cni plugins</a></li>
+</ul>
+<h4 id="CNI-Interfaces"><a href="#CNI-Interfaces" class="headerlink" title="CNI Interfaces"></a><a href="https://github.com/containernetworking/cni">CNI Interfaces</a></h4><p>CNI项目</p>
+<ul>
+<li>libcni： 实现 CNI runtime 的 SDK，比如 kubernetes 里面的 NetworkPlugin 部分就使用了 libcni 来调用 CNI plugins. 这里面也有一些 interface，容易混淆，这个 interface 是对于 runtime 而言的，并不是对 plugin 的约束，比如 AddNetworkList, runtime 调用这个方法后，会按顺序执行对应  plugin 的 add 命令。 libcni 里面的 config caching：解决的是如果 ADD 之后配置变化了，如何 DEL 的问题.</li>
+<li>skel: 实现 CNI plugin 的骨架代码</li>
+<li>cnitool: 模拟 runtime 执行比如 libcni 的 AddNetworkList，触发执行 cni plugins</li>
+</ul>
+<p>CNI Plugin对runtime的假设</p>
+<ul>
+<li>Container runtime 先为 container 创建 network 再调用 plugins.</li>
+<li>Container runtime 决定 container 属于哪个网络，继而决定执行哪个 CNI plugin.</li>
+<li>Network configuration 为 JSON 格式，包含一些必选可选参数.</li>
+<li>创建时 container runtime 串行添加 container 到各个 network (ADD).</li>
+<li>销毁时 container runtime 逆序将 container 从各个 network 移除 (DEL).</li>
+<li>单个 container 的 ADD/DEL 操作串行，但是多个 container 之间可以并发.</li>
+<li>ADD 之后必有 DEL，多次 DEL 操作幂等.</li>
+<li>ADD 操作不会执行两次（对于同样的 KEY-network name, CNI_CONTAINERID, CNI_IFNAME）</li>
+</ul>
+<p>CNI的运行流程， <a href="https://github.com/containernetworking/cni/blob/master/SPEC.md">具体方法</a></p>
+<ol>
+<li>基本操作: ADD, DEL, CHECK and VERSION</li>
+<li>Plugins 是二进制，当需要 network 操作时，runtime 执行二进制对应 命令</li>
+<li>通过 stdin 向 plugin 输入 JSON 格式的配置文件，以及其他 container 相关的信息 比如：Container ID, Network namespace path, Network configuration, Extra arguments, Name of the interface inside the container</li>
+<li>通过 stdout 返回结果, 返回包括Interfaces list, IP configuration assigned to each interface, DNS information</li>
+</ol>
+<p>下面进行具体的代码分析：</p>
+<p>CNI接口实现主要有AddNetwork, CheckNetwork, DelNetwork</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// github.com/containernetworking/cni/libcni/api.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CNI <span class="keyword">interface</span> &#123;</span><br><span class="line">	AddNetworkList(ctx context.Context, net *NetworkConfigList, rt *RuntimeConf) (types.Result, error)</span><br><span class="line">	CheckNetworkList(ctx context.Context, net *NetworkConfigList, rt *RuntimeConf) error</span><br><span class="line">	DelNetworkList(ctx context.Context, net *NetworkConfigList, rt *RuntimeConf) error</span><br><span class="line">	GetNetworkListCachedResult(net *NetworkConfigList, rt *RuntimeConf) (types.Result, error)</span><br><span class="line">	GetNetworkListCachedConfig(net *NetworkConfigList, rt *RuntimeConf) ([]<span class="keyword">byte</span>, *RuntimeConf, error)</span><br><span class="line"></span><br><span class="line">	AddNetwork(ctx context.Context, net *NetworkConfig, rt *RuntimeConf) (types.Result, error)</span><br><span class="line">	CheckNetwork(ctx context.Context, net *NetworkConfig, rt *RuntimeConf) error</span><br><span class="line">	DelNetwork(ctx context.Context, net *NetworkConfig, rt *RuntimeConf) error</span><br><span class="line">	GetNetworkCachedResult(net *NetworkConfig, rt *RuntimeConf) (types.Result, error)</span><br><span class="line">	GetNetworkCachedConfig(net *NetworkConfig, rt *RuntimeConf) ([]<span class="keyword">byte</span>, *RuntimeConf, error)</span><br><span class="line"></span><br><span class="line">	ValidateNetworkList(ctx context.Context, net *NetworkConfigList) ([]<span class="keyword">string</span>, error)</span><br><span class="line">	ValidateNetwork(ctx context.Context, net *NetworkConfig) ([]<span class="keyword">string</span>, error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>CNI结构体</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">type</span> NetworkConfig <span class="keyword">struct</span> &#123;</span><br><span class="line">	Network *types.NetConf   <span class="comment">//NetConf describes a network.</span></span><br><span class="line">	Bytes   []<span class="keyword">byte</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CNIConfig <span class="keyword">struct</span> &#123;</span><br><span class="line">	Path     []<span class="keyword">string</span></span><br><span class="line">	exec     invoke.Exec</span><br><span class="line">	cacheDir <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> NetConf <span class="keyword">struct</span> &#123;</span><br><span class="line">	CNIVersion <span class="keyword">string</span> <span class="string">`json:"cniVersion,omitempty"`</span></span><br><span class="line"></span><br><span class="line">	Name         <span class="keyword">string</span>          <span class="string">`json:"name,omitempty"`</span></span><br><span class="line">	Type         <span class="keyword">string</span>          <span class="string">`json:"type,omitempty"`</span></span><br><span class="line">	Capabilities <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">bool</span> <span class="string">`json:"capabilities,omitempty"`</span></span><br><span class="line">	IPAM         IPAM            <span class="string">`json:"ipam,omitempty"`</span></span><br><span class="line">	DNS          DNS             <span class="string">`json:"dns"`</span></span><br><span class="line"></span><br><span class="line">	RawPrevResult <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125; <span class="string">`json:"prevResult,omitempty"`</span></span><br><span class="line">	PrevResult    Result                 <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> RuntimeConf <span class="keyword">struct</span> &#123;</span><br><span class="line">	ContainerID <span class="keyword">string</span></span><br><span class="line">	NetNS       <span class="keyword">string</span></span><br><span class="line">	IfName      <span class="keyword">string</span></span><br><span class="line">	Args        [][<span class="number">2</span>]<span class="keyword">string</span></span><br><span class="line"></span><br><span class="line">	CapabilityArgs <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	CacheDir <span class="keyword">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>AddNetwork操作(CheckNetwork和Deletework同理)</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//直接调用addwork,结果缓存</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *CNIConfig)</span> <span class="title">AddNetwork</span><span class="params">(ctx context.Context, net *NetworkConfig, rt *RuntimeConf)</span> <span class="params">(types.Result, error)</span></span> &#123;</span><br><span class="line">	result, err := c.addNetwork(ctx, net.Network.Name, net.Network.CNIVersion, net, <span class="literal">nil</span>, rt)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err = c.cacheAdd(result, net.Bytes, net.Network.Name, rt); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">"failed to set network %q cached result: %v"</span>, net.Network.Name, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> result, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *CNIConfig)</span> <span class="title">addNetwork</span><span class="params">(ctx context.Context, name, cniVersion <span class="keyword">string</span>, net *NetworkConfig, prevResult types.Result, rt *RuntimeConf)</span> <span class="params">(types.Result, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 一系列验证.....</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//生成networkconfig</span></span><br><span class="line">	newConf, err := buildOneConfig(name, cniVersion, net, prevResult, rt)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	<span class="comment">//执行pluginPath下的cni插件， netConf.Bytes写入stdin</span></span><br><span class="line">	<span class="keyword">return</span> invoke.ExecPluginWithResult(ctx, pluginPath, newConf.Bytes, c.args(<span class="string">"ADD"</span>, rt), c.exec)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>CNIConfig: 主要数据成员是plugin的路径，并实现了CNI接口</li>
+<li>NetworkConfig和NetworkConfigList： 包括在/etc/cni/net.d下面的配置</li>
+<li>RuntimeConf: 定义了runtimeConf配置</li>
+<li>AddNetwork(): 先从pluginPath获得plugin的binary，然后injectRuntimeConfig()将网络配置注入到networkconfig中，并作为最后plugin执行的输入，然后还会将network的操作（ADD或者DEL）以及RuntimeConf，作为plugin执行时的变量</li>
+</ol>
+<h4 id="CNI-Plugins-1"><a href="#CNI-Plugins-1" class="headerlink" title="CNI Plugins"></a><a href="https://github.com/containernetworking/plugins/tree/master/plugins">CNI Plugins</a></h4><p>cni plugins库中提供的插件类型有main, ipam, meta</p>
+<p>main是实现了某种特定网络功能的插件; meta本身并不会提供具体的网络功能，它会调用其他插件，或者单纯是为了测试；ipam是分配IP地址的插件, ipam并不提供某种网络功能，只是为了灵活性把它单独抽象出来，这样不同的网络插件可以根据需求选择ipam，或者实现自己的ipam。</p>
+<blockquote>
+<p>main</p>
+<ul>
+<li>loopback：这个插件很简单，负责生成 lo 网卡，并配置上 127.0.0.1/8 地址</li>
+<li>bridge：和 docker 默认的网络模型很像，把所有的容器连接到虚拟交换机上</li>
+<li>macvlan：使用 macvlan 技术，从某个物理网卡虚拟出多个虚拟网卡，它们有独立的 ip 和 mac 地址</li>
+<li>ipvlan：和 macvlan 类似，区别是虚拟网卡有着相同的 mac 地址</li>
+<li>ptp：通过 veth pair 在容器和主机之间建立通道</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>meta</p>
+<ul>
+<li>flannel：结合 bridge 插件使用，根据 flannel 分配的网段信息，调用 bridge 插件，保证多主机情况下容器</li>
+<li>tuning：调整现有接口的sysctl参数</li>
+<li>portmap：一个基于iptables的portmapping插件。将端口从主机的地址空间映射到容器。</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>ipam</p>
+<ul>
+<li>host-local：基于本地文件的 ip 分配和管理，把分配的 IP 地址保存在文件中</li>
+<li>dhcp：从已经运行的 DHCP 服务器中获取 ip 地址</li>
+</ul>
+</blockquote>
+<h3 id="kubelet如何调用CNI"><a href="#kubelet如何调用CNI" class="headerlink" title="kubelet如何调用CNI"></a>kubelet如何调用CNI</h3><p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwi5tc0cwtj30ts0ggjrs.jpg" alt="kubelet调用CNI模型" title="">
+            </p>
+
+<p>在容器运行时(CRI)，会调用CNI插件为sanbox容器配置网络</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwi5j7vzo6j30xg0jkjsf.jpg" alt="kubelet调用CNI流程图" title="">
+            </p>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://cloud.tencent.com/developer/article/1579809?s=original-sharing" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1579809?s=original-sharing</a>   //Extend Kubernetes - CNI</li>
+<li><a href="https://wiki.opskumu.com/kubernetes/wang-luo-fang-an/src-kubelet-cni" target="_blank" rel="noopener">https://wiki.opskumu.com/kubernetes/wang-luo-fang-an/src-kubelet-cni</a> //Kubelet CNI 源码解析</li>
+<li><a href="https://zhuanlan.zhihu.com/p/34085344" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/34085344</a>  //kubernetes源码阅读 kubelet对cni的实现</li>
+<li><a href="https://www.jianshu.com/p/1919fb8a48ea" target="_blank" rel="noopener">https://www.jianshu.com/p/1919fb8a48ea</a>  //Kubelet 对CNI的实现</li>
+<li><a href="https://yucs.github.io/2017/12/06/2017-12-6-CNI/" target="_blank" rel="noopener">https://yucs.github.io/2017/12/06/2017-12-6-CNI/</a>  //Kubernetes网络插件CNI调研整理</li>
+<li><a href="https://blog.csdn.net/waltonwang/article/details/72669826" target="_blank" rel="noopener">https://blog.csdn.net/waltonwang/article/details/72669826</a>  //从源码看kubernetes与CNI Plugin的集成</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/02/03/kubernetes-kubelet/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">kubernetes中kubelet源码解析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/01/31/docker-containerd/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">docker容器运行时containerd</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

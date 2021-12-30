@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux 用户态和内核态 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="Unix&#x2F;Linux的体系架构                                Linux操作系统的体系架构分为用户态和内核态（或者用户空间和内核）。内核从本质上看是一种软件——控制计算机的硬件资源，并提供上层应用程序运行的环境。用户态即上层应用程序的活动空间，应用程序的执行必须依托于内核提供的资源，包括CPU资源、存储资源、I&#x2F;O资源等。为了使上层应用能够访问到这些资源，内核必须为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux 用户态和内核态">
+<meta property="og:url" content="https://github.com/fafucoder/2020/04/08/linux-workspace/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="Unix&#x2F;Linux的体系架构                                Linux操作系统的体系架构分为用户态和内核态（或者用户空间和内核）。内核从本质上看是一种软件——控制计算机的硬件资源，并提供上层应用程序运行的环境。用户态即上层应用程序的活动空间，应用程序的执行必须依托于内核提供的资源，包括CPU资源、存储资源、I&#x2F;O资源等。为了使上层应用能够访问到这些资源，内核必须为">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqsmldj1dj60v40kawfw02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqslui0rgj60z60qcacj02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqsokfmqgj60mi0h8aaj02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqsq74kt1j60uw0fygmf02.jpg">
+<meta property="article:published_time" content="2020-04-08T03:13:04.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.352Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux 用户态和内核态</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux 用户态和内核态</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-04-08T03:13:04.000Z" itemprop="datePublished" class="page-time">
+  2020-04-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-workspace"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux 用户态和内核态</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-04-08 11:13:04" datetime="2020-04-08T03:13:04.000Z"  itemprop="datePublished">2020-04-08</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="Unix-Linux的体系架构"><a href="#Unix-Linux的体系架构" class="headerlink" title="Unix/Linux的体系架构"></a>Unix/Linux的体系架构</h3><p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg" alt="linux体系架构" title="">
+            </p>
+
+<p>Linux操作系统的体系架构分为用户态和内核态（或者用户空间和内核）。内核从本质上看是一种软件——控制计算机的硬件资源，并提供上层应用程序运行的环境。用户态即上层应用程序的活动空间，应用程序的执行必须依托于内核提供的资源，包括CPU资源、存储资源、I/O资源等。为了使上层应用能够访问到这些资源，内核必须为上层应用提供访问的接口：即系统调用</p>
+<p>系统调用是操作系统的最小功能单位，这些系统调用根据不同的应用场景可以进行扩展和裁剪，现在各种版本的Unix实现都提供了不同数量的系统调用，如Linux的不同版本提供了240-260个系统调用，FreeBSD大约提供了320个（reference：UNIX环境高级编程）</p>
+<p>Shell是一个特殊的应用程序，俗称命令行，本质上是一个命令解释器，它下通系统调用，上通各种应用，通常充当着一种“胶水”的角色，来连接各个小功能程序，让不同程序能够以一个清晰的接口协同工作，从而增强各个程序的功能。同时，Shell是可编程的，它可以执行符合Shell语法的文本，这样的文本称为Shell脚本，通常短短的几行Shell脚本就可以实现一个非常大的功能，原因就是这些Shell语句通常都对系统调用做了一层封装。为了方便用户和系统交互，一般，一个Shell对应一个终端，终端是一个硬件设备，呈现给用户的是一个图形化窗口。我们可以通过这个窗口输入或者输出文本。这个文本直接传递给shell进行分析解释，然后执行。</p>
+<h3 id="运行级别"><a href="#运行级别" class="headerlink" title="运行级别"></a>运行级别</h3><p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqsmldj1dj60v40kawfw02.jpg" alt="cpu运行级别" title="">
+            </p>
+
+<p>linux的运行级别如上所示， Linux使用了Ring3级别运行用户态，Ring0作为 内核态，没有使用Ring1和Ring2。Ring3状态不能访问Ring0的地址空间，包括代码和数据。</p>
+<p>用户态通过系统调用切换成内核态，cpu通过跳转到系统调用对应的内核代码位置执行， 完成后再由内核态切回用户态</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqslui0rgj60z60qcacj02.jpg" alt="系统调用" title="">
+            </p>
+
+<p>系统内核 向下控制硬件资源，向内管理操作系统资源：包括进程的调度和管理、内存的管理、文件系统的管理、设备驱动程序的管理以及网络资源的管理，向上则向应用程序提供系统调用的接口。</p>
+<h3 id="运行态切换"><a href="#运行态切换" class="headerlink" title="运行态切换"></a>运行态切换</h3><p>用户态的应用程序可以通过三种方式来访问内核态的资源</p>
+<ol>
+<li>系统调用</li>
+<li>异常事件</li>
+<li>外围设备的中断</li>
+</ol>
+<h4 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h4><p>因为操作系统的资源是有限的，如果访问资源的操作过多，必然会消耗过多的资源，而且如果不对这些操作加以区分，很可能造成资源访问的冲突。所以，为了减少有限资源的访问和使用冲突，Unix/Linux的设计哲学之一就是：对不同的操作赋予不同的执行等级，就是所谓特权的概念。简单说就是有多大能力做多大的事，与系统相关的一些特别关键的操作必须由最高特权的程序来完成。Intel的X86架构的CPU提供了0到3四个特权级，数字越小，特权越高，Linux操作系统中主要采用了0和3两个特权级，分别对应的就是内核态和用户态。运行于用户态的进程可以执行的操作和访问的资源都会受到极大的限制，而运行在内核态的进程则可以执行任何操作并且在资源的使用上没有限制。很多程序开始时运行于用户态，但在执行的过程中，一些操作需要在内核权限下才能执行，这就涉及到一个从用户态切换到内核态的过程。比如C函数库中的内存分配函数malloc()，它具体是使用sbrk()系统调用来分配内存，当malloc调用sbrk()的时候就涉及一次从用户态到内核态的切换，类似的函数还有printf()，调用的是wirte()系统调用来输出字符串，等等。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqsokfmqgj60mi0h8aaj02.jpg" alt="系统调用" title="">
+            </p>
+
+<h4 id="异常事件"><a href="#异常事件" class="headerlink" title="异常事件"></a>异常事件</h4><p>当CPU正在执行运行在用户态的程序时，突然发生某些预先不可知的异常事件，这个时候就会触发从当前用户态执行的进程转向内核态执行相关的异常事件，典型的如缺页异常</p>
+<h4 id="外围设备中断"><a href="#外围设备中断" class="headerlink" title="外围设备中断"></a>外围设备中断</h4><p>当外围设备完成用户的请求操作后，会像CPU发出中断信号，此时，CPU就会暂停执行下一条即将要执行的指令，转而去执行中断信号对应的处理程序，如果先前执行的指令是在用户态下，则自然就发生从用户态到内核态的转换。</p>
+<p>系统调用的本质其实也是中断，相对于外围设备的硬中断，这种中断称为软中断，这是操作系统为用户特别开放的一种中断，如Linux int 80h中断。所以，从触发方式和效果上来看，这三种切换方式是完全一样的，都相当于是执行了一个中断响应的过程。但是从触发的对象来看，系统调用是进程主动请求切换的，而异常和硬中断则是被动的。</p>
+<h3 id="常用系统调用方式"><a href="#常用系统调用方式" class="headerlink" title="常用系统调用方式"></a>常用系统调用方式</h3><h4 id="procfs-proc"><a href="#procfs-proc" class="headerlink" title="procfs(/proc)"></a>procfs(/proc)</h4><p>procfs 是 进程文件系统 的缩写，它本质上是一个伪文件系统，为什么说是 伪 文件系统呢？因为它不占用外部存储空间，只是占用少量的内存，通常是挂载在 /proc 目录下。</p>
+<p>我们在该目录下看到的一个文件，实际上是一个内核变量。内核就是通过这个目录，以文件的形式展现自己的内部信息，相当于 /proc 目录为用户态和内核态之间的交互搭建了一个桥梁，用户态读写 /proc 下的文件，就是读写内核相关的配置参数。</p>
+<p>比如常见的 /proc/cpuinfo、/proc/meminfo 和 /proc/net 就分别提供了 CPU、内存、网络的相关参数。除此之外，还有很多的参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:~# ls &#x2F;proc&#x2F;</span><br><span class="line">1     1143  1345  1447  2     2292  29   331   393  44    63    70    76   acpi       diskstats    irq          locks         sched_debug    sysvipc            zoneinfo</span><br><span class="line">10    1145  1357  148   20    23    290  332   396  442   64    7019  77   asound     dma          kallsyms     mdstat        schedstat      thread-self</span><br><span class="line">1042  1149  1361  149   2084  2425  291  34    398  45    65    7029  8    buddyinfo  driver       kcore        meminfo       scsi           timer_list</span><br><span class="line">1044  1150  1363  15    2087  25    3    3455  413  46    66    7079  83   bus        execdomains  keys         misc          self           timer_stats</span><br><span class="line">1046  1151  1371  16    2090  256   30   35    418  47    6600  7080  884  cgroups    fb           key-users    modules       slabinfo       tty</span><br><span class="line">1048  1153  1372  17    21    26    302  36    419  5     67    71    9    cmdline    filesystems  kmsg         mounts        softirqs       uptime</span><br><span class="line">11    1190  1390  18    22    27    31   37    420  518   6749  72    96   consoles   fs           kpagecgroup  mtrr          stat           version</span><br><span class="line">1126  12    143   182   2214  28    32   373   421  524   68    73    97   cpuinfo    interrupts   kpagecount   net           swaps          version_signature</span><br><span class="line">1137  1252  1434  184   2215  280   327  38    422  525   69    74    98   crypto     iomem        kpageflags   pagetypeinfo  sys            vmallocinfo</span><br><span class="line">1141  13    144   190   2262  281   33   39    425  5940  7     75    985  devices    ioports      loadavg      partitions    sysrq-trigger  vmstat</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，这里面有很多的数字表示的文件，这些其实是当前系统运行的进程文件，数字表示进程号（PID），每个文件包含该进程所有的配置信息，包括进程状态、文件描述符、内存映射等等，我们可以看下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:~# ls &#x2F;proc&#x2F;1&#x2F;</span><br><span class="line">attr&#x2F;            cmdline          environ          io               mem              ns&#x2F;              pagemap          schedstat        stat             timers</span><br><span class="line">autogroup        comm             exe              limits           mountinfo        numa_maps        personality      sessionid        statm            uid_map</span><br><span class="line">auxv             coredump_filter  fd&#x2F;              loginuid         mounts           oom_adj          projid_map       setgroups        status           wchan</span><br><span class="line">cgroup           cpuset           fdinfo&#x2F;          map_files&#x2F;       mountstats       oom_score        root&#x2F;            smaps            syscall          </span><br><span class="line">clear_refs       cwd&#x2F;             gid_map          maps             net&#x2F;             oom_score_adj    sched            stack            task&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>综上，内核通过一个个的文件来暴露自己的系统配置信息，这些文件，有些是只读的，有些是可写的，有些是动态变化的，比如进程文件，当应用程序读取某个 /proc/ 文件时，内核才会去注册这个文件，然后再调用一组内核函数来处理，将相应的内核参数拷贝到用户态空间，这样用户读这个文件就可以获取到内核的信息。一个大概的图示如下所示：<br><a href="https://img2018.cnblogs.com/blog/431521/201906/431521-20190603105337542-1918784356.png" target="_blank" rel="noopener">procfs</a></p>
+<h4 id="sysctl-proc-sys"><a href="#sysctl-proc-sys" class="headerlink" title="sysctl(/proc/sys)"></a>sysctl(/proc/sys)</h4><p>我们熟悉的 sysctl 是一个 Linux 命令，man sysctl 可以看到它的功能和用法。它主要是被用来修改内核的运行时参数，换句话说，它可以在内核运行过程中，动态修改内核参数。</p>
+<p>它本质上还是用到了文件的读写操作，来完成用户态和内核态的通信。它使用的是 /proc 的一个子目录 /proc/sys。和 procfs 的区别在于：</p>
+<p>procfs 主要是输出只读数据，而 sysctl 输出的大部分信息是可写的。</p>
+<p>例如，我们比较常见的是通过 cat /proc/sys/net/ipv4/ip_forward 来获取内核网络层是否允许转发 IP 数据包，通过 echo 1 &gt; /proc/sys/net/ipv4/ip_forward 或者 sysctl -w net.ipv4.ip_forward=1 来设置内核网络层允许转发 IP 数据包。</p>
+<p>同样的操作，Linux 也提供了文件 /etc/sysctl.conf 来让你进行批量修改。</p>
+<h4 id="sysfs-sys"><a href="#sysfs-sys" class="headerlink" title="sysfs(/sys)"></a>sysfs(/sys)</h4><p>sysfs 是 Linux 2.6 才引入的一种虚拟文件系统，它的做法也是通过文件 /sys 来完成用户态和内核的通信。和 procfs 不同的是，sysfs 是将一些原本在 procfs 中的，关于设备和驱动的部分，独立出来，以 “设备树” 的形式呈现给用户。</p>
+<p>sysfs 不仅可以从内核空间读取设备和驱动程序的信息，也可以对设备和驱动进行配置。</p>
+<p>我们看下 /sys 下有什么：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># ls &#x2F;sys</span><br><span class="line">block  bus  class  dev  devices  firmware  fs  hypervisor  kernel  module  power</span><br></pre></td></tr></table></figure>
+
+<h4 id="netlink-套接口"><a href="#netlink-套接口" class="headerlink" title="netlink 套接口"></a>netlink 套接口</h4><p>netlink 是 Linux 用户态与内核态通信最常用的一种方式。Linux kernel 2.6.14 版本才开始支持。它本质上是一种 socket，常规 socket 使用的标准 API，在它身上同样适用。</p>
+<p>netlink 这种灵活的方式，使得它可以用于内核与多种用户进程之间的消息传递系统，比如路由子系统，防火墙（Netfilter），ipsec 安全策略等等。</p>
+<h3 id="用户空间和内核空间"><a href="#用户空间和内核空间" class="headerlink" title="用户空间和内核空间"></a>用户空间和内核空间</h3><p>用户空间就是用户进程所在的内存区域，系统空间就是操作系统占据的内存区域。用户进程和系统进程的所有数据都在内存中。</p>
+<p>在电脑开机之前，内存就是一块原始的物理内存。什么也没有。开机加电，系统启动后，就对物理内存进行了划分。当然，这是系统的规定，物理内存条上并没有划分好的地址和空间范围。这些划分都是操作系统在逻辑上的划分。不同版本的操作系统划分的结果都是不一样的。例如在32位操作系统中，一般将最高的1G字节划分为内核空间，供内核使用，而将较低的3G字节划分为用户空间，供各个进程使用。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqsq74kt1j60uw0fygmf02.jpg" alt="用户空间和内核空间" title="">
+            </p>
+
+<p>其中: </p>
+<ul>
+<li>内核空间中存放的是内核代码和数据，而进程的用户空间中存放的是用户程序的代码和数据。</li>
+<li>进程在运行的时候，在内核空间和用户空间各有一个堆栈。</li>
+<li>用户空间中，每个进程的用户空间是互相独立的，互不相干。</li>
+<li>内核空间中，绝大部分是共享的，并不是完全共享，因为内核空间中，不同进程的内核栈之间是不共享的。</li>
+</ul>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://cllc.fun/2019/03/02/linux-user-kernel-space" target="_blank" rel="noopener">https://cllc.fun/2019/03/02/linux-user-kernel-space</a> //用户空间与内核空间简述</li>
+<li><a href="https://www.cnblogs.com/bakari/p/5520860.html" target="_blank" rel="noopener">Linux探秘之用户态与内核态</a>    //Linux云计算网络</li>
+<li><a href="https://seemoonup.github.io/2019/10/15/tech/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E5%86%85%E6%A0%B8%E6%80%81%E7%94%A8%E6%88%B7%E6%80%81/" target="_blank" rel="noopener">转 cpu 寄存器 内核态 用户态</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/04/12/linux-iperf/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">iperf</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/04/05/linux-xvlan/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">xvlan</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

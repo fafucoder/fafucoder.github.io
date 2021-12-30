@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>iptables 学习记录 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="一、iptables相关概念iptables的底层实现是netfilter，整个流程图如下图所示。                                  当网卡上收到一个包送达协议栈时，最先经过的netfilter钩子是PREROUTING，如果确实有用户埋了这个钩子函数，那么内核将在这里对数据包进行目的地址转换（DNAT）。不管在PREROUTING有没有做过DNAT，内核都会通过查">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iptables 学习记录">
+<meta property="og:url" content="https://github.com/fafucoder/2020/03/24/linux-iptables/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="一、iptables相关概念iptables的底层实现是netfilter，整个流程图如下图所示。                                  当网卡上收到一个包送达协议栈时，最先经过的netfilter钩子是PREROUTING，如果确实有用户埋了这个钩子函数，那么内核将在这里对数据包进行目的地址转换（DNAT）。不管在PREROUTING有没有做过DNAT，内核都会通过查">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtxqi74mj319u0s440y.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbty6c5a9j30vh0u0dq6.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtylky4ej32la0s011q.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtz6uvfcj30u00vajxx.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtznc2uaj319r0u0aj0.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxdfnfni2rj313w03w0ta.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxdfbbvxvjj30o21bsaep.jpg">
+<meta property="article:published_time" content="2020-03-24T06:46:05.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.342Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">iptables 学习记录</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">iptables 学习记录</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-03-24T06:46:05.000Z" itemprop="datePublished" class="page-time">
+  2020-03-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-iptables"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">iptables 学习记录</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-03-24 14:46:05" datetime="2020-03-24T06:46:05.000Z"  itemprop="datePublished">2020-03-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="一、iptables相关概念"><a href="#一、iptables相关概念" class="headerlink" title="一、iptables相关概念"></a>一、iptables相关概念</h3><p>iptables的底层实现是netfilter，整个流程图如下图所示。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg" alt="netfilter流程图" title="">
+            </p>
+
+
+<p>当网卡上收到一个包送达协议栈时，最先经过的netfilter钩子是PREROUTING，如果确实有用户埋了这个钩子函数，那么内核将在这里对数据包进行目的地址转换（DNAT）。不管在PREROUTING有没有做过DNAT，内核都会通过查本地路由表决定这个数据包是发送给本地进程还是发送给其他机器。如果是发送给其他机器（或其他network namespace），就相当于把本地当作路由器，就会经过netfilter的FORWARD钩子，用户可以在此处设置包过滤钩子函数，例如iptables的reject函数。所有马上要发到协议栈外的包都会经过POSTROUTING钩子，用户可以在这里埋下源地址转换（SNAT）或源地址伪装（Masquerade，简称Masq）的钩子函数。如果经过上面的路由决策，内核决定把包发给本地进程，就会经过INPUT钩子。本地进程收到数据包后，回程报文会先经过OUTPUT钩子，然后经过一次路由决策（例如，决定从机器的哪块网卡出去，下一跳地址是多少等），最后出协议栈的网络包同样会经过POSTROUTING钩子。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtxqi74mj319u0s440y.jpg" alt="数据流向" title="">
+            </p>
+
+<h3 id="二、iptables三板斧-table-rule-chain"><a href="#二、iptables三板斧-table-rule-chain" class="headerlink" title="二、iptables三板斧 table, rule, chain"></a>二、iptables三板斧 table, rule, chain</h3><p>iptables的工作流程如下图所示，</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbty6c5a9j30vh0u0dq6.jpg" alt="iptables工作流程" title="">
+            </p>
+
+<h4 id="五张链"><a href="#五张链" class="headerlink" title="五张链"></a>五张链</h4><ul>
+<li>INPUT: 处理输入本地进程的数据包</li>
+<li>OUTPUT: 处理输入本地进程的输出数据包</li>
+<li>FORWORD: 处理转发到其他机器/network namespace的数据包</li>
+<li>PREROUTING: 目的地址转换DNAT</li>
+<li>POSTROUTING: 原地址转换SNAT</li>
+</ul>
+<h4 id="五张表"><a href="#五张表" class="headerlink" title="五张表"></a>五张表</h4><ul>
+<li>raw: 去除数据包连接追踪机制</li>
+<li>fileter: 控制到达某条链上的数据包是继续放行、直接丢弃（drop）或拒绝（reject）</li>
+<li>nat: 修改数据包的源和目的地址</li>
+<li>mangle: 修改数据包的IP头信息</li>
+<li>security: ….</li>
+</ul>
+<h4 id="规则动作"><a href="#规则动作" class="headerlink" title="规则动作"></a>规则动作</h4><ul>
+<li>ACCEPT: 将数据包放行，进行完此处理动作后，将不再比对其它规则，直接跳往下一个规则链</li>
+<li>REJECT: 拦阻该数据包，并传送数据包通知对方</li>
+<li>DROP: 丢弃包不予处理，进行完此处理动作后，将不再比对其它规则，直接中断过滤程序</li>
+<li>REDIRECT: 将包重新导向到另一个端口（PNAT），进行完此处理动作后，将会继续比对其它规则。(iptables -t nat -A PREROUTING -p tcp –dport 80 -j REDIRECT –to-ports 8080)</li>
+<li>SNAT: 改写封包来源 IP 为某特定 IP 或 IP 范围，可以指定 port 对应的范围，进行完此处理动作后，将直接跳往下一个规则链。通过<code>--to-source</code>指定SNAT转换后的地址(iptables -t nat -A POSTROUTING -p tcp-o eth0 -j SNAT –to-source 194.236.50.155-194.236.50.160:1024-32000)</li>
+<li>DNAT: 改写封包目的地 IP 为某特定 IP 或 IP 范围，可以指定 port 对应的范围，进行完此处理动作后，将会直接跳往下一个规则链。通过<code>--to-destination</code>指定DNAT转换后的地址(iptables -t nat -A PREROUTING -p tcp -d 15.45.23.67 –dport 80 -j DNAT –to-destination 192.168.1.1-192.168.1.10:80-100)</li>
+<li>MASQUERADE： 改写封包来源 IP 为防火墙 NIC IP，可以指定 port 对应的范围，进行完此处理动作后，直接跳往下一个规则链。这个功能与 SNAT 略有不同，当进行IP伪装时，不需指定要伪装成哪个IP，IP 会从网卡直接读取，当使用拨接连线时，IP 通常是由ISP公司的 DHCP 服务器指派的，这个时候 MASQUERADE 特别有用</li>
+<li>MARK: 将封包标上某个代号，以便提供作为后续过滤的条件判断依据，进行完此处理动作后，将会继续比对其它规则</li>
+<li>RETURN: 结束在目前规则链中的过滤程序，返回主规则链继续过滤</li>
+<li>QUEUE: 封包放入队列，交给其它程序处理</li>
+<li>MIRROR: 镜射封包，也就是将来源IP与目的地IP对调后，将封包送回，进行完此处理动作后，将会中断过滤程序</li>
+<li>LOG: 将封包相关讯息记录在<code>/var/log</code>中</li>
+</ul>
+<h4 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h4><ol>
+<li><p>表的优先级从高到低是：raw、mangle、nat、filter、security。</p>
+</li>
+<li><p>iptables支持用户自定义链， 不支持用户自定义表。</p>
+</li>
+<li><p>不是每个链上都能挂表，关系如下图</p>
+<p><img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtylky4ej32la0s011q.jpg" alt="iptables链表关系"></p>
+</li>
+<li><p>iptables的每条链下面的规则处理顺序是从上到下逐条遍历的，除非中途碰到DROP，REJECT，RETURN这些内置动作。如果iptables规则前面是自定义链，则意味着这条规则的动作是JUMP，即跳到这条自定义链遍历其下的所有规则，然后跳回来遍历原来那条链后面的规则</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtz6uvfcj30u00vajxx.jpg" alt="iptables遍历规则" title="">
+            </p>
+</li>
+<li><p>查询iptables时，默认是filter表</p>
+</li>
+</ol>
+<h4 id="drop-跟reject区别"><a href="#drop-跟reject区别" class="headerlink" title="drop 跟reject区别"></a>drop 跟reject区别</h4><ol>
+<li>reject 动作会返回一个拒绝(终止)数据包(TCP FIN或UDP-ICMP-PORT-UNREACHABLE)，明确的拒绝对方的连接动作。 连接马上断开，Client会认为访问的主机不存在。</li>
+<li>DROP动作只是简单的直接丢弃数据，并不反馈任何回应。需要Client等待超时。</li>
+</ol>
+<h4 id="数据经过的流程图"><a href="#数据经过的流程图" class="headerlink" title="数据经过的流程图"></a>数据经过的流程图</h4><p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtznc2uaj319r0u0aj0.jpg" alt="iptables数据经过流程图" title="">
+            </p>
+
+<h3 id="三、iptables常见命令"><a href="#三、iptables常见命令" class="headerlink" title="三、iptables常见命令"></a>三、iptables常见命令</h3><h4 id="命令格式"><a href="#命令格式" class="headerlink" title="命令格式"></a>命令格式</h4><p>iptables command chain chain_name options</p>
+<h4 id="iptables-参数"><a href="#iptables-参数" class="headerlink" title="iptables 参数"></a>iptables 参数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">Usage: iptables -[ACD] chain rule-specification [options]</span><br><span class="line">       iptables -I chain [rulenum] rule-specification [options]</span><br><span class="line">       iptables -R chain rulenum rule-specification [options]</span><br><span class="line">       iptables -D chain rulenum [options]</span><br><span class="line">       iptables -[LS] [chain [rulenum]] [options]</span><br><span class="line">       iptables -[FZ] [chain] [options]</span><br><span class="line">       iptables -[NX] chain</span><br><span class="line">       iptables -E old-chain-name new-chain-name</span><br><span class="line">       iptables -P chain target [options]</span><br><span class="line">       iptables -h (print this help information)</span><br><span class="line"></span><br><span class="line">Commands:</span><br><span class="line">  --append  -A chain            			  Append to chain</span><br><span class="line">  --check   -C chain            			  Check for the existence of a rule</span><br><span class="line">  --delete  -D chain            			  Delete matching rule from chain</span><br><span class="line">  --delete  -D chain rulenum    			  Delete rule rulenum (1 &#x3D; first) from chain</span><br><span class="line">  --insert  -I chain [rulenum]  			  Insert in chain as rulenum (default 1&#x3D;first)</span><br><span class="line">  --replace -R chain rulenum    			  Replace rule rulenum (1 &#x3D; first) in chain</span><br><span class="line">  --list    -L [chain [rulenum]] 			  List the rules in a chain or all chains</span><br><span class="line">  --list-rules -S [chain [rulenum]] 		Print the rules in a chain or all chains</span><br><span class="line">  --flush   -F [chain]          			  Delete all rules in  chain or all chains</span><br><span class="line">  --zero    -Z [chain [rulenum]] 		 	  List Zero counters in chain or all chains</span><br><span class="line">  --new     -N chain            			  Create a new user-defined chain</span><br><span class="line">  --delete-chain -X [chain]         		Delete a user-defined chain</span><br><span class="line">  --policy       -P chain target			 	Change policy on chain to target</span><br><span class="line">  --rename-chain -E old-chain new-chain Change chain name, (moving any references)</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">    --ipv4          -4              				        Nothing (line is ignored by ip6tables-restore)</span><br><span class="line">    --ipv6          -6              			 	        Error (line is ignored by iptables-restore)</span><br><span class="line">[!] --protocol      -p proto        		            protocol: by number or name, eg. &#96;tcp&#39;</span><br><span class="line">[!] --source        -s address[&#x2F;mask][...]	        source specification</span><br><span class="line">[!] --destination   -d address[&#x2F;mask][...]	        destination specification</span><br><span class="line">[!] --in-interface  -i input name[+]                network interface name ([+] for wildcard)</span><br><span class="line"> 	  --jump 	        -j target                       target for rule (may load target extension)</span><br><span class="line">  	--goto          -g chain                        jump to chain with no return</span><br><span class="line">    --match         -m match                        extended match (may load extension)</span><br><span class="line">    --numeric       -n                              numeric output of addresses and ports</span><br><span class="line">[!] --out-interface -o output name[+]               network interface name ([+] for wildcard)</span><br><span class="line">    --table         -t table                        table to manipulate (default: &#96;filter&#39;)</span><br><span class="line">    --verbose       -v                              verbose mode</span><br><span class="line">    --wait          -w [seconds]                    maximum wait to acquire xtables lock before give up</span><br><span class="line">    --wait-interval -W [usecs]                      wait time to try to acquire xtables lock, default is 1 second</span><br><span class="line">    --line-numbers                                  print line numbers when listing</span><br><span class="line">    --exact         -x                              expand numbers (display exact values)</span><br><span class="line">[!] --fragment      -f                              match second or further fragments only</span><br><span class="line">    --modprobe&#x3D;&lt;command&gt;                            try to insert modules using this command</span><br><span class="line">    --set-counters PKTS BYTES                       set the counter during insert&#x2F;append</span><br><span class="line">[!] --version       -V                              print package version.</span><br></pre></td></tr></table></figure>
+<h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><p>iptables –line-numbers -t 表名 -n(不解析ip) -v(详细信息) -L 链名</p>
+<h4 id="删除iptables"><a href="#删除iptables" class="headerlink" title="删除iptables"></a>删除iptables</h4><ol>
+<li>先查看路由规则，iptables –line-numbers -nvL INPUT</li>
+<li>清除路由规则, iptables  -t tablename -D 链名 line-number (例如3)</li>
+</ol>
+<h3 id="iptables-save"><a href="#iptables-save" class="headerlink" title="iptables-save"></a>iptables-save</h3><p>iptables-save命令可以将内核中的当前iptables配置导出到标准输出中，可以通过IO重定向功能输出到文件，例如<code>iptables-save &gt; hello.txt</code> 通过使用iptables-save能更直观的看懂iptables路由规则</p>
+<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><p>-t(–table): 指定iptables中的表<br>-c(–counters): 当前的数据包计数器和字节计数器信息</p>
+<h3 id="四、Netfilter路由选择"><a href="#四、Netfilter路由选择" class="headerlink" title="四、Netfilter路由选择"></a>四、Netfilter路由选择</h3><h4 id="ip-rule路由策略"><a href="#ip-rule路由策略" class="headerlink" title="ip rule路由策略"></a>ip rule路由策略</h4><p>ip rule命令用于设置路由策略，使用它不仅能够根据目的地址而且能够根据报文大小，应用或IP源地址等属性来选择转发路径。</p>
+<h5 id="ip-rule-命令"><a href="#ip-rule-命令" class="headerlink" title="ip rule 命令"></a>ip rule 命令</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Usage: ip rule [ list | add | del ] SELECTOR ACTION</span><br><span class="line"> </span><br><span class="line">SELECTOR :&#x3D; [ from PREFIX 数据包源地址] [ to PREFIX 数据包目的地址] [ tos TOS 服务类型]</span><br><span class="line">            [ dev STRING 物理接口] [ pref NUMBER ] [fwmark MARK iptables 标签]</span><br><span class="line"> </span><br><span class="line">ACTION :&#x3D; [ table TABLE_ID 指定所使用的路由表] [ nat ADDRESS 网络地址转换]</span><br><span class="line">          [ prohibit 丢弃该表| reject 拒绝该包| unreachable 丢弃该包]</span><br><span class="line"> </span><br><span class="line">TABLE_ID :&#x3D; [ local | main | default | new | NUMBER ]</span><br><span class="line"></span><br><span class="line"># 例子</span><br><span class="line">通过路由表 inr.ruhep 路由来自源地址为192.203.80&#x2F;24的数据包</span><br><span class="line">ip rule add from 192.203.80&#x2F;24 table inr.ruhep prio 220 </span><br><span class="line"> </span><br><span class="line">把源地址为193.233.7.83的数据报的源地址转换为192.203.80.144，并通过表1进行路由</span><br><span class="line">ip rule add from 193.233.7.83 nat 192.203.80.144 table 1 prio 320</span><br></pre></td></tr></table></figure>
+
+<h5 id="ip-rule-默认规则"><a href="#ip-rule-默认规则" class="headerlink" title="ip rule 默认规则"></a>ip rule 默认规则</h5><p>在 Linux 系统启动时，内核会为路由策略数据库配置三条缺省的规则：</p>
+<p>0：匹配任何条件，查询路由表local(ID 255)，该表local是一个特殊的路由表，包含对于本地和广播地址的优先级控制路由。rule 0非常特殊，不能被删除或者覆盖。</p>
+<p>32766：匹配任何条件，查询路由表main(ID 254)，该表是一个通常的表，包含所有的无策略路由。系统管理员可以删除或者使用另外的规则覆盖这条规则。</p>
+<p>32767：匹配任何条件，查询路由表default(ID 253)，该表是一个空表，它是后续处理保留。对于前面的策略没有匹配到的数据包，系统使用这个策略进行处理，这个规则也可以删除。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxdfnfni2rj313w03w0ta.jpg" alt="default ip rule" title="">
+            </p>
+
+<h4 id="ip-route路由表"><a href="#ip-route路由表" class="headerlink" title="ip route路由表"></a>ip route路由表</h4><p>所谓路由表，指的是路由器或者其他互联网网络设备上存储的表，该表中存有到达特定网络终端的路径，在某些情况下，还有一些与这些路径相关的度量。路由器的主要工作就是为经过路由器的每个数据包寻找一条最佳的传输路径，并将该数据有效地传送到目的站点。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ip route list table table_number</span><br><span class="line"> </span><br><span class="line">ip route list table table_name</span><br><span class="line"></span><br><span class="line">#例1：在一号表中添加默认路由为192.168.1.1</span><br><span class="line">ip route add default via 192.168.1.1 table 1 </span><br><span class="line"> </span><br><span class="line">#例2：在一号表中添加一条到192.168.0.0网段的路由为192.168.1.2</span><br><span class="line">ip route add 192.168.0.0&#x2F;24 via 192.168.1.2 table 1</span><br></pre></td></tr></table></figure>
+
+<h5 id="ip-route-默认路由表"><a href="#ip-route-默认路由表" class="headerlink" title="ip route 默认路由表"></a>ip route 默认路由表</h5><p>linux 系统中，可以自定义从 1－252个路由表，其中，linux系统维护了4个路由表：</p>
+<p>0#表： 系统保留表</p>
+<p>253#表： defulte table 没特别指定的默认路由都放在改表</p>
+<p>254#表： main table 没指明路由表的所有路由放在该表</p>
+<p>255#表： locale table 保存本地接口地址，广播地址、NAT地址 由系统维护，用户不得更改</p>
+<h4 id="ip-route-与-ip-rule-关系"><a href="#ip-route-与-ip-rule-关系" class="headerlink" title="ip route 与 ip rule 关系"></a>ip route 与 ip rule 关系</h4><p>在Netfilter中，通过路由选择决定把包发送给本地进程还是经过Forward链转发到其他接口上。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxdfbbvxvjj30o21bsaep.jpg" alt="netfilter flow" title="">
+            </p>
+
+<p>上图中<strong>routing</strong>就是使用<code>ip rule，ip route</code>设置的规则，<strong>其中ip route配置的路由表服务于ip rule配置的规则。</strong></p>
+<p>以一例子来说明：公司内网要求192.168.0.100 以内的使用 10.0.0.1 网关上网 （电信），其他IP使用 20.0.0.1 （网通）上网。</p>
+<p>首先要在网关服务器上添加一个默认路由，当然这个指向是绝大多数的IP的出口网关：ip route add default gw 20.0.0.1</p>
+<p>之后通过 ip route 添加一个路由表：ip route add table 3 via 10.0.0.1 dev ethX (ethx 是 10.0.0.1 所在的网卡, 3 是路由表的编号)</p>
+<p>之后添加 ip rule 规则：ip rule add fwmark 3 table 3 （fwmark 3 是标记，table 3 是路由表3 上边。 意思就是凡事标记了 3 的数据使用 table3 路由表）</p>
+<p>之后使用 iptables 给相应的数据打上标记：iptables -A PREROUTING -t mangle -i eth0 -s 192.168.0.1 - 192.168.0.100 -j MARK –set-mark 3</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="http://www.zsythink.net/archives/1199" target="_blank" rel="noopener">http://www.zsythink.net/archives/1199</a> // iptables概念</li>
+<li><a href="http://www.zsythink.net/archives/1493" target="_blank" rel="noopener">http://www.zsythink.net/archives/1493</a> // iptables查询</li>
+<li><a href="https://blog.csdn.net/guochunyang/article/details/49867707" target="_blank" rel="noopener">https://blog.csdn.net/guochunyang/article/details/49867707</a> // iptables规则</li>
+<li><a href="https://blog.csdn.net/u011537073/article/details/82685586" target="_blank" rel="noopener">https://blog.csdn.net/u011537073/article/details/82685586</a>  // iptables基础知识</li>
+<li><a href="https://www.ichenfu.com/2018/09/09/packet-flow-in-netfilter/" target="_blank" rel="noopener">https://www.ichenfu.com/2018/09/09/packet-flow-in-netfilter/</a>   // netfilter 数据流图</li>
+<li><a href="https://blog.csdn.net/qq_26602023/article/details/106413909" target="_blank" rel="noopener">https://blog.csdn.net/qq_26602023/article/details/106413909</a>   // linux网络知识：路由策略（ip rule，ip route）</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/03/28/linux-vim/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">vim常用命令</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/03/24/linux-journalctl/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">journalctl日志查看命令</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

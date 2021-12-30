@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>go mod整理文档 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="golang">
+    <meta name="description" content="GOPATH什么是GOPATH终端输入go env 123➜  ~ go envGOPATH&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;go&quot;...  进入到GOPATH目录下结构如下 1234567891011➜  ~ tree -d -L 2 $GOPATH&#x2F;Users&#x2F;dawn&#x2F;go├── bin├── pkg│">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go mod整理文档">
+<meta property="og:url" content="https://github.com/fafucoder/2020/03/09/golang-mod/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="GOPATH什么是GOPATH终端输入go env 123➜  ~ go envGOPATH&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;go&quot;...  进入到GOPATH目录下结构如下 1234567891011➜  ~ tree -d -L 2 $GOPATH&#x2F;Users&#x2F;dawn&#x2F;go├── bin├── pkg│">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.eddycjy.com/6e556b628df36b1fd3800fb9d91a0d16.jpg">
+<meta property="og:image" content="https://image.eddycjy.com/b45438512cbb44015402da1a98190ac0.jpg">
+<meta property="og:image" content="https://image.eddycjy.com/7d509e8945fa31b7986369986c58e6f4.jpg">
+<meta property="og:image" content="https://image.eddycjy.com/2bd0bed89d9300c0aac24c7bc72a6307.jpgg">
+<meta property="article:published_time" content="2020-03-09T04:25:37.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.327Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.eddycjy.com/6e556b628df36b1fd3800fb9d91a0d16.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">go mod整理文档</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">go mod整理文档</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-03-09T04:25:37.000Z" itemprop="datePublished" class="page-time">
+  2020-03-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-golang-mod"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">go mod整理文档</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-03-09 12:25:37" datetime="2020-03-09T04:25:37.000Z"  itemprop="datePublished">2020-03-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="GOPATH"><a href="#GOPATH" class="headerlink" title="GOPATH"></a>GOPATH</h3><h4 id="什么是GOPATH"><a href="#什么是GOPATH" class="headerlink" title="什么是GOPATH"></a>什么是GOPATH</h4><p>终端输入go env</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ go env</span><br><span class="line">GOPATH&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;go&quot;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>进入到GOPATH目录下结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ tree -d -L 2 $GOPATH</span><br><span class="line">&#x2F;Users&#x2F;dawn&#x2F;go</span><br><span class="line">├── bin</span><br><span class="line">├── pkg</span><br><span class="line">│   ├── mod</span><br><span class="line">│   └── sumdb</span><br><span class="line">└── src</span><br><span class="line">    ├── github.com</span><br><span class="line">    ├── go-types</span><br><span class="line">    ├── gomod-test</span><br><span class="line">    └── k8s.io</span><br></pre></td></tr></table></figure>
+
+<p>GOPATH目录下一共包含了三个子目录，分别是：</p>
+<ul>
+<li>bin：存储所编译生成的二进制文件。</li>
+<li>pkg：存储预编译的目标文件，以加快程序的后续编译速度。</li>
+<li>src：存储所有.go文件或源代码。在编写 Go 应用程序，程序包和库时，一般会以$GOPATH/src/github.com/foo/bar的路径进行存放。</li>
+</ul>
+<p>因此在使用 GOPATH 模式下，我们需要将应用代码存放在固定的$GOPATH/src目录下，并且如果执行go get来拉取外部依赖会自动下载并安装到$GOPATH目录下。</p>
+<h4 id="为何弃用GOPATH"><a href="#为何弃用GOPATH" class="headerlink" title="为何弃用GOPATH"></a>为何弃用GOPATH</h4><p>GOPATH 模式下没有版本控制的概念，具有致命的缺陷，至少会造成以下问题</p>
+<ul>
+<li>在执行go get的时候，你无法传达任何的版本信息的期望，也就是说你也无法知道自己当前更新的是哪一个版本，也无法通过指定来拉取自己所期望的具体版本</li>
+<li>在运行Go应用程序的时候，你无法保证其它人与你所期望依赖的第三方库是相同的版本，也就是说在项目依赖库的管理上，你无法保证所有人的依赖版本都一致</li>
+<li>你没办法处理 v1、v2、v3 等等不同版本的引用问题，因为 GOPATH 模式下的导入路径都是一样的，都是github.com/foo/bar</li>
+</ul>
+<p>因此Go语言官方从 Go1.11 起开始推进 Go modules（前身vgo），Go1.13 起不再推荐使用 GOPATH 的使用模式</p>
+<h3 id="Go-Modules"><a href="#Go-Modules" class="headerlink" title="Go Modules"></a>Go Modules</h3><h4 id="GO-MOD环境配置"><a href="#GO-MOD环境配置" class="headerlink" title="GO MOD环境配置"></a>GO MOD环境配置</h4><p>通过go env可以查看配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ go env                </span><br><span class="line">GO111MODULE&#x3D;&quot;off&quot;</span><br><span class="line">GOBIN&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;go&#x2F;bin&quot;</span><br><span class="line">GOPATH&#x3D;&quot;&#x2F;Users&#x2F;dawn&#x2F;go&quot;</span><br><span class="line">GOPRIVATE&#x3D;&quot;&quot;</span><br><span class="line">GOPROXY&#x3D;&quot;https:&#x2F;&#x2F;goproxy.cn,direct&quot;</span><br><span class="line">GOROOT&#x3D;&quot;&#x2F;usr&#x2F;local&#x2F;go&quot;</span><br><span class="line">GOSUMDB&#x3D;&quot;sum.golang.google.cn&quot;</span><br></pre></td></tr></table></figure>
+
+<h5 id="GO111MODULE"><a href="#GO111MODULE" class="headerlink" title="GO111MODULE"></a>GO111MODULE</h5><p>Go语言提供了 GO111MODULE 这个环境变量来作为 Go modules 的开关，其允许设置以下参数：</p>
+<p>auto：只要项目包含了 go.mod 文件的话启用 Go modules，目前在 Go1.11 至 Go1.14 是默认值。<br>on：启用 Go modules，推荐设置，将会是未来版本中的默认值。<br>off：禁用 Go modules，不推荐设置。</p>
+<h5 id="GOPROXY"><a href="#GOPROXY" class="headerlink" title="GOPROXY"></a>GOPROXY</h5><p>这个环境变量主要是用于设置 Go 模块代理（Go module proxy），其作用是用于使 Go 在后续拉取模块版本时能够脱离传统的 VCS 方式，直接通过镜像站点来快速拉取。</p>
+<p>GOPROXY 的默认值是：<a href="https://proxy.golang.org,direct，这有一个很严重的问题，就是" target="_blank" rel="noopener">https://proxy.golang.org,direct，这有一个很严重的问题，就是</a> proxy.golang.org 在国内是无法访问的，因此这会直接卡住你的第一步，所以你必须在开启 Go modules 的时，同时设置国内的 Go 模块代理，执行如下命令：<br><code>go env -w GOPROXY=https://goproxy.cn,direct</code></p>
+<p>GOPROXY的值是一个以英文逗号 “,” 分割的 Go 模块代理列表，允许设置多个模块代理，假设你不想使用，也可以将其设置为 “off” ，这将会禁止 Go 在后续操作中使用任何 Go 模块代理。</p>
+<h6 id="direct是什么"><a href="#direct是什么" class="headerlink" title="direct是什么"></a>direct是什么</h6><p>而在刚刚设置的值中，我们可以发现值列表中有 “direct” 标识，它又有什么作用呢？</p>
+<p>实际上 “direct” 是一个特殊指示符，用于指示 Go 回源到模块版本的源地址去抓取（比如 GitHub 等），场景如下：当值列表中上一个 Go 模块代理返回 404 或 410 错误时，Go 自动尝试列表中的下一个，遇见 “direct” 时回源，也就是回到源地址去抓取，而遇见 EOF 时终止并抛出类似 “invalid version: unknown revision…” 的错误。</p>
+<h4 id="开启GO-Modules"><a href="#开启GO-Modules" class="headerlink" title="开启GO Modules"></a>开启GO Modules</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ go env -w GO111MODULE&#x3D;on</span><br><span class="line">warning: go env -w GO111MODULE&#x3D;... does not override conflicting OS environment variable</span><br><span class="line">➜  ~ export GO111MODULE&#x3D;on   </span><br><span class="line">➜  ~ go env                  </span><br><span class="line">GO111MODULE&#x3D;&quot;on&quot;</span><br></pre></td></tr></table></figure>
+
+<p>如果对应的系统环境变量有值了（进行过设置），会出现如下警告信息：warning: go env -w GO111MODULE=… does not override conflicting OS environment variable。</p>
+<p>可以通过直接设置系统环境变量（写入对应的.bash_profile文件亦可）来实现这个目的：</p>
+<p><code>➜  ~ export GO111MODULE=on</code></p>
+<h5 id="关于环境变量优先级的问题"><a href="#关于环境变量优先级的问题" class="headerlink" title="关于环境变量优先级的问题"></a>关于环境变量优先级的问题</h5><p>go env -w的优先级是最低的(相当于默认配置)，然后系统环境变量次之(环境变量配置在本地，例如配置.zshrc/.bashrc里面的)，当前shell的优先级最高(当前shell export的最高，关闭当前shell,配置的就失效了)</p>
+<p>因此如果想设置一次性环境变量，直接在当前终端export就可以了，关闭当前shell后，配置就失效了，所以可以不同的shell终端可以拥有不同的环境变量.</p>
+<p>如果GO11MODULES=off,需要下载翻墙包，那要怎么办呢，可以通过如下命令<br><code>GO11MOGULE=on go get golang.org/x/text@v0.3.2</code></p>
+<h4 id="GO-MOD命令"><a href="#GO-MOD命令" class="headerlink" title="GO MOD命令"></a>GO MOD命令</h4><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>go mod init</td>
+<td>生成 go.mod 文件</td>
+<td>go mod初始化</td>
+</tr>
+<tr>
+<td>go mod download</td>
+<td>下载 go.mod 文件中指明的所有依赖</td>
+<td>一般配合vendor使用</td>
+</tr>
+<tr>
+<td>go mod tidy</td>
+<td>整理现有的依赖</td>
+<td>有点鸡肋</td>
+</tr>
+<tr>
+<td>go mod graph</td>
+<td>查看现有的依赖结构</td>
+<td>有点鸡肋，依赖冲突可能有用，但是不好排查</td>
+</tr>
+<tr>
+<td>go mod edit</td>
+<td>编辑 go.mod 文件</td>
+<td>有点鸡肋，一般直接在编辑器里修改</td>
+</tr>
+<tr>
+<td>go mod vendor</td>
+<td>导出项目所有的依赖到vendor目录</td>
+<td>一般配合download使用</td>
+</tr>
+<tr>
+<td>go mod verify</td>
+<td>校验一个模块是否被篡改过</td>
+<td></td>
+</tr>
+<tr>
+<td>go mod why</td>
+<td>查看为什么需要依赖某模块</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="Go-Modules下的go-get行为"><a href="#Go-Modules下的go-get行为" class="headerlink" title="Go Modules下的go get行为"></a>Go Modules下的go get行为</h3><p>开启go modules后，如何导入数据包呢，答案是跟没开启一样，直接通过 go get导入数据包</p>
+<h4 id="go-get-命令"><a href="#go-get-命令" class="headerlink" title="go get 命令"></a>go get 命令</h4><p>常用的拉取命令如下:<br>| 命令           | 作用                                                           | 说明         |<br>| —————- | —————————————————————- | ————– |<br>| go get           | 拉取依赖，会进行指定性拉取（更新），并不会更新所依赖的其它模块。 | 获取包      |<br>| go get -u        | 更新现有的依赖，会强制更新它所依赖的其它全部模块，不包括自身。 | 获取最新包 |<br>| go get -u -v     | 更新现有的依赖, 并输出详细更新信息。            | 查看详情   |<br>| go get -u -t ./… | 更新所有直接依赖和间接依赖的模块版本，包括单元测试中用到的。 | 可以获取全部包 |</p>
+<h4 id="go-get-获取指定版本"><a href="#go-get-获取指定版本" class="headerlink" title="go get 获取指定版本"></a>go get 获取指定版本</h4><p>我想选择具体版本应当如何执行呢，如下:<br>| 命令                          | 作用                                               |<br>| ——————————- | —————————————————- |<br>| go get golang.org/x/text@latest | 拉取最新的版本，若存在tag，则优先使用。 |<br>| go get golang.org/x/text@master | 拉取 master 分支的最新 commit。              |<br>| go get golang.org/x/text@v0.3.2 | 拉取 tag 为 v0.3.2 的 commit。                  |<br>| go get golang.org/x/text@342b2e | 拉取 hash 为 342b231 的 commit，最终会被转换为 v0.3. |</p>
+<h4 id="go-get-版本选择"><a href="#go-get-版本选择" class="headerlink" title="go get 版本选择"></a>go get 版本选择</h4><p>go get拉取的时候有两种选择:</p>
+<ol>
+<li>所拉取的模块带有发布tags:</li>
+</ol>
+<ul>
+<li>如果只有单个模块，那么就取主版本号最大的那个tag</li>
+<li>如果有多个模块，则推算相应的模块路径，取主版本号最大的那个tag（子模块的tag的模块路径会有前缀要求）</li>
+</ul>
+<ol start="2">
+<li>所拉取的模块没有发布tags:</li>
+</ol>
+<ul>
+<li>默认取主分支最新一次 commit 的 commithash。</li>
+</ul>
+<h3 id="go-mod-依赖问题"><a href="#go-mod-依赖问题" class="headerlink" title="go mod 依赖问题"></a>go mod 依赖问题</h3><h4 id="go-mod-版本格式"><a href="#go-mod-版本格式" class="headerlink" title="go mod 版本格式"></a>go mod 版本格式</h4><p>go mod的版本信息如下：</p>
+<p class="img-lightbox">
+                <img src="https://image.eddycjy.com/6e556b628df36b1fd3800fb9d91a0d16.jpg" alt="go mod版本信息" title="">
+            </p>
+
+<p>其版本格式为“主版本号.次版本号.修订号”，版本号的递增规则如下：</p>
+<ul>
+<li>主版本号：当你做了不兼容的 API 修改。</li>
+<li>次版本号：当你做了向下兼容的功能性新增。</li>
+<li>修订号：当你做了向下兼容的问题修正。</li>
+</ul>
+<p>假设先行版本号或特殊情况，可以将版本信息追加到“主版本号.次版本号.修订号”的后面，作为延伸，如下:</p>
+<p class="img-lightbox">
+                <img src="https://image.eddycjy.com/b45438512cbb44015402da1a98190ac0.jpg" alt="go mod版本信息" title="">
+            </p>
+
+<h4 id="go-mod-依赖"><a href="#go-mod-依赖" class="headerlink" title="go mod 依赖"></a>go mod 依赖</h4><p>现在我们已经有一个模块，也有发布的 tag，但是一个模块往往依赖着许多其它许许多多的模块，并且不同的模块在依赖时很有可能会出现依赖同一个模块的不同版本，如下图（来自Russ Cox）：</p>
+<p class="img-lightbox">
+                <img src="https://image.eddycjy.com/7d509e8945fa31b7986369986c58e6f4.jpg" alt="go mod版本信息" title="">
+            </p>
+
+<p>在上述依赖中，模块 A 依赖了模块 B 和模块 C，而模块 B 依赖了模块 D，模块 C 依赖了模块 D 和 F，模块 D 又依赖了模块 E，而且同模块的不同版本还依赖了对应模块的不同版本。那么这个时候 Go modules 怎么选择版本，选择的是哪一个版本呢？</p>
+<p>我们根据 proposal 可得知，Go modules 会把每个模块的依赖版本清单都整理出来，最终得到一个构建清单，如下图（来自Russ Cox）：</p>
+<p class="img-lightbox">
+                <img src="https://image.eddycjy.com/2bd0bed89d9300c0aac24c7bc72a6307.jpgg" alt="go mod版本信息" title="">
+            </p>
+
+<p>我们看到 rough list 和 final list，两者的区别在于重复引用的模块 D（v1.3、v1.4），其最终清单选用了模块 D 的 v1.4 版本，主要原因：</p>
+<p>语义化版本的控制：因为模块 D 的 v1.3 和 v1.4 版本变更，都属于次版本号的变更，而在语义化版本的约束下，v1.4 必须是要向下兼容 v1.3 版本，因此认为不存在破坏性变更，也就是兼容的。</p>
+<p>模块导入路径的规范：主版本号不同，模块的导入路径不一样，因此若出现不兼容的情况，其主版本号会改变，模块的导入路径自然也就改变了，因此不会与第一点的基础相冲突。</p>
+<h4 id="go-mod-引来引发的问题"><a href="#go-mod-引来引发的问题" class="headerlink" title="go mod 引来引发的问题"></a>go mod 引来引发的问题</h4><p>在导入模块的时候，社区规范的愿景很好，但是每个开发者不一定会严格遵循社区规范开发，最后的结果就是导入依赖的时候会出现不兼容的问题，那要如何解决呢？</p>
+<ol>
+<li>获取依赖图， go mod graph | grep “依赖”, 例如: go mod graph | grep “submariner”</li>
+<li>使用replace替换为你你需要的版本，例如: github.com/submariner-io/submariner =&gt; github.com/submariner-io/submariner v0.2.0</li>
+</ol>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://colobu.com/2019/09/23/review-go-module-again/" target="_blank" rel="noopener">https://colobu.com/2019/09/23/review-go-module-again/</a> //鸟窝</li>
+<li><a href="https://eddycjy.com/posts/go/go-moduels/2020-02-28-go-modules/" target="_blank" rel="noopener">https://eddycjy.com/posts/go/go-moduels/2020-02-28-go-modules/</a>   //煎鱼(非常详细，推荐阅读)</li>
+<li><a href="https://qcrao.com/2020/04/27/accident/" target="_blank" rel="noopener">https://qcrao.com/2020/04/27/accident/</a> //码农桃花源(饶大还是幽默的)</li>
+<li><a href="https://mp.weixin.qq.com/s/ENKV234bolS8UWd73JtRnQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/ENKV234bolS8UWd73JtRnQ</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/03/24/linux-journalctl/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">journalctl日志查看命令</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/03/04/kubernetes-device-plugins/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">kubernetes中device-plugins原理解析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux lvs原理及实践 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="前言负载均衡(Load Balance)的职责是将网络请求，或者其他形式的负载“均摊”到不同的机器上，让每台服务器获取到适合自己处理能力的负载。在为高负载服务器分流的同时，还可以避免资源浪费。负载均衡的原理就是当用户的请求到达前端负载均衡器(Director Server)时，通过设置好的调度算法，智能均衡的将请求分发到后端真正服务器上(Real Server)。根据请求类型的不同可以将负载均衡分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux lvs原理及实践">
+<meta property="og:url" content="https://github.com/fafucoder/2021/12/19/linux-lvs/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="前言负载均衡(Load Balance)的职责是将网络请求，或者其他形式的负载“均摊”到不同的机器上，让每台服务器获取到适合自己处理能力的负载。在为高负载服务器分流的同时，还可以避免资源浪费。负载均衡的原理就是当用户的请求到达前端负载均衡器(Director Server)时，通过设置好的调度算法，智能均衡的将请求分发到后端真正服务器上(Real Server)。根据请求类型的不同可以将负载均衡分">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxv0a244zyj30ou0dtmys.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxvmcgh1xwj30oy0dwq57.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxvobeirpcj30p00e340q.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxw0gf5xdlj30lr0ck0tc.jpg">
+<meta property="article:published_time" content="2021-12-19T09:01:20.000Z">
+<meta property="article:modified_time" content="2021-12-30T11:26:08.524Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux lvs原理及实践</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux lvs原理及实践</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-12-19T09:01:20.000Z" itemprop="datePublished" class="page-time">
+  2021-12-19
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-lvs"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux lvs原理及实践</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-12-19 17:01:20" datetime="2021-12-19T09:01:20.000Z"  itemprop="datePublished">2021-12-19</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>负载均衡(Load Balance)的职责是将网络请求，或者其他形式的负载“均摊”到不同的机器上，让每台服务器获取到适合自己处理能力的负载。在为高负载服务器分流的同时，还可以避免资源浪费。负载均衡的原理就是当用户的请求到达前端负载均衡器(Director Server)时，通过设置好的调度算法，智能均衡的将请求分发到后端真正服务器上(Real Server)。根据请求类型的不同可以将负载均衡分为四层负载均衡(L4)和七层负载均衡(L7)， 常见的负载均衡器包括LVS，Nginx, HAProxy等。</p>
+<h3 id="LVS概述"><a href="#LVS概述" class="headerlink" title="LVS概述"></a>LVS概述</h3><p>LVS是Linux Virtual Server的简称， 也就是 Linux 虚拟服务器，工作在 OSI 模型的传输层，即四层负载均衡。LVS主要由两部分组成，包括ipvs和ipvsadm。</p>
+<ul>
+<li>ipvs(ip virtual server)：工作在内核空间，是真正生效实现调度的代码。</li>
+<li>ipvsadm：工作在用户空间，叫 ipvsadm，负责为 ipvs 内核框架编写规则，定义谁是集群服务，而谁是后端真实的服务器(Real Server)</li>
+</ul>
+<h3 id="LVS-基本工作原理"><a href="#LVS-基本工作原理" class="headerlink" title="LVS 基本工作原理"></a>LVS 基本工作原理</h3><p>LVS的底层是利用NETIFILTER的钩子能力：</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg" alt="ipvs工作原理" title="">
+            </p>
+
+<ol>
+<li>当用户向负载均衡调度器（Director Server）发起请求，调度器将请求发往至内核空间</li>
+<li>PREROUTING 链首先会接收到用户请求，判断目标 IP 确定是本机 IP，将数据包发往 INPUT 链</li>
+<li>IPVS 是工作在 INPUT 链上的，当用户请求到达 INPUT 时，IPVS 会将用户请求和自己已定义好的集群服务进行比对，如果用户请求的就是定义的集群服务，那么此时 IPVS 会强行修改数据包里的目标 IP 地址及端口，并将新的数据包发往 POSTROUTING 链</li>
+<li>POSTROUTING 链接收数据包后发现目标 IP 地址刚好是自己的后端服务器，那么此时通过选路，将数据包最终发送给后端的服务器</li>
+</ol>
+<h3 id="LVS-调度算法"><a href="#LVS-调度算法" class="headerlink" title="LVS 调度算法"></a>LVS 调度算法</h3><p>前言说到负载均衡器原理是根据负载均衡算法把请求转发到后端真实服务器上。LVS作为四层负载均衡器，针对不同的网络服务需求和服务器配置，LVS调度器实现了多种负载均衡调度算法，主要包括如下：</p>
+<ol>
+<li><p><strong>轮询调度 rr（Round Robin）</strong>：这种算法是最简单的，就是按依次循环的方式将请求调度到不同的服务器上，该算法最大的特点就是简单。轮询算法假设所有的服务器处理请求的能力都是一样的，调度器会将所有的请求平均分配给每个真实服务器，不管后端 RS 配置和处理能力，非常均衡地分发下去。</p>
+</li>
+<li><p><strong>加权轮叫 wrr（Weighted Round Robin）</strong>：这种算法比 rr 的算法多了一个权重的概念，可以给 RS 设置权重，权重越高，那么分发的请求数越多，权重的取值范围 0 – 100。主要是对 rr 算法的一种优化和补充，LVS 会考虑每台服务器的性能，并给每台服务器添加要给权值，如果服务器 A 的权值为 1，服务器 B 的权值为 2，则调度到服务器 B 的请求会是服务器 A 的 2 倍。权值越高的服务器，处理的请求越多。</p>
+</li>
+<li><p><strong>最少链接 lc（Least Connections）</strong>：这个算法会根据后端 RS 的连接数来决定把请求分发给谁，比如 RS1 连接数比 RS2 连接数少，那么请求就优先发给 RS1。</p>
+</li>
+<li><p><strong>加权最少链接 wlc（Weighted Least Connections）</strong>：这个算法比最少链接 lc算法多了一个权重的概念。</p>
+</li>
+<li><p><strong>基于局部性的最少链接 lblc（Locality-Based Least Connections）</strong>：这个算法是针对目标 IP 地址的负载均衡，目前主要用于 Cache 集群系统。该算法根据请求的目标 IP 地址找出该目标 IP 地址最近使用的服务器，若该服务器 是可用的且没有超载，将请求发送到该服务器；若服务器不存在，或者该服务器超载且有服务器处于一半的工作负载，则用 “最少链接” 的原则选出一个可用的服务 器，将请求发送到该服务器。</p>
+</li>
+<li><p><strong>复杂的基于局部性最少的连接算法 lblcr（Locality-Based Least Connections with Replication）*</strong>：这个算法也是针对目标 IP 地址的负载均衡，目前主要用于 Cache 集群系统。它与 LBLC 算法的不同之处是它要维护从一个 目标 IP 地址到一组服务器的映射，而 LBLC 算法维护从一个目标 IP 地址到一台服务器的映射。该算法根据请求的目标 IP 地址找出该目标 IP 地址对应的服务 器组，按 “最小连接” 原则从服务器组中选出一台服务器，若服务器没有超载，将请求发送到该服务器，若服务器超载；则按 “最小连接” 原则从这个集群中选出一 台服务器，将该服务器加入到服务器组中，将请求发送到该服务器。同时，当该服务器组有一段时间没有被修改，将最忙的服务器从服务器组中删除，以降低复制的 程度。</p>
+</li>
+<li><p><strong>目标地址散列 dh（Destination Hashing）</strong>：这个算法根据请求的目标 IP 地址，作为散列键（Hash Key）从静态分配的散列表找出对应的服务器，若该服务器是可用的且未超载，将请求发送到该服务器，否则返回空。</p>
+</li>
+<li><p><strong>源地址散列 sh（Source Hashing）</strong>：这个调度算法根据请求的源 IP 地址，作为散列键（Hash Key）从静态分配的散列表找出对应的服务器，若该服务器是可用的且未超载，将请求发送到该服务器，否则返回空。</p>
+</li>
+</ol>
+<h3 id="LVS-工作模式"><a href="#LVS-工作模式" class="headerlink" title="LVS 工作模式"></a>LVS 工作模式</h3><p>根据负载均衡器对数据包的处理方式分类，LVS支持三种工作模式，分别为NAT模式，DR模式以及TUN模式。原生的LVS工作模式不支持FULLNAT，FULLNAT模式需要自己重新编译LVS。在介绍LVS工作模式之前有必要先解释下相关名词：</p>
+<ul>
+<li>DS：Director Server，指的是前端负载均衡器节点。</li>
+<li>RS：Real Server，后端真实的工作服务器。</li>
+<li>VIP：向外部直接面向用户请求，作为用户请求的目标的 IP 地址。</li>
+<li>DIP：Director Server IP，主要用于和内部主机通讯的 IP 地址。</li>
+<li>RIP：Real Server IP，后端服务器的 IP 地址。</li>
+<li>CIP：Client IP，访问客户端的 IP 地址。</li>
+</ul>
+<h4 id="LVS-NAT模式"><a href="#LVS-NAT模式" class="headerlink" title="LVS NAT模式"></a>LVS NAT模式</h4><h5 id="LVS-NAT的工作原理"><a href="#LVS-NAT的工作原理" class="headerlink" title="LVS NAT的工作原理"></a>LVS NAT的工作原理</h5><ol>
+<li>当用户请求到达 Director Server，此时请求的数据报文会先到内核空间的 PREROUTING 链。 此时报文的源 IP 为 CIP，目标 IP 为 VIP</li>
+<li>PREROUTING 检查发现数据包的目标 IP 是本机，将数据包送至 INPUT 链</li>
+<li>IPVS 比对数据包请求的服务是否为集群服务，若是，修改数据包的目标 IP 地址为后端服务器 IP，然后将数据包发至 POSTROUTING 链。 此时报文的源 IP 为 CIP，目标 IP 为 RIP</li>
+<li>POSTROUTING 链通过选路，将数据包发送给 Real Server</li>
+<li>Real Server 比对发现目标为自己的 IP，开始构建响应报文发回给 Director Server。 此时报文的源 IP 为 RIP，目标 IP 为 CIP</li>
+<li>Director Server 在响应客户端前，此时会将源 IP 地址修改为自己的 VIP 地址，然后响应给客户端。 此时报文的源 IP 为 VIP，目标 IP 为 CIP</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxv0a244zyj30ou0dtmys.jpg" alt="LVS NAT模式" title="">
+            </p>
+
+<h5 id="LVS-NAT模式特点"><a href="#LVS-NAT模式特点" class="headerlink" title="LVS NAT模式特点"></a>LVS NAT模式特点</h5><ul>
+<li><strong>RS 应该使用私有地址，RS 的网关必须指向 DIP。</strong></li>
+<li><strong>DIP 和 RIP 必须在同一个网段内。</strong></li>
+<li>支持端口映射。</li>
+<li>RS 可以使用任意操作系统。</li>
+<li>请求和响应报文都需要经过 Director Server，高负载场景中，Director Server 易成为性能瓶颈。</li>
+</ul>
+<h5 id="LVS-NAT模式实践"><a href="#LVS-NAT模式实践" class="headerlink" title="LVS NAT模式实践"></a>LVS NAT模式实践</h5><p>一、使用Docker模拟(适用于没虚拟机的情况)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1. 起两个nginx容器，分别是 </span></span><br><span class="line">[root@localhost ~]# docker run -d -p 8000:8000 --name first -t jwilder/whoami</span><br><span class="line">[root@localhost ~]# docker run -d -p 8001:8000 --name second -t jwilder/whoami</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 2. 获取容器的IP地址</span></span><br><span class="line">[root@localhost ~]# docker inspect -f '&#123;&#123;range .NetworkSettings.Networks&#125;&#125;&#123;&#123;.IPAddress&#125;&#125;&#123;&#123;end&#125;&#125;' first</span><br><span class="line">[root@localhost ~]# docker inspect -f '&#123;&#123;range .NetworkSettings.Networks&#125;&#125;&#123;&#123;.IPAddress&#125;&#125;&#123;&#123;end&#125;&#125;' second</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行curl获取结果(ip为步骤二返回的结果)</span></span><br><span class="line">[root@localhost ~]# curl 172.17.0.2:8000</span><br><span class="line">[root@localhost ~]# curl 172.17.0.3:8000</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建ipvs规则</span></span><br><span class="line">[root@localhost ~]# ipvsadm -A -t 192.168.56.102:80 -s rr</span><br><span class="line">[root@localhost ~]# ipvsadm -a -t 192.168.56.102:80 -r 172.17.0.2:8000 -m</span><br><span class="line">[root@localhost ~]# ipvsadm -a -t 192.168.56.102:80 -r 172.17.0.3:8000 -m</span><br><span class="line">[root@localhost ~]# ipvsadm -Ln</span><br><span class="line">TCP  192.168.56.102:80 rr</span><br><span class="line"><span class="meta">  -&gt;</span><span class="bash"> 172.17.0.2:8000              Masq    1      0          0         </span></span><br><span class="line"><span class="meta">  -&gt;</span><span class="bash"> 172.17.0.3:8000              Masq    1      0          0   </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 验证是否生效(返回结果一次是A，一次是B)</span></span><br><span class="line">[root@localhost ~]# curl 192.168.56.102</span><br><span class="line">I'm fdb291a03b87</span><br><span class="line">[root@localhost ~]# curl 192.168.56.102</span><br><span class="line">I'm 9799eb62225c</span><br></pre></td></tr></table></figure>
+
+<p>二、使用虚拟机模拟</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 前置条件：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   1. 虚拟机网段一致</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   2. 服务器2，3上部署了http服务器,且内容不一致</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在虚拟机1上执行， (本机IP为192.168.56.101)</span></span><br><span class="line">ipvsadm -A -t 192.168.57.4:80 -s rr</span><br><span class="line">ipvsadm -a -t 192.168.57.4:80 -r 192.168.56.102:80 -m</span><br><span class="line">ipvsadm -a -t 192.168.57.4:80 -r 192.168.56.104:80 -m</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 开启ip forward</span></span></span><br><span class="line">echo 1 &gt;/proc/sys/net/ipv4/ip_forward</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在虚拟机2，3上执行，(本机IP为192.168.56.102， 192.168.56.104), 如果默认路由不设置为虚拟机1，发现是访问不通的</span></span><br><span class="line">ip route del default</span><br><span class="line">ip route add default via 192.168.56.101</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 检查是否能够访问, 在虚拟机1上执行curl</span></span><br><span class="line">curl 192.168.57.4</span><br></pre></td></tr></table></figure>
+
+<h4 id="LVS-DR模式"><a href="#LVS-DR模式" class="headerlink" title="LVS DR模式"></a>LVS DR模式</h4><p>DR（Direct Routing 直接路由模式）模式时 LVS 调度器只接收客户发来的请求并将请求转发给后端服务器，后端服务器处理请求后直接把内容直接响应给客户，而不用再次经过 LVS 调度器。LVS 只需要将网络帧的 MAC 地址修改为某一台后端服务器 RS 的 MAC，该包就会被转发到相应的 RS 处理，注意此时的源 IP 和目标 IP 都没变。RS 收到 LVS 转发来的包时，链路层发现 MAC 是自己的，到上面的网络层，发现 IP 也是自己的，于是这个包被合法地接受，RS 感知不到前面有 LVS 的存在。而当 RS 返回响应时，只要直接向源 IP（即用户的 IP）返回即可，不再经过 LVS。</p>
+<h5 id="LVS-DR模式工作原理"><a href="#LVS-DR模式工作原理" class="headerlink" title="LVS DR模式工作原理"></a>LVS DR模式工作原理</h5><ol>
+<li>当用户请求到达 Director Server，此时请求的数据报文会先到内核空间的 PREROUTING 链。 此时报文的源 IP 为 CIP，目标 IP 为 VIP。</li>
+<li>PREROUTING 检查发现数据包的目标 IP 是本机，将数据包送至 INPUT 链。</li>
+<li>IPVS 比对数据包请求的服务是否为集群服务，若是，将请求报文中的源 MAC 地址修改为 DIP 的 MAC 地址，将目标 MAC 地址修改 RIP 的 MAC 地址，然后将数据包发至 POSTROUTING 链。 此时的源 IP 和目的 IP 均未修改，仅修改了源 MAC 地址为 DIP 的 MAC 地址，目标 MAC 地址为 RIP 的 MAC 地址。</li>
+<li>由于 DS 和 RS 在同一个网络中，所以是通过二层来传输。POSTROUTING 链检查目标 MAC 地址为 RIP 的 MAC 地址，那么此时数据包将会发至 Real Server。</li>
+<li>RS 发现请求报文的 MAC 地址是自己的 MAC 地址，就接收此报文。处理完成之后，将响应报文通过 lo 接口传送给 eth0 网卡然后向外发出。 此时的源 IP 地址为 VIP，目标 IP 为 CIP。</li>
+<li>响应报文最终送达至客户端。</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxvmcgh1xwj30oy0dwq57.jpg" alt="LVS DR模式" title="">
+            </p>
+
+<h5 id="LVS-DR模式特点"><a href="#LVS-DR模式特点" class="headerlink" title="LVS DR模式特点"></a>LVS DR模式特点</h5><ul>
+<li>保证前端路由将目标地址为 VIP 报文统统发给 Director Server，而不是 RS。</li>
+<li>RS 可以使用私有地址；也可以是公网地址，如果使用公网地址，此时可以通过互联网对 RIP 进行直接访问。</li>
+<li>VIP与DIP，RIP可以不在同一网段中.</li>
+<li>所有的请求报文经由 Director Server，但响应报文必须不能进过 Director Server。</li>
+<li>不支持地址转换，也不支持端口映射。</li>
+<li>RS 可以是大多数常见的操作系统。</li>
+<li>RS 的网关绝不允许指向 DIP（因为我们不允许他经过 Director Server）。</li>
+<li>RS 上的 lo 接口配置 VIP 的 IP 地址。</li>
+<li><strong>RS 和 DS 必须在同一个物理网络中(同一机房中)。</strong></li>
+</ul>
+<h5 id="LVS-DR模式的相关问题"><a href="#LVS-DR模式的相关问题" class="headerlink" title="LVS DR模式的相关问题"></a>LVS DR模式的相关问题</h5><p>为了解决<code>保证前端路由将目标地址为 VIP 报文统统发给 Director Server，而不是 RS。</code>的问题一般有如下解决方案：</p>
+<ul>
+<li>在前端路由器做静态地址路由绑定，将对于 VIP 的地址仅路由到 Director Server。但用户未必有路由操作权限，因为有可能是运营商提供的，所以这个方法未必实用。</li>
+<li>arptables：在 arp 的层次上实现在 ARP 解析时做防火墙规则，过滤 RS 响应 ARP 请求。这是由 iptables 提供的。</li>
+<li>修改 RS 上内核参数（<code>arp_ignore</code> 和 <code>arp_announce</code>）将 RS 上的 VIP 配置在 lo 接口的别名上，并限制其不能响应对 VIP 地址解析请求。</li>
+</ul>
+<h5 id="关于arp-ignore和arp-announce"><a href="#关于arp-ignore和arp-announce" class="headerlink" title="关于arp_ignore和arp_announce"></a>关于arp_ignore和arp_announce</h5><p>arp_ignore：定义接收 ARP 请求时的响应级别 </p>
+<ul>
+<li>0：响应任意网卡上接收到的对本机 IP 地址的 ARP 请求（包括环回网卡），不论目的 IP 地址是否在接收网卡上</li>
+<li>1：只响应目的 IP 地址为接收网卡地址的 ARP 请求 </li>
+<li>2：只响应目的 IP 地址为接收网卡地址的 ARP 请求，且 ARP 请求的源 IP 地址必须和接收网卡的地址在同网段</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">arp_ignore - INTEGER</span><br><span class="line">    Define different modes for sending replies in response to</span><br><span class="line">    received ARP requests that resolve local target IP addresses:</span><br><span class="line">        0 - (default): reply for any local target IP address, configured on any interface</span><br><span class="line">        1 - reply only if the target IP address is local address configured on the incoming interface</span><br><span class="line">        2 - reply only if the target IP address is local address configured on the incoming interface</span><br><span class="line">            and both with the sender&#39;s IP address are part from same subnet on this interface</span><br><span class="line">        3 - do not reply for local addresses configured with scope host,</span><br><span class="line">            only resolutions for global and link addresses are replied</span><br><span class="line">        4-7 - reserved</span><br><span class="line">        8 - do not reply for all local addresses</span><br><span class="line"></span><br><span class="line">    The max value from conf&#x2F;&#123;all,interface&#125;&#x2F;arp_ignore is used</span><br><span class="line">    when ARP request is received on the &#123;interface&#125;</span><br></pre></td></tr></table></figure>
+
+<p>arp_announce：定义将自己地址向外通告时的通告级别 </p>
+<ul>
+<li>0：允许任意网卡上的任意地址向外通告 </li>
+<li>1：尽量仅向目标网络通告与其网络匹配的地址 </li>
+<li>2：仅向与本地接口上地址匹配的网络进行通告</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">arp_announce - INTEGER</span><br><span class="line">    Define different restriction levels for announcing the local source IP address</span><br><span class="line">    from IP packets in ARP requests sent on interface:</span><br><span class="line">        0 - (default) Use any local address, configured on any interface</span><br><span class="line">        1 - Try to avoid local addresses that are not in the target&#39;s subnet for this interface.</span><br><span class="line">            This mode is useful when target hosts reachable via this interface require the source IP</span><br><span class="line">            address in ARP requests to be part of their logical network configured on the receiving</span><br><span class="line">            interface. When we generate the request we will check all our subnets that include the</span><br><span class="line">            target IP and will preserve the source address if it is from such subnet.</span><br><span class="line">            If there is no such subnet we select source address according to the rules for level 2.</span><br><span class="line">        2 - Always use the best local address for this target. In this mode we ignore the source</span><br><span class="line">            address in the IP packet and try to select local address that we prefer for talks</span><br><span class="line">            with the target host. Such local address is selected by looking for primary IP addresses</span><br><span class="line">            on all our subnets on the outgoing interface that include the target IP address.</span><br><span class="line">            If no suitable local address is found we select the first local address we have on the</span><br><span class="line">            outgoing interface or on all other interfaces, with the hope we will receive reply</span><br><span class="line">            for our request and even sometimes no matter the source IP address we announce.</span><br><span class="line"></span><br><span class="line">    The max value from conf&#x2F;&#123;all,interface&#125;&#x2F;arp_announce is used.</span><br><span class="line"></span><br><span class="line">    Increasing the restriction level gives more chance for receiving answer from the resolved target</span><br><span class="line">    while decreasing the level announces more valid sender&#39;s information.</span><br></pre></td></tr></table></figure>
+
+<h5 id="LVS-DR模式实践"><a href="#LVS-DR模式实践" class="headerlink" title="LVS DR模式实践"></a>LVS DR模式实践</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 前置条件：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   1. 虚拟机网段一致</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   2. 服务器2，3上部署了http服务器,且内容不一致</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在虚拟机1上执行， (本机IP为192.168.56.101)</span></span><br><span class="line">ip addr add 192.168.56.200/32 dev enp0s8</span><br><span class="line">ipvsadm -A -t 192.168.56.200:80 -s wrr</span><br><span class="line">ipvsadm -a -t 192.168.56.200:80 -r 192.168.56.102:80 -g -w 1</span><br><span class="line">ipvsadm -a -t 192.168.56.200:80 -r 192.168.56.104:80 -g -w 3</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 开启ip forward</span></span></span><br><span class="line">echo 1 &gt;/proc/sys/net/ipv4/ip_forward</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在虚拟机2，3上执行，(本机IP为192.168.56.102， 192.168.56.104)</span></span><br><span class="line">ip addr add 192.168.56.200/32 dev lo</span><br><span class="line">ip route add 192.168.56.200 dev lo</span><br><span class="line">echo "1" &gt;/proc/sys/net/ipv4/conf/lo/arp_ignore</span><br><span class="line">echo "2" &gt;/proc/sys/net/ipv4/conf/lo/arp_announce</span><br><span class="line">echo "1" &gt;/proc/sys/net/ipv4/conf/all/arp_ignore</span><br><span class="line">echo "2" &gt;/proc/sys/net/ipv4/conf/all/arp_announce</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 检查是否能够访问, 在外部主机上执行curl</span></span><br><span class="line">curl 192.168.56.200</span><br></pre></td></tr></table></figure>
+
+<h4 id="LVS-TUN-模式"><a href="#LVS-TUN-模式" class="headerlink" title="LVS TUN 模式"></a>LVS TUN 模式</h4><blockquote>
+<p>TUN工作在三层，TAP工作在二层</p>
+</blockquote>
+<h5 id="LVS-TUN模式工作原理"><a href="#LVS-TUN模式工作原理" class="headerlink" title="LVS TUN模式工作原理"></a>LVS TUN模式工作原理</h5><ol>
+<li>当用户请求到达 Director Server，此时请求的数据报文会先到内核空间的 PREROUTING 链。 此时报文的源 IP 为 CIP，目标 IP 为 VIP。</li>
+<li>PREROUTING 检查发现数据包的目标 IP 是本机，将数据包送至 INPUT 链。</li>
+<li>IPVS 比对数据包请求的服务是否为集群服务，若是，在请求报文的首部再次封装一层 IP 报文，封装源 IP 为 DIP，目标 IP 为 RIP。然后发至 POSTROUTING 链。 此时源 IP 为 DIP，目标 IP 为 RIP。</li>
+<li>POSTROUTING 链根据最新封装的 IP 报文，将数据包发至 RS（因为在外层封装多了一层 IP 首部，所以可以理解为此时通过隧道传输）。 此时源 IP 为 DIP，目标 IP 为 RIP。</li>
+<li>RS 接收到报文后发现是自己的 IP 地址，就将报文接收下来，拆除掉最外层的 IP 后，会发现里面还有一层 IP 首部，而且目标是自己的 lo 接口 VIP，那么此时 RS 开始处理此请求，处理完成之后，通过 lo 接口送给 eth0 网卡，然后向外传递。 此时的源 IP 地址为 VIP，目标 IP 为 CIP。</li>
+<li>响应报文最终送达至客户端。</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxvobeirpcj30p00e340q.jpg" alt="LVS TUN模式" title="">
+            </p>
+
+<h5 id="LVS-TUN模式特点"><a href="#LVS-TUN模式特点" class="headerlink" title="LVS TUN模式特点"></a>LVS TUN模式特点</h5><ul>
+<li>不改变请求数据包，而是在请求数据包上新增一层 IP 首部信息。因此负载均衡器不能对端口进行转发，但可以和真实服务器不在同一局域网内，且真实服务器需要支持能够解析两层 IP 首部信息，即需要支持“IP Tunneling”或“IP Encapsulation”协议</li>
+<li>真实服务器中的 VIP，只能被自己 “看见”，其他设备不可知。因此 VIP 必须绑定在真实服务器的 lo 网卡上，并且不允许将此网卡信息经过 ARP 协议对外通告</li>
+<li>请求的数据包经过负载均衡器后，直接由真实服务器返回给客户端，响应数据包不需要再经过负载均衡器</li>
+<li>RS 的网关不会也不可能指向 DIP。</li>
+</ul>
+<h5 id="LVS-TUN模式实践"><a href="#LVS-TUN模式实践" class="headerlink" title="LVS TUN模式实践"></a>LVS TUN模式实践</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 前置条件：</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   2. 服务器2，3上部署了http服务器,且内容不一致</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在虚拟机1上执行， (本机IP为192.168.56.101)</span></span><br><span class="line">ip addr add 192.168.56.210/32 dev enp0s8</span><br><span class="line">ipvsadm -A -t 192.168.56.210:80 -s rr</span><br><span class="line">ipvsadm -a -t 192.168.56.210:80 -r 192.168.56.102:80 -i</span><br><span class="line">ipvsadm -a -t 192.168.56.210:80 -r 192.168.56.104:80 -i</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在虚拟机2，3上执行，(本机IP为192.168.56.102， 192.168.56.104)</span></span><br><span class="line">modprobe ipip // 启用ipip</span><br><span class="line">lsmod | grep ipip</span><br><span class="line">ip addr add 192.168.56.210/32 dev tunl0</span><br><span class="line">ip link set tunl0 up</span><br><span class="line">ip route add 192.168.56.210 dev tunl0</span><br><span class="line"></span><br><span class="line">echo 1 &gt;/proc/sys/net/ipv4/conf/lo/arp_ignore</span><br><span class="line">echo 2 &gt;/proc/sys/net/ipv4/conf/lo/arp_announce</span><br><span class="line">echo 1 &gt;/proc/sys/net/ipv4/conf/all/arp_ignore</span><br><span class="line">echo 2 &gt;/proc/sys/net/ipv4/conf/all/arp_announce</span><br><span class="line">echo 0 &gt; /proc/sys/net/ipv4/conf/tunl0/rp_filter</span><br><span class="line">echo 0 &gt; /proc/sys/net/ipv4/conf/all/rp_filter</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 检查是否能够访问, 在外部主机上执行curl</span></span><br><span class="line">curl 192.168.56.210</span><br></pre></td></tr></table></figure>
+
+<h4 id="LVS-FULLNAT模式"><a href="#LVS-FULLNAT模式" class="headerlink" title="LVS FULLNAT模式"></a>LVS FULLNAT模式</h4><p>LVS NAT, DR模式中，RS跟DS必须在同一个VLAN中，当集群规模较小时，使用 NAT、DR 模式都是没有问题的，当集群内有几十台以上时，那么这些服务器通常都不在同一个 VLAN/网段 内了。这时，必须再研发出一种能支持跨 VLAN/网段 通信的模式，FULLNAT 模式就是为了解决这个问题而生的。</p>
+<p>LVS FullNAT 模式几乎和 LVS NAT 模式相同，不同之处即是：引入 Local Address（内网 IP 地址）。CIP-&gt;VIP 转换换为 LIP-&gt;RIP，而 LIP 和 RIP 均为 IDC 内网 IP，因此可以跨 VLAN 通讯。LVS原生模式不支持FULLNAT，因此需要自己手动编译内核～</p>
+<h5 id="LVS-FULLNAT内核编译"><a href="#LVS-FULLNAT内核编译" class="headerlink" title="LVS FULLNAT内核编译"></a>LVS FULLNAT内核编译</h5><blockquote>
+<p>注意：内核编译的内核包需要跟自己的操作系统内核版本对应上(大版本对应上~)，暂时未找到centos7对应的内核包在哪儿。</p>
+<p>本机的内核版本为：2.6.32-220</p>
+</blockquote>
+<ol>
+<li>安装依赖</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yum -y install elfutils-devel.x86_64 audit-libs-devel.x86_64</span><br><span class="line">yum -y install rpmdevtools yum-utils</span><br><span class="line">yum -y install redhat-rpm-config</span><br><span class="line">yum -y install gcc xmlto patchutils asciidoc zlib-devel binutils-devel newt-devel python-devel hmaccalc perl-ExtUtils-Embed.x86_64</span><br><span class="line">yum -y install rng-tools 随机数生成器</span><br><span class="line">yum -y install bison</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>下载内核包，ipvs补丁包</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 内核包</span></span><br><span class="line">wget ftp://ftp.redhat.com/pub/redhat/linux/enterprise/6Server/en/os/SRPMS/kernel-2.6.32-220.23.1.el6.src.rpm</span><br><span class="line"><span class="meta">#</span><span class="bash"> lvs fullnat包</span></span><br><span class="line">wget http://kb.linuxvirtualserver.org/images/a/a5/Lvs-fullnat-synproxy.tar.gz</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>生成内核代码</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh kernel-2.6.32-220.23.1.el6.src.rpm</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成随机数(一定要生成随机数，否则rpmbuild的时候会卡住)</span></span><br><span class="line">rngd -r /dev/urandom   </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> rpmbuild -bp kernel.spec</span></span><br><span class="line">cd ~/rpmbuild/SPECS</span><br><span class="line"></span><br><span class="line">rpmbuild -bp --target=$(uname -m) kernel.spec</span><br></pre></td></tr></table></figure>
+
+<pre><code>4. 打 LVS补丁</code></pre><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf Lvs-fullnat-synproxy.tar.gz</span><br><span class="line"></span><br><span class="line">cp ~/lvs-fullnat-synproxy/lvs-2.6.32-220.23.1.el6.patch ~/rpmbuild/BUILD/kernel-2.6.32-220.23.1.el6/linux-2.6.32-220.23.1.el6.x86_64 &amp;&amp; cd $_</span><br><span class="line"></span><br><span class="line">patch -p1 &lt; lvs-2.6.32-220.23.1.el6.patch</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>编译内核</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 最好不要重新修改内核版本(遇到过改了内核版本后，编译没问题，重启后触发Kernel panic – not syncing: Attempted to <span class="built_in">kill</span> init的问题)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用-j 加快内核编译速度</span></span><br><span class="line">make -j16</span><br><span class="line">make modules_install</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>重启操作系统</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">reboot</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启后发现系统版本已经改变了， Linux localhost.localdomain 2.6.32 <span class="comment">#2 SMP Thu Dec 30 03:38:53 EST 2021 x86_64 x86_64 x86_64 GNU/Linux</span></span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>编译ipvsadm, keepalived等工具</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">cd ~/lvs-fullnat-synproxy &amp;&amp; tar -zxvf lvs-tools.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译 keepalived</span></span><br><span class="line">cd ~/lvs-fullnat-synproxy/tools/keepalived</span><br><span class="line">./configure --with-kernel-dir="/lib/modules/`uname -r`/build" &amp;&amp; make &amp;&amp; make install</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译 ipvsadm</span></span><br><span class="line">cd ~/lvs-fullnat-synproxy/tools/ipvsadm</span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编译 quaage</span></span><br><span class="line">cd ~/lvs-fullnat-synproxy/tools/quagga</span><br><span class="line">./configure --disable-ripd --disable-ripngd --disable-bgpd --disable-watchquagga --disable-doc  --enable-user=root --enable-vty-group=root --enable-group=root --enable-zebra --localstatedir=/var/run/quagga &amp;&amp; make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li>验证是否编译成功</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 输入 ipvsadm -h 可以看到有fullnat 模式</span></span><br><span class="line"></span><br><span class="line">  --gatewaying   -g                   gatewaying (direct routing) (default)</span><br><span class="line">  --ipip         -i                   ipip encapsulation (tunneling)</span><br><span class="line">  --fullnat      -b                   fullnat mode</span><br><span class="line">  --masquerading -m                   masquerading (NAT)</span><br></pre></td></tr></table></figure>
+
+<h5 id="LVS-FULLNAT模式工作原理"><a href="#LVS-FULLNAT模式工作原理" class="headerlink" title="LVS FULLNAT模式工作原理"></a>LVS FULLNAT模式工作原理</h5><ol>
+<li>当用户请求到达 Director Server，此时请求的数据报文会先到内核空间的 PREROUTING 链。 此时报文的源 IP 为 CIP，目标 IP 为 VIP</li>
+<li>PREROUTING 检查发现数据包的目标 IP 是本机，将数据包送至 INPUT 链</li>
+<li>IPVS 比对数据包请求的服务是否为集群服务，若是，修改数据包的源IP地址分发服务器IP，目标 IP 地址为后端服务器 IP，然后将数据包发至 POSTROUTING 链。 此时报文的源 IP 为 DIP，目标 IP 为 RIP</li>
+<li>POSTROUTING 链通过选路，将数据包发送给 Real Server</li>
+<li>Real Server 比对发现目标为自己的 IP，开始构建响应报文发回给 Director Server。 此时报文的源 IP 为 RIP，目标 IP 为 DIP</li>
+<li>Director Server 在响应客户端前，此时会将源 IP 地址修改为自己的 VIP 地址，然后响应给客户端。 此时报文的源 IP 为 VIP，目标 IP 为 CIP</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxw0gf5xdlj30lr0ck0tc.jpg" alt="LVS FULLNAT模式" title="">
+            </p>
+
+<h5 id="LVS-FULLNAT模式实践"><a href="#LVS-FULLNAT模式实践" class="headerlink" title="LVS FULLNAT模式实践"></a>LVS FULLNAT模式实践</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 虚拟机4的IP地址为192.168.58.100， 虚拟机2，3的IP地址为192.168.56.102， 192.168.56.104, 在虚拟机上执行：</span></span><br><span class="line">ip addr add 192.168.58.200/32 dev eth1</span><br><span class="line"></span><br><span class="line">ipvsadm -A -t 192.168.58.200:80 -s wrr</span><br><span class="line">ipvsadm -a -t 192.168.58.200:80 -r 192.168.56.102:80 -b -w 2</span><br><span class="line">ipvsadm -a -t 192.168.58.200:80 -r 192.168.56.104:80 -b -w 1</span><br><span class="line">ipvsadm -P -t 192.168.58.200:80 -z 192.168.58.100</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 集群外执行curl, 验证是否成功</span></span><br><span class="line">curl 192.168.56.200</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://github.com/xgfone/snippet/blob/master/snippet/docs/architecture/ha-lb/lvs-lb-and-install.md">LVS 负载均衡原理及安装配置详解</a>  // 推荐阅读</li>
+<li><a href="https://wsgzao.github.io/post/lvs/" target="_blank" rel="noopener">LVS 原理介绍和配置实践</a>  // 推荐阅读</li>
+<li><a href="https://segmentfault.com/a/1190000039819984" target="_blank" rel="noopener">深入浅出 LVS 负载均衡系列（一）：NAT、FULLNAT 模型原理</a>  //这系列文章不错</li>
+<li><a href="https://segmentfault.com/a/1190000039932089" target="_blank" rel="noopener">深入浅出 LVS 负载均衡系列（二）：DR、TUN 模型原理</a>  //这系列文章不错</li>
+<li><a href="https://segmentfault.com/a/1190000040190992" target="_blank" rel="noopener">深入浅出 LVS 负载均衡（三）实操 NAT、DR 模型</a>    //这系列文章不错</li>
+<li><a href="https://www.haxi.cc/archives/LVS-FULLNAT实战.html" target="_blank" rel="noopener">LVS FULLNAT 实战</a>   // lvs fullnat 编译，样例</li>
+<li><a href="http://kb.linuxvirtualserver.org/wiki/IPVS_FULLNAT_and_SYNPROXY" target="_blank" rel="noopener">IPVS FULLNAT and SYNPROXY</a>  // 编译 lvs fullnat</li>
+<li><a href="https://blog.csdn.net/chao199512/article/details/81390485" target="_blank" rel="noopener">LVS/fullnat模式（内核编译）</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/12/26/kubernetes-dns1/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">kubernetes dns解析续</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/12/17/hello-world/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Hello World</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

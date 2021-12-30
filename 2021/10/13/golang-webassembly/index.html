@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>web应用的未来是webAssembly? | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="golang">
+    <meta name="description" content="什么是WebAssembly在说明什么是Webassembly之前，我们有必要了解一下asm.js。2012年，Mozilla 的工程师 Alon Zakai 在研究 LLVM 编译器时突发奇想：许多 3D 游戏都是用 C &#x2F; C++ 语言写的，如果能将 C &#x2F; C++ 语言编译成 JavaScript 代码，它们不就能在浏览器里运行了吗？众所周知，JavaScript 的基本语法与 C 语言高度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="web应用的未来是webAssembly?">
+<meta property="og:url" content="https://github.com/fafucoder/2021/10/13/golang-webassembly/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="什么是WebAssembly在说明什么是Webassembly之前，我们有必要了解一下asm.js。2012年，Mozilla 的工程师 Alon Zakai 在研究 LLVM 编译器时突发奇想：许多 3D 游戏都是用 C &#x2F; C++ 语言写的，如果能将 C &#x2F; C++ 语言编译成 JavaScript 代码，它们不就能在浏览器里运行了吗？众所周知，JavaScript 的基本语法与 C 语言高度">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i7drsi3tvf.feishu.cn/space/api/box/stream/download/asynccode/?code=M2NkMjI2MTBlMDY5ZjIzNzQxMzk2NWMxYzI3ZjQwNDFfSUhEV1hsbGlFRFl5bU5xTUs1NEJKV3pjU2ZBZTFRWWNfVG9rZW46Ym94Y25iNERHS1doN25BNkxpdGE2dGdVaDdSXzE2MzQxMzE5MDM6MTYzNDEzNTUwM19WNA">
+<meta property="og:image" content="https://i7drsi3tvf.feishu.cn/space/api/box/stream/download/asynccode/?code=ODlmMmQ3ZDBmMDdmYTgyYmE5MGM0YWI2MjdmMzdjNDBfbXNsRXN5TThZMU9mdGJPYU42eVFBd2xrQXY0RjRrTnNfVG9rZW46Ym94Y256MFZjSGFHZHUwc3VoU2M5WG4xYkxpXzE2MzQxMzE5MDM6MTYzNDEzNTUwM19WNA">
+<meta property="og:image" content="https://i7drsi3tvf.feishu.cn/space/api/box/stream/download/asynccode/?code=MzlhZTAzZjExYzVhYjFmZTY2MGJhZDdiNTFmNWM0MWFfUTVrRVZuMWxhMVlpMTcwN3lDVmJaYVV4WHZaVm5oNVpfVG9rZW46Ym94Y25aUEFUWlAxUm44SjJjbzZjQ3NUREdnXzE2MzQxMzE5MDM6MTYzNDEzNTUwM19WNA">
+<meta property="article:published_time" content="2021-10-13T13:30:10.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.328Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i7drsi3tvf.feishu.cn/space/api/box/stream/download/asynccode/?code=M2NkMjI2MTBlMDY5ZjIzNzQxMzk2NWMxYzI3ZjQwNDFfSUhEV1hsbGlFRFl5bU5xTUs1NEJKV3pjU2ZBZTFRWWNfVG9rZW46Ym94Y25iNERHS1doN25BNkxpdGE2dGdVaDdSXzE2MzQxMzE5MDM6MTYzNDEzNTUwM19WNA">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">web应用的未来是webAssembly?</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">web应用的未来是webAssembly?</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-10-13T13:30:10.000Z" itemprop="datePublished" class="page-time">
+  2021-10-13
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-golang-webassembly"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">web应用的未来是webAssembly?</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-10-13 21:30:10" datetime="2021-10-13T13:30:10.000Z"  itemprop="datePublished">2021-10-13</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="什么是WebAssembly"><a href="#什么是WebAssembly" class="headerlink" title="什么是WebAssembly"></a>什么是WebAssembly</h2><p>在说明什么是Webassembly之前，我们有必要了解一下asm.js。2012年，Mozilla 的工程师 Alon Zakai 在研究 LLVM 编译器时突发奇想：许多 3D 游戏都是用 C / C++ 语言写的，如果能将 C / C++ 语言编译成 JavaScript 代码，它们不就能在浏览器里运行了吗？众所周知，JavaScript 的基本语法与 C 语言高度相似。于是，他开始研究怎么才能实现这个目标，为此专门做了一个编译器项目 Emscripten。这个编译器可以将 C / C++ 代码编译成 JS 代码，但不是普通的 JS，而是一种叫做 asm.js 的 JavaScript 变体，性能差不多是原生代码的50%。</p>
+<p>之后Google开发了Portable Native Client，也是一种能让浏览器运行C/C++代码的技术。 后来可能是因为彼此之间有共同的更高追求，Google, Microsoft, Mozilla, Apple等几家大公司一起合作开发了一个面向Web的通用二进制和文本格式的项目，那就是WebAssembly。asm.js 与 WebAssembly 功能基本一致，就是转出来的代码不一样：asm.js 是文本，WebAssembly 是二进制字节码，因此运行速度更快、体积更小。</p>
+<p>WebAssembly(又称 wasm) 是一种新的字节码格式，主流浏览器都已经支持 WebAssembly。 和 JS 需要解释执行不同的是，WebAssembly 字节码和底层机器码很相似可快速装载运行，因此性能相对于 JS 解释执行大大提升。 也就是说 WebAssembly 并不是一门编程语言，而是一份字节码标准，需要用高级编程语言编译出字节码放到 WebAssembly 虚拟机中才能运行， 浏览器厂商需要做的就是根据 WebAssembly 规范实现虚拟机。</p>
+<p>这里引用MDN上官方对其的解释：WebAssembly是一种新的编码方式，可以在现代的网络浏览器中运行 － 它是一种低级的类汇编语言，具有紧凑的二进制格式，可以接近原生的性能运行，并为诸如C / C ++ / Rust等语言提供一个编译目标，以便它们可以在Web上运行。它也被设计为可以与JavaScript共存，允许两者一起工作(总结一句话：Webassembly就像是JVM虚拟机，可以执行二进制码)。</p>
+<blockquote>
+<p>有人这么评价Webassembly： Webassembly是Rust押宝的唯一使用场景(Rust语言的使用场景太少了，不像golang在云原生跟中间键领域有很多应用)。</p>
+</blockquote>
+<h2 id="为什么需要WebAssembly"><a href="#为什么需要WebAssembly" class="headerlink" title="为什么需要WebAssembly"></a>为什么需要WebAssembly</h2><p>自从 JavaScript 诞生起到现在已经变成最流行的编程语言，这背后正是 Web 的发展所推动的。Web 应用变得更多更复杂，但这也渐渐暴露出了 JavaScript 的问题：</p>
+<ol>
+<li>语法太灵活导致开发大型 Web 项目困难；</li>
+<li>性能不能满足一些场景的需要。</li>
+</ol>
+<p>针对以上两点缺陷，近年来出现了一些 JS 的代替语言，例如：</p>
+<ol>
+<li>微软的<a href="http://www.typescriptlang.org/" target="_blank" rel="noopener"> TypeScript </a>通过为 JS 加入静态类型检查来改进 JS 松散的语法，提升代码健壮性；</li>
+<li>谷歌的<a href="https://www.dartlang.org/" target="_blank" rel="noopener"> Dart </a>则是为浏览器引入新的虚拟机去直接运行 Dart 程序以提升性能；</li>
+<li>火狐的<a href="http://asmjs.org/" target="_blank" rel="noopener"> asm.js </a>则是取 JS 的子集，JS 引擎针对 asm.js 做性能优化。</li>
+</ol>
+<p>以上尝试各有优缺点，其中：</p>
+<ol>
+<li>TypeScript 只是解决了 JS 语法松散的问题，最后还是需要编译成 JS 去运行，对性能没有提升；</li>
+<li>Dart 只能在 Chrome 预览版中运行，无主流浏览器支持，用 Dart 开发的人不多；</li>
+<li>asm.js 语法太简单、有很大限制，开发效率低。</li>
+</ol>
+<p>三大浏览器巨头分别提出了自己的解决方案，互不兼容，这违背了 Web 的宗旨； 是技术的规范统一让 Web 走到了今天，因此形成一套新的规范去解决 JS 所面临的问题迫在眉睫。于是 WebAssembly 诞生了，WebAssembly 是一种新的字节码格式，主流浏览器都已经支持 WebAssembly。 和 JS 需要解释执行不同的是，WebAssembly 字节码和底层机器码很相似可快速装载运行，因此性能相对于 JS 解释执行大大提升。 也就是说 WebAssembly 并不是一门编程语言，而是一份字节码标准，需要用高级编程语言编译出字节码放到 WebAssembly 虚拟机中才能运行， 浏览器厂商需要做的就是根据 WebAssembly 规范实现虚拟机。</p>
+<blockquote>
+<p>总结一句话就是：主流厂商极力主导 + webassembly速度快</p>
+</blockquote>
+<h2 id="Webassembly原理"><a href="#Webassembly原理" class="headerlink" title="Webassembly原理"></a>Webassembly原理</h2><p>要搞懂 WebAssembly 的原理，需要先搞懂计算机的运行原理。 电子计算机都是由电子元件组成，为了方便处理电子元件只存在开闭两种状态，对应着 0 和 1，也就是说计算机只认识 0 和 1，数据和逻辑都需要由 0 和 1 表示，也就是可以直接装载到计算机中运行的机器码。 机器码可读性极差，因此人们通过高级语言 C、C++、Rust、Go 等编写再编译成机器码。</p>
+<p>由于不同的计算机 CPU 架构不同，机器码标准也有所差别，常见的 CPU 架构包括 x86、AMD64、ARM， 因此在由高级编程语言编译成可自行代码时需要指定目标架构。WebAssembly 字节码是一种抹平了不同 CPU 架构的机器码，WebAssembly 字节码不能直接在任何一种 CPU 架构上运行， 但由于非常接近机器码，可以非常快的被翻译为对应架构的机器码，因此 WebAssembly 运行速度和机器码接近，这听上去非常像 Java 字节码。</p>
+<p>在javascript中，JavaScript引擎是执行 JavaScript 代码的程序或解释器。JavaScript引擎可以实现为标准解释器，或者以某种形式将JavaScript编译为字节码的即时编译器。不用的浏览器使用不同的引擎如下所示：</p>
+<ul>
+<li><p><a href="https://link.segmentfault.com/?enc=sUDGcZBE4XE+vSy5zjw84Q==.NqvwmK7YdB1NXJpJlh2DNQLg1aBzu82zEWbf/mLpt9JyjRr3+KoxkLT+FwB8JUSoRUdZr2njfFAdW/ex3PcpnA==" target="_blank" rel="noopener">V8</a> — 开源，由 Google 开发，用 C ++ 编写</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=Lcfwj3jXwKG3LmIWG3zMdA==.96YdUZxH/6IBmMcriO6tSIZNC1VIRPZ/eQZKc278Lf6Hoz1pxLZVOwjHu0/qcOMVqZ9l7XET4ID0V4QgJc/f7w==" target="_blank" rel="noopener">Rhino</a> — 由 Mozilla 基金会管理，开源，完全用 Java 开发</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=fEBfBX1Wd1oq35Opx9XqBg==.+OCUcVZ4OMlh0scYGO+X5yDy31T3RhLgz5LU8pR/QG3GrOaSb2UWZAqEPjXXQxNg" target="_blank" rel="noopener">SpiderMonkey</a> — 是第一个支持 Netscape Navigator 的 JavaScript 引擎，目前正供 Firefox 使用</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=5dW2eusqpsCf0enmAMJYHg==.ecsPVoKRqxuA7xY07xwHk2pUZj9fu69Y5Xk9MFLPPcYUhCtmLH8aLW7GfggLyLZB5Fn3g7TYJR2k0t3941/3mA==" target="_blank" rel="noopener">JavaScriptCore</a> — 开源，以Nitro形式销售，由苹果为Safari开发</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=wE8dCPOCitI59es0P62axw==.NQQ7Mbn0KzdeG2aWMep/ZoMepjYQU0i2Y70FT0ArpGB6zy+1ygTmPYQDKCYBwp3bzBw4MzXWC2RvNNsv1WCpUg==" target="_blank" rel="noopener">KJS</a> — KDE 的引擎，最初由 Harri Porten 为 KDE 项目中的 Konqueror 网页浏览器开发</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=4p1lBDVXg9F3LoYDCAYqZw==.69EhewNej7/0qL6i/vfOmKrHRr8J75bQnL6m3/Pq/NJ9B/5ltxTPYbJTUIhqMwAMHFWYhsMI6zbTzo/cs4QMyA==" target="_blank" rel="noopener">Chakra</a> (JScript9) — Internet Explorer</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=HbF4R5UwNZvgHmR/1wtgDQ==.eZWlURXx88Zj4cbJlV52kYcs6ilppQjxqB9f0e/bKPr6736fvUxWXbL77DDy7W8ONHasBxCyxiS/G07KFi3mIQ==" target="_blank" rel="noopener">Chakra</a> (JavaScript) — Microsoft Edge</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=JJkYtp97F7aGkuRpJu4j+A==.m2XjtFgQZ+p7pfw2mm6hzwz8hHSy2krktwpxq8U1xVjUx1swsJd9bpTYlTiR4YQF5iEyx+frqx1Ir7CGq4Yi8A==" target="_blank" rel="noopener">Nashorn</a>, 作为 OpenJDK 的一部分，由 Oracle Java 语言和工具组编写</p>
+</li>
+<li><p><a href="https://link.segmentfault.com/?enc=s1goWbasfcZ7FRTX379/UA==.utRib33Njx3A6/klirW/KCvy0haJmdcHrB0fRetgT6Kg+zz1lM2n0QTZNDYWTvPE" target="_blank" rel="noopener">JerryScript</a> — 物联网的轻量级引擎</p>
+</li>
+</ul>
+<p>因此我们看下javascript在V8引擎下的工作机制: javacript运行中，引擎首先解析javascript生成抽象语法树(AST), 然后生成机器码。</p>
+<p class="img-lightbox">
+                <img src="https://i7drsi3tvf.feishu.cn/space/api/box/stream/download/asynccode/?code=M2NkMjI2MTBlMDY5ZjIzNzQxMzk2NWMxYzI3ZjQwNDFfSUhEV1hsbGlFRFl5bU5xTUs1NEJKV3pjU2ZBZTFRWWNfVG9rZW46Ym94Y25iNERHS1doN25BNkxpdGE2dGdVaDdSXzE2MzQxMzE5MDM6MTYzNDEzNTUwM19WNA" alt="img" title="">
+            </p>
+
+<p>接着通过V8 的优化编译器 (TurboFan)的优化，把优化后的机器码推向后端(所谓的后端就是即时编译器JIT)</p>
+<p class="img-lightbox">
+                <img src="https://i7drsi3tvf.feishu.cn/space/api/box/stream/download/asynccode/?code=ODlmMmQ3ZDBmMDdmYTgyYmE5MGM0YWI2MjdmMzdjNDBfbXNsRXN5TThZMU9mdGJPYU42eVFBd2xrQXY0RjRrTnNfVG9rZW46Ym94Y256MFZjSGFHZHUwc3VoU2M5WG4xYkxpXzE2MzQxMzE5MDM6MTYzNDEzNTUwM19WNA" alt="img" title="">
+            </p>
+
+<p>但是webassembly并不需要以上的全部步骤－如下所示是它被插入到执行过程示意图:</p>
+<p class="img-lightbox">
+                <img src="https://i7drsi3tvf.feishu.cn/space/api/box/stream/download/asynccode/?code=MzlhZTAzZjExYzVhYjFmZTY2MGJhZDdiNTFmNWM0MWFfUTVrRVZuMWxhMVlpMTcwN3lDVmJaYVV4WHZaVm5oNVpfVG9rZW46Ym94Y25aUEFUWlAxUm44SjJjbzZjQ3NUREdnXzE2MzQxMzE5MDM6MTYzNDEzNTUwM19WNA" alt="img" title="">
+            </p>
+
+<p>可以看到webassembly并不需要编译阶段，而是直接把编译后的字节码发送给后端，因此速度更快。</p>
+<p>目前能编译成 WebAssembly 字节码的高级语言有：</p>
+<ul>
+<li><p><a href="https://github.com/AssemblyScript/assemblyscript">AssemblyScript</a>:语法和 TypeScript 一致，对前端来说学习成本低，为前端编写 WebAssembly 最佳选择；</p>
+</li>
+<li><p>C\C++:官方推荐的方式，详细使用见<a href="http://webassembly.org.cn/getting-started/developers-guide/" target="_blank" rel="noopener">文档</a>;</p>
+</li>
+<li><p><a href="https://www.rust-lang.org/" target="_blank" rel="noopener">Rust</a>:语法复杂、学习成本高，详细使用见<a href="https://github.com/rust-lang-nursery/rust-wasm">文档</a>;</p>
+</li>
+<li><p><a href="http://kotlinlang.org/" target="_blank" rel="noopener">Kotlin</a>:语法和 Java、JS 相似，语言学习成本低，详细使用见<a href="https://kotlinlang.org/docs/reference/native-overview.html" target="_blank" rel="noopener">文档</a>;</p>
+</li>
+<li><p><a href="https://golang.org/" target="_blank" rel="noopener">Golang</a>:语法简单学习成本低。详细使用见<a href="https://blog.gopheracademy.com/advent-2017/go-wasm/" target="_blank" rel="noopener">文档</a>。</p>
+</li>
+<li><p>其他语言: 详细见<a href="https://github.com/appcypher/awesome-wasm-langs">文档</a>。</p>
+</li>
+</ul>
+<h2 id="Webassembly使用场景："><a href="#Webassembly使用场景：" class="headerlink" title="Webassembly使用场景："></a>Webassembly使用场景：</h2><p>总体而言，WASM不会替代JavaScript，但是却可以辅助解决很多JavaScript无法解决的问题。下面是Webassembly的一些场景：</p>
+<h5 id="浏览器场景："><a href="#浏览器场景：" class="headerlink" title="浏览器场景："></a>浏览器场景：</h5><ul>
+<li><p>更好的让一些语言和工具可以编译到 Web 平台运行。</p>
+</li>
+<li><p>图片/视频编辑。</p>
+</li>
+<li><p>游戏：</p>
+<ul>
+<li>需要快速打开的小游戏</li>
+</ul>
+</li>
+<li><p>AAA 级，资源量很大的游戏。</p>
+</li>
+<li><p>游戏门户（代理/原创游戏平台）</p>
+</li>
+<li><p>P2P 应用（游戏，实时合作编辑）</p>
+</li>
+<li><p>音乐播放器（流媒体，缓存）</p>
+</li>
+<li><p>图像识别</p>
+</li>
+<li><p>视频直播</p>
+</li>
+<li><p>VR 和虚拟现实</p>
+</li>
+<li><p>CAD 软件</p>
+</li>
+<li><p>科学可视化和仿真</p>
+</li>
+<li><p>互动教育软件和新闻文章。</p>
+</li>
+<li><p>模拟/仿真平台(ARC, DOSBox, QEMU, MAME, …)。</p>
+</li>
+<li><p>语言编译器/虚拟机。</p>
+</li>
+</ul>
+<h5 id="非浏览器场景："><a href="#非浏览器场景：" class="headerlink" title="非浏览器场景："></a>非浏览器场景：</h5><ul>
+<li><p>游戏分发服务（便携、安全）。</p>
+</li>
+<li><p>服务端执行不可信任的代码。</p>
+</li>
+<li><p>服务端应用。</p>
+</li>
+<li><p>移动混合原生应用。</p>
+</li>
+<li><p>多节点对称计算</p>
+</li>
+</ul>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><p>基于golang实现webassembly的demo</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/11/08/golang-goroutine/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">golang goroutine浅析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/10/12/node-package-json/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">nodejs中package.json的常见字段</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

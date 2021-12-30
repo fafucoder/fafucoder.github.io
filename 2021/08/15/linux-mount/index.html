@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux 文件挂载mount | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="mount 简介mount用来显示挂载信息或者进行文件系统挂载。mount并非只能挂载文件系统，也可以将目录挂载到另一个目录下，其实它实现的是目录【硬链接】，默认情况下，是无法对目录建立硬链接的，但是通过mount可以完成绑定，绑定后两个目录的inode号是完全相同的，但尽管建立的是目录的【硬链接】，但其实也仅是拿来当软链接用。 mount 常用命令mount1234567891011121314">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux 文件挂载mount">
+<meta property="og:url" content="https://github.com/fafucoder/2021/08/15/linux-mount/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="mount 简介mount用来显示挂载信息或者进行文件系统挂载。mount并非只能挂载文件系统，也可以将目录挂载到另一个目录下，其实它实现的是目录【硬链接】，默认情况下，是无法对目录建立硬链接的，但是通过mount可以完成绑定，绑定后两个目录的inode号是完全相同的，但尽管建立的是目录的【硬链接】，但其实也仅是拿来当软链接用。 mount 常用命令mount1234567891011121314">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-08-15T13:24:00.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.343Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux 文件挂载mount</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux 文件挂载mount</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-08-15T13:24:00.000Z" itemprop="datePublished" class="page-time">
+  2021-08-15
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-mount"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux 文件挂载mount</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-08-15 21:24:00" datetime="2021-08-15T13:24:00.000Z"  itemprop="datePublished">2021-08-15</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="mount-简介"><a href="#mount-简介" class="headerlink" title="mount 简介"></a>mount 简介</h3><p>mount用来显示挂载信息或者进行文件系统挂载。mount并非只能挂载文件系统，也可以将目录挂载到另一个目录下，其实它实现的是目录【硬链接】，默认情况下，是无法对目录建立硬链接的，但是通过mount可以完成绑定，绑定后两个目录的inode号是完全相同的，但尽管建立的是目录的【硬链接】，但其实也仅是拿来当软链接用。</p>
+<h3 id="mount-常用命令"><a href="#mount-常用命令" class="headerlink" title="mount 常用命令"></a>mount 常用命令</h3><h5 id="mount"><a href="#mount" class="headerlink" title="mount"></a>mount</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">mount [-t vfstype ] [-o options] device directory</span><br><span class="line">-a  将/etc/fstab文件里指定的挂载选项重新挂载一遍。</span><br><span class="line">-t  支持ext2/ext3/ext4/vfat/fat/iso9660(光盘默认格式)。不用-t时默认会调用blkid来获取文件系统类型。</span><br><span class="line">-n  不把挂载记录写在/etc/mtab文件中，一般挂载会在/proc/mounts中记录下挂载信息，然后同步到/etc/mtab，指定-n表示不同步该挂载信息。</span><br><span class="line"></span><br><span class="line">-o  指定挂载特殊选项。下面是两个比较常用的：</span><br><span class="line">  loop  挂载镜像文件，如iso文件</span><br><span class="line">  ro    只读挂载</span><br><span class="line">  rw    读写挂载</span><br><span class="line">  auto  相当于mount -a</span><br><span class="line">  dev   如果挂载的文件系统中有设备访问入口则启用它，使其可以作为设备访问入口</span><br><span class="line">  default rw,suid,dev,exec,auto,nouser,async,and relatime</span><br><span class="line">  async 异步挂载，只写到内存</span><br><span class="line">  sync  同步挂载，通过挂载位置写入对方硬盘</span><br><span class="line">  atime 修改访问时间，每次访问都修改atime会导致性能降低，所以默认是noatime</span><br><span class="line">  noatime 不修改访问时间，高并发时使用这个选项可以减少磁盘IO</span><br><span class="line">  nodiratime   不修改文件夹访问时间，高并发时使用这个选项可以减少磁盘IO</span><br><span class="line">  exec/noexec  挂载后的文件系统里的可执行程序是否可执行，默认是可以执行exec，优先级高于权限的限定</span><br><span class="line">  remount  重新挂载，此时可以不用指定挂载点。</span><br><span class="line">  suid/nosuid 对挂载的文件系统启用或禁用suid，对于外来设备最好禁用suid</span><br><span class="line">  _netdev 需要网络挂载时默认将停留在挂载界面直到加载网络了。使用_netdev可以忽略网络正常挂载。如NFS开机挂载。</span><br><span class="line">  user  允许普通用户进行挂载该目录，但只允许挂载者进行卸载该目录</span><br><span class="line">  users  允许所有用户挂载和卸载该目录</span><br><span class="line">  nouser  禁止普通用户挂载和卸载该目录，这是默认的，默认情况下一个目录不指定user/users时，将只有root能挂载</span><br></pre></td></tr></table></figure>
+
+<h5 id="umount"><a href="#umount" class="headerlink" title="umount"></a>umount</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount device&#x2F;directory</span><br></pre></td></tr></table></figure>
+
+<h3 id="mount-bind-命令"><a href="#mount-bind-命令" class="headerlink" title="mount bind 命令"></a>mount bind 命令</h3><p>mount bind可为当前挂载点绑定一个新的挂载点。</p>
+<p>执行如下命令，可创建foo目录的一个镜像目录bar，它们已经绑定在一起：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir foo bar</span><br><span class="line">mount --bind foo bar</span><br></pre></td></tr></table></figure>
+
+<p>mount bind绑定后的两个目录类似于硬链接，无论读写bar还是读写foo，都会反应在另一方，内核在底层所操作的都是同一个物理位置。将bar卸载后，bar目录回归原始空目录状态，期间所执行的修改都保留在foo目录下。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centos3 mount]# echo "hello foo" &gt; foo/hello</span><br><span class="line">[root@centos3 mount]# ls bar</span><br><span class="line">hello</span><br><span class="line">[root@centos3 mount]# cat bar/hello</span><br><span class="line">hello foo</span><br></pre></td></tr></table></figure>
+
+<p>mount bind除了可以绑定两个普通目录，还可以绑定挂载点。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount --bind /mnt/foo /mnt/bar</span><br></pre></td></tr></table></figure>
+
+<h5 id="shared-subtrees"><a href="#shared-subtrees" class="headerlink" title="shared subtrees"></a>shared subtrees</h5><p>nux的每个挂载点都具有一个决定该挂载点是否共享子挂载点的属性，称为shared subtrees(注：这是挂载点的属性，就像是否只读一样的属性)。该属性用于决定某挂载点之下新增或移除子挂载点时，是否同步影响bind另一端的挂载点。</p>
+<p>hared subtrees有四种属性值，它们的设置方式分别为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 挂载前直接设置shared subtrees属性</span><br><span class="line">mount --make-private    --bind &lt;olddir&gt; &lt;newdir&gt;</span><br><span class="line">mount --make-shared     --bind &lt;olddir&gt; &lt;newdir&gt;</span><br><span class="line">mount --make-slave      --bind &lt;olddir&gt; &lt;newdir&gt;</span><br><span class="line">mount --make-unbindable --bind &lt;olddir&gt; &lt;newdir&gt;</span><br><span class="line"></span><br><span class="line"># 或者挂载后设置挂载点属性</span><br><span class="line">mount --bind &lt;olddir&gt; &lt;newdir&gt;</span><br><span class="line">mount --make-private    &lt;newdir&gt;</span><br><span class="line">mount --make-shared     &lt;newdir&gt; </span><br><span class="line">mount --make-slave      &lt;newdir&gt;</span><br><span class="line">mount --make-unbindable &lt;newdir&gt;</span><br></pre></td></tr></table></figure>
+
+<p>对于shared subtrees这几种属性值，以mount –bind foo bar为例：</p>
+<p>private属性：表示在foo或bar下新增、移除子挂载点，不会体现在另一方，即foo &lt;-x-&gt; bar<br>shared属性：表示在foo或bar下新增、移除子挂载点，都会体现在另一方，即foo &lt;–&gt; bar<br>slave属性：类似shared，但只是单向的，foo下新增或移除子挂载点会体现在bar中，但bar中新增或移除子挂载点不会影响foo，即，即foo –&gt; bar, bar -x-&gt; foo<br>unbindable属性：表示挂载点bar目录将无法执行bind操作关联到其它挂载点</p>
+<h3 id="etc-fstab与-etc-mtab和-proc-mounts区别"><a href="#etc-fstab与-etc-mtab和-proc-mounts区别" class="headerlink" title="/etc/fstab与/etc/mtab和/proc/mounts区别"></a>/etc/fstab与/etc/mtab和/proc/mounts区别</h3><h5 id="etc-fstab"><a href="#etc-fstab" class="headerlink" title="/etc/fstab"></a>/etc/fstab</h5><p>/etc/fstab是用来存放文件系统的静态信息的文件。当系统启动的时候，系统会自动地从这个文件读取信息，并且会自动将此文件中指定的文件系统挂载到指定的目录。(/etc/fstab 是只读不写的)</p>
+<h5 id="etc-mtab"><a href="#etc-mtab" class="headerlink" title="/etc/mtab"></a>/etc/mtab</h5><p>/etc/mtab是当前的分区挂载情况，记录的是当前系统已挂载的分区。每次挂载/卸载分区时会更新/etc/mtab文件中的信息(执行mount命令会改变/etc/mtab的信息)。</p>
+<h5 id="proc-mounts"><a href="#proc-mounts" class="headerlink" title="/proc/mounts"></a>/proc/mounts</h5><p>/proc/mounts是mount namespace而引入的，功能跟/etc/mtab一样，都是记录当前分区的挂载情况。因为记录 mount 信息的 /etc/mtab 是全局的，也就是说，即使某个进程有自己的 namespace，但只要还和外面共享同一个 /etc/mtab，那么，里面进行umount/mount操作的信息也会被记录到/etc/mtab里，外面也会看到。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://blog.csdn.net/taiyang1987912/article/details/42492741" target="_blank" rel="noopener">/etc/mtab与/proc/mounts</a>  //mtab mounts fstab这三个文件的区别</li>
+<li><a href="https://man7.org/linux/man-pages/man8/mount.8.html" target="_blank" rel="noopener">man Linux manual page</a>    //man mount 命令</li>
+<li><a href="https://www.junmajinlong.com/linux/mount_bind/#shared-subtrees" target="_blank" rel="noopener">mount bind功能详解</a>         // 骏马金龙老师的文章都很不错的</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/08/15/linux-lvm/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">使用LVM实现linux扩容</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/08/13/linux-tc/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">linux 流量控制TC</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

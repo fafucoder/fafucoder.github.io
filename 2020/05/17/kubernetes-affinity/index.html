@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>kubernetes 亲和性和反亲和性调度 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="概述kubernetes 提供将pod限制在指定的node上运行，或者指定更倾向于在某些特定的node上运行，有几种方式实现这个功能：  NodeName: 最简单的节点选择方式，直接指定节点，跳过调度器。 NodeSelector: 早期的简单控制方式，直接通过键—值对将 Pod 调度到具有特定 label 的 Node 上。 NodeAffinity: NodeSelector 的升级版，支持">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes 亲和性和反亲和性调度">
+<meta property="og:url" content="https://github.com/fafucoder/2020/05/17/kubernetes-affinity/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概述kubernetes 提供将pod限制在指定的node上运行，或者指定更倾向于在某些特定的node上运行，有几种方式实现这个功能：  NodeName: 最简单的节点选择方式，直接指定节点，跳过调度器。 NodeSelector: 早期的简单控制方式，直接通过键—值对将 Pod 调度到具有特定 label 的 Node 上。 NodeAffinity: NodeSelector 的升级版，支持">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-17T07:23:09.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.333Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kubernetes 亲和性和反亲和性调度</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kubernetes 亲和性和反亲和性调度</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-05-17T07:23:09.000Z" itemprop="datePublished" class="page-time">
+  2020-05-17
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-affinity"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kubernetes 亲和性和反亲和性调度</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-05-17 15:23:09" datetime="2020-05-17T07:23:09.000Z"  itemprop="datePublished">2020-05-17</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>kubernetes 提供将pod限制在指定的node上运行，或者指定更倾向于在某些特定的node上运行，有几种方式实现这个功能：</p>
+<ul>
+<li>NodeName: 最简单的节点选择方式，直接指定节点，跳过调度器。</li>
+<li>NodeSelector: 早期的简单控制方式，直接通过键—值对将 Pod 调度到具有特定 label 的 Node 上。</li>
+<li>NodeAffinity: NodeSelector 的升级版，支持更丰富的配置规则，使用更灵活。(NodeSelector 将被淘汰.)</li>
+<li>PodAffinity: 根据已在节点上运行的 Pod 标签来约束 Pod 可以调度到哪些节点，而不是根据 node label。</li>
+</ul>
+<h4 id="NodeName"><a href="#NodeName" class="headerlink" title="NodeName"></a>NodeName</h4><p>nodeName 是 PodSpec 的一个字段，用于直接指定调度节点，并运行该 pod。调度器在工作时，实际选择的是 nodeName 为空的 pod 并进行调度然后再回填该 nodeName，所以直接指定 nodeName 实际是直接跳过了调度器。换句话说，指定 nodeName 的方式是优于其他节点选择方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx</span><br><span class="line">  nodeName: kube-01</span><br></pre></td></tr></table></figure>
+
+<h4 id="NodeSelector"><a href="#NodeSelector" class="headerlink" title="NodeSelector"></a>NodeSelector</h4><p>nodeSelector 也是 PodSpec 中的一个字段，指定键—值对的映射。如果想要将 pod 运行到对应的 node 上，需要先给这些 node 打上 label，然后在 podSpec.NodeSelector 指定对应 node labels 即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: nginx</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx</span><br><span class="line">  nodeSelector:</span><br><span class="line">    type: gpu</span><br></pre></td></tr></table></figure>
+
+<h3 id="Affinity"><a href="#Affinity" class="headerlink" title="Affinity"></a>Affinity</h3><p>affinity格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">affinity:</span><br><span class="line">  nodeAffinity:</span><br><span class="line">    preferredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">    requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">  podAffinity:</span><br><span class="line">    preferredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">    requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">  podAntiAffinity:</span><br><span class="line">    preferredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">    requiredDuringSchedulingIgnoredDuringExecution:</span><br></pre></td></tr></table></figure>
+
+<p>Affinity 当前支持两种调度模式:</p>
+<ul>
+<li>requiredDuringSchedulingIgnoredDuringExecution: 一定要满足的条件，如果没有找到满足条件的节点，则 Pod 创建失败。所有也称为hard 模式。</li>
+<li>preferredDuringSchedulingIgnoredDuringExecution: 优先选择满足条件的节点，如果没有找到满足条件的节点，则在其他节点中择优创建 Pod。所有也称为 soft 模式。</li>
+</ul>
+<p>其中IgnoredDuringExecution的意义就跟 nodeSelector 的实现一样，即使 node label 发生变更，也不会影响之前已经部署且又不满足 affinity rules 的 pods，这些 pods 还会继续在该 node 上运行。换句话说，亲和性选择节点仅在调度 Pod 时起作用。</p>
+<p>nodeAffinity 当前支持的匹配符号包括：In、NotIn、Exists、DoesNotExists、Gt、Lt 。</p>
+<h4 id="NodeAffinity"><a href="#NodeAffinity" class="headerlink" title="NodeAffinity"></a>NodeAffinity</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: with-node-affinity</span><br><span class="line">spec:</span><br><span class="line">  affinity:</span><br><span class="line">    nodeAffinity:</span><br><span class="line">      # 必须选择 node label key 为 kubernetes.io&#x2F;e2e-az-name,</span><br><span class="line">      # value 为 e2e-az1 或 e2e-az2.</span><br><span class="line">      requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">        nodeSelectorTerms:</span><br><span class="line">        - matchExpressions:</span><br><span class="line">          - key: kubernetes.io&#x2F;e2e-az-name</span><br><span class="line">            operator: In</span><br><span class="line">            values:</span><br><span class="line">            - e2e-az1</span><br><span class="line">            - e2e-az2</span><br><span class="line">      # 过滤掉上面的必选项后，再优先选择 node label key 为 another-node-label-key</span><br><span class="line">      # value 为 another-node-label-value.</span><br><span class="line">      preferredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">      # 如果满足节点亲和，积分加权重(优选算法，会对 nodes 打分)</span><br><span class="line">      # weight: 0 - 100</span><br><span class="line">      - weight: 1</span><br><span class="line">        preference:</span><br><span class="line">          matchExpressions:</span><br><span class="line">          - key: another-node-label-key</span><br><span class="line">            operator: In</span><br><span class="line">            values:</span><br><span class="line">            - another-node-label-value</span><br><span class="line">  containers:</span><br><span class="line">  - name: with-node-affinity</span><br><span class="line">    image: k8s.gcr.io&#x2F;pause:2.0</span><br></pre></td></tr></table></figure>
+
+<p>NodeAffinity 的结构体:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">type NodeAffinity struct &#123;</span><br><span class="line">    RequiredDuringSchedulingIgnoredDuringExecution *NodeSelector</span><br><span class="line">    PreferredDuringSchedulingIgnoredDuringExecution []PreferredSchedulingTerm</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type NodeSelector struct &#123;</span><br><span class="line">    NodeSelectorTerms []NodeSelectorTerm</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type NodeSelectorTerm struct &#123;</span><br><span class="line">    MatchExpressions []NodeSelectorRequirement</span><br><span class="line">    MatchFields []NodeSelectorRequirement</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置相关的注意点：</p>
+<ul>
+<li>如果 nodeSelector 和 nodeAffinity 两者都指定，那 node 需要两个条件都满足，pod 才能调度。</li>
+<li>如果指定了多个 NodeSelectorTerms，那 node 只要满足其中一个条件，pod 就可以进行调度。</li>
+<li>如果指定了多个 MatchExpressions，那必须要满足所有条件，才能将 pod 调度到该 node。</li>
+</ul>
+<h4 id="PodAffinity"><a href="#PodAffinity" class="headerlink" title="PodAffinity"></a>PodAffinity</h4><p>跟NodeAffinity的调度方式类似</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://segmentfault.com/a/1190000018446833" target="_blank" rel="noopener">https://segmentfault.com/a/1190000018446833</a>  //Kubernetes 亲和性调度</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/05/17/docker-network-conflict/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">docker网络冲突问题</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/05/17/kubernetes-taint/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">kubernetes taint(污点)跟toleration(容忍)</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

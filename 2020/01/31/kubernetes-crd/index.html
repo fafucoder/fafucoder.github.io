@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>kubernetes自定义CRD | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="CRD简介K8S中一切都是resource，比如Deployment，Service等等。 我们可以基于CRD（CustomResourceDefinitions）功能新增resource，比如我想自定义一种Deployment资源，提供不同的部署策略。 k8s中resource可以通过RESTFUL API进行CURD操作，对于CRD创建的resource也是一样的。 CRD仅仅是定义一种res">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes自定义CRD">
+<meta property="og:url" content="https://github.com/fafucoder/2020/01/31/kubernetes-crd/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="CRD简介K8S中一切都是resource，比如Deployment，Service等等。 我们可以基于CRD（CustomResourceDefinitions）功能新增resource，比如我想自定义一种Deployment资源，提供不同的部署策略。 k8s中resource可以通过RESTFUL API进行CURD操作，对于CRD创建的resource也是一样的。 CRD仅仅是定义一种res">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://maoqide.live/media/posts/cloud/sample-controller/client-go-controller-interaction.jpeg">
+<meta property="article:published_time" content="2020-01-31T05:08:29.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.334Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://maoqide.live/media/posts/cloud/sample-controller/client-go-controller-interaction.jpeg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kubernetes自定义CRD</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kubernetes自定义CRD</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-01-31T05:08:29.000Z" itemprop="datePublished" class="page-time">
+  2020-01-31
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-crd"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kubernetes自定义CRD</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-01-31 13:08:29" datetime="2020-01-31T05:08:29.000Z"  itemprop="datePublished">2020-01-31</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="CRD简介"><a href="#CRD简介" class="headerlink" title="CRD简介"></a>CRD简介</h3><p>K8S中一切都是resource，比如Deployment，Service等等。</p>
+<p>我们可以基于CRD（CustomResourceDefinitions）功能新增resource，比如我想自定义一种Deployment资源，提供不同的部署策略。</p>
+<p>k8s中resource可以通过RESTFUL API进行CURD操作，对于CRD创建的resource也是一样的。</p>
+<p>CRD仅仅是定义一种resource，我们还需要实现controller，类似于deployment controller等等，监听对应资源的CURD事件，做出对应的处理，比如部署POD。</p>
+<p><a href="https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions" target="_blank" rel="noopener">CRD官方文档</a></p>
+<h3 id="编写自定义CRD"><a href="#编写自定义CRD" class="headerlink" title="编写自定义CRD"></a>编写自定义CRD</h3><p>编写自定义CRD包括两部分， 一个是定义crd, 一个是编写controller</p>
+<p>####自定义CRD</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apiextensions.k8s.io/v1</span>   <span class="comment">#版本</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">CustomResourceDefinition</span>        <span class="comment">#类型</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">crontabs.stable.example.com</span>   <span class="comment">#名称必须符合下面的格式：&lt;plural&gt;.&lt;group&gt;</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">group:</span> <span class="string">stable.example.com</span>           <span class="comment"># REST API使用的组名称：/apis/&lt;group&gt;/&lt;version&gt;</span></span><br><span class="line">  <span class="attr">version:</span> <span class="string">v1</span>  <span class="comment">#版本</span></span><br><span class="line">  <span class="attr">scope:</span> <span class="string">Namespaced</span>   <span class="comment">#Namespaced或Cluster</span></span><br><span class="line">  <span class="attr">names:</span></span><br><span class="line">    <span class="attr">plural:</span> <span class="string">crontabs</span>  <span class="comment">#复数名， URL中使用的复数名称: /apis/&lt;group&gt;/&lt;version&gt;/&lt;plural&gt;</span></span><br><span class="line">    <span class="attr">singular:</span> <span class="string">crontab</span>  <span class="comment">#单数名</span></span><br><span class="line">    <span class="attr">kind:</span> <span class="string">CronTab</span>   <span class="comment"># CamelCased格式的单数类型。在清单文件中使用</span></span><br><span class="line">    <span class="attr">shortNames:</span>   <span class="comment"># CLI中使用的资源简称</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ct</span></span><br><span class="line">  <span class="attr">additionalPrinterColumns:</span>  <span class="comment">#终端显示额外显示的信息</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Spec</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">description:</span> <span class="string">The</span> <span class="string">cron</span> <span class="string">spec</span> <span class="string">defining</span> <span class="string">the</span> <span class="string">interval</span> <span class="string">a</span> <span class="string">CronJob</span> <span class="string">is</span> <span class="string">run</span></span><br><span class="line">      <span class="attr">JSONPath:</span> <span class="string">.spec.cronSpec</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Replicas</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">      <span class="attr">description:</span> <span class="string">The</span> <span class="string">number</span> <span class="string">of</span> <span class="string">jobs</span> <span class="string">launched</span> <span class="string">by</span> <span class="string">the</span> <span class="string">CronJob</span></span><br><span class="line">      <span class="attr">JSONPath:</span> <span class="string">.spec.replicas</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Age</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">date</span></span><br><span class="line">      <span class="attr">JSONPath:</span> <span class="string">.metadata.creationTimestamp</span></span><br><span class="line">  <span class="attr">validation:</span> <span class="comment">#验证规则</span></span><br><span class="line">    <span class="attr">openAPIV3Schema:</span></span><br><span class="line">      <span class="attr">properties:</span></span><br><span class="line">        <span class="attr">spec:</span></span><br><span class="line">          <span class="attr">properties:</span></span><br><span class="line">            <span class="attr">cronSpec:</span> <span class="comment">#--必须是字符串，并且必须是正则表达式所描述的形式</span></span><br><span class="line">              <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">              <span class="attr">pattern:</span> <span class="string">'^(\d+|\*)(/\d+)?(\s+(\d+|\*)(/\d+)?)&#123;4&#125;$'</span></span><br><span class="line">            <span class="attr">replicas:</span> <span class="comment">#----必须是整数，最小值必须为1，最大值必须为10</span></span><br><span class="line">              <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">              <span class="attr">minimum:</span> <span class="number">1</span></span><br><span class="line">              <span class="attr">maximum:</span> <span class="number">10</span></span><br></pre></td></tr></table></figure>
+<p>自定义crd还可以包含自定义验证规则,额外打印信息等</p>
+<p>编写完自定义crd, 只需<code>kubectl apply -f xxx.yaml</code>就行</p>
+<p>定义完crd就可以定义cr</p>
+<h4 id="定义CR"><a href="#定义CR" class="headerlink" title="定义CR"></a>定义CR</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">"stable.example.com/v1"</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">CronTab</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">my-new-cron-object</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">cronSpec:</span> <span class="string">"* * * * */5"</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">my-awesome-cron-image</span></span><br></pre></td></tr></table></figure>
+<p>通过<code>kubectl create -f crd.yaml</code>可以创建一个CRD</p>
+<p>通过<code>kubectl get crd</code>可以获取创建的所有CRD。</p>
+<h4 id="定义controller"><a href="#定义controller" class="headerlink" title="定义controller"></a>定义controller</h4><p>定义完crd部分， 就需要实现controller部分</p>
+<p>可以使用client-go来作为Kubernetes的客户端， 常用的controller生成框架包括<a href="https://github.com/kubernetes-sigs/kubebuilder">Kubebuilder</a></p>
+<p>官方的自定义controller例子<a href="https://github.com/kubernetes/sample-controller">sample-controller</a></p>
+<h4 id="client-go原理"><a href="#client-go原理" class="headerlink" title="client-go原理"></a>client-go原理</h4><p>client-go的原理图如下：</p>
+<p class="img-lightbox">
+                <img src="http://maoqide.live/media/posts/cloud/sample-controller/client-go-controller-interaction.jpeg" alt="client原理图" title="">
+            </p>
+
+<p>具体流程就是list-watch机制， api-server会发送指定事件， controller通过watch事件， 处理事件。</p>
+<p>各名词解析：</p>
+<p>Reflector: 定义在 cache 包的 Reflector 类中，它监听特定资源类型(Kind)的 Kubernetes API，在ListAndWatch方法中执行。监听的对象可以是 Kubernetes 的内置资源类型或者是自定义资源类型。当 reflector 通过 watch API 发现新的资源实例被创建，它将通过对应的 list API 获取到新创建的对象并在watchHandler方法中将其加入到Delta Fifo队列中。</p>
+<p>Informer: 定义在 cache 包的 base controller 中，它从Delta Fifo队列中 pop 出对象，在processLoop方法中执行。base controller 的工作是将对象保存一遍后续获取，并调用 controller 将对象传给 controller。</p>
+<p>Indexer: 提供对象的 indexing 方法，定义在 cache 包的 Indexer中。一个典型的 indexing 的应用场景是基于对象的 label 创建索引。Indexer 基于几个 indexing 方法维护索引，它使用线程安全的 data store 来存储对象和他们的key。在 cache 包的 Store 类中定义了一个名为MetaNamespaceKeyFunc的默认方法，可以为对象生成一个<namespace>/<name>形式的key。</p>
+<h4 id="编写controller代码"><a href="#编写controller代码" class="headerlink" title="编写controller代码"></a>编写controller代码</h4><p>这部分代码来源于<a href="http://maoqide.live/post/cloud/sample-controller/" target="_blank" rel="noopener">maoqide</a></p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">*** main.go</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">// 创建 clientset</span></span><br><span class="line">kubeClient, err := kubernetes.NewForConfig(cfg)		<span class="comment">// k8s clientset, "k8s.io/client-go/kubernetes"</span></span><br><span class="line">exampleClient, err := clientset.NewForConfig(cfg)	<span class="comment">// sample clientset, "k8s.io/sample-controller/pkg/generated/clientset/versioned"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建 Informer</span></span><br><span class="line">kubeInformerFactory := kubeinformers.NewSharedInformerFactory(kubeClient, time.Second*<span class="number">30</span>)		<span class="comment">// k8s informer, "k8s.io/client-go/informers"</span></span><br><span class="line">exampleInformerFactory := informers.NewSharedInformerFactory(exampleClient, time.Second*<span class="number">30</span>)		<span class="comment">// sample informer, "k8s.io/sample-controller/pkg/generated/informers/externalversions"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建 controller，传入 clientset 和 informer</span></span><br><span class="line">controller := NewController(kubeClient, exampleClient,</span><br><span class="line">		kubeInformerFactory.Apps().V1().Deployments(),</span><br><span class="line">		exampleInformerFactory.Samplecontroller().V1alpha1().Foos())</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行 Informer，Start 方法为非阻塞，会运行在单独的 goroutine 中</span></span><br><span class="line">kubeInformerFactory.Start(stopCh)	</span><br><span class="line">exampleInformerFactory.Start(stopCh)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行 controller</span></span><br><span class="line">controller.Run(<span class="number">2</span>, stopCh)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">*** controller.go </span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">NewController() *Controller &#123;</span><br><span class="line">	<span class="comment">// 将 CRD 资源类型定义加入到 Kubernetes 的 Scheme 中，以便 Events 可以记录 CRD 的事件</span></span><br><span class="line">	utilruntime.Must(samplescheme.AddToScheme(scheme.Scheme))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建 Broadcaster</span></span><br><span class="line">	eventBroadcaster := record.NewBroadcaster()</span><br><span class="line">	<span class="comment">// ... ...</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 监听 CRD 类型'Foo'并注册 ResourceEventHandler 方法，当'Foo'的实例变化时进行处理</span></span><br><span class="line">	fooInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs&#123;</span><br><span class="line">		AddFunc: controller.enqueueFoo,</span><br><span class="line">		UpdateFunc: <span class="function"><span class="keyword">func</span><span class="params">(old, <span class="built_in">new</span> <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">			controller.enqueueFoo(<span class="built_in">new</span>)</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 监听 Deployment 变化并注册 ResourceEventHandler 方法，</span></span><br><span class="line">	<span class="comment">// 当它的 ownerReferences 为 Foo 类型实例时，将该 Foo 资源加入 work queue</span></span><br><span class="line">	deploymentInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs&#123;</span><br><span class="line">		AddFunc: controller.handleObject,</span><br><span class="line">		UpdateFunc: <span class="function"><span class="keyword">func</span><span class="params">(old, <span class="built_in">new</span> <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">			newDepl := <span class="built_in">new</span>.(*appsv1.Deployment)</span><br><span class="line">			oldDepl := old.(*appsv1.Deployment)</span><br><span class="line">			<span class="keyword">if</span> newDepl.ResourceVersion == oldDepl.ResourceVersion &#123;</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">			controller.handleObject(<span class="built_in">new</span>)</span><br><span class="line">		&#125;,</span><br><span class="line">		DeleteFunc: controller.handleObject,</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Controller)</span> <span class="title">Run</span><span class="params">(threadiness <span class="keyword">int</span>, stopCh &lt;-<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="comment">// 在启动 worker 前等待缓存同步</span></span><br><span class="line">	<span class="keyword">if</span> ok := cache.WaitForCacheSync(stopCh, c.deploymentsSynced, c.foosSynced); !ok &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">"failed to wait for caches to sync"</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 运行两个 worker 来处理资源</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; threadiness; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> wait.Until(c.runWorker, time.Second, stopCh)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 无限循环，不断的调用 processNextWorkItem 处理下一个对象</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Controller)</span> <span class="title">runWorker</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> c.processNextWorkItem() &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从workqueue中获取下一个对象并进行处理，通过调用 syncHandler</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Controller)</span> <span class="title">processNextWorkItem</span><span class="params">()</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">    obj, shutdown := c.workqueue.Get()</span><br><span class="line">    <span class="keyword">if</span> shutdown &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    err := <span class="function"><span class="keyword">func</span><span class="params">(obj <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">        <span class="comment">// 调用 workqueue.Done(obj) 方法告诉 workqueue 当前项已经处理完毕，</span></span><br><span class="line">        <span class="comment">// 如果我们不想让当前项重新入队，一定要调用 workqueue.Forget(obj)。</span></span><br><span class="line">        <span class="comment">// 当我们没有调用Forget时，当前项会重新入队 workqueue 并在一段时间后重新被获取。</span></span><br><span class="line">        <span class="keyword">defer</span> c.workqueue.Done(obj)</span><br><span class="line">        <span class="keyword">var</span> key <span class="keyword">string</span></span><br><span class="line">        <span class="keyword">var</span> ok <span class="keyword">bool</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 我们期望的是 key 'namespace/name' 格式的 string</span></span><br><span class="line">        <span class="keyword">if</span> key, ok = obj.(<span class="keyword">string</span>); !ok &#123;</span><br><span class="line">            <span class="comment">// 无效的项调用Forget方法，避免重新入队。</span></span><br><span class="line">            c.workqueue.Forget(obj)</span><br><span class="line">            utilruntime.HandleError(fmt.Errorf(<span class="string">"expected string in workqueue but got %#v"</span>, obj))</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> err := c.syncHandler(key); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="comment">// 放回workqueue避免偶发的异常</span></span><br><span class="line">            c.workqueue.AddRateLimited(key)</span><br><span class="line">            <span class="keyword">return</span> fmt.Errorf(<span class="string">"error syncing '%s': %s, requeuing"</span>, key, err.Error())</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果没有异常，Forget当前项，同步成功</span></span><br><span class="line">        c.workqueue.Forget(obj)</span><br><span class="line">        klog.Infof(<span class="string">"Successfully synced '%s'"</span>, key)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    &#125;(obj)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        utilruntime.HandleError(err)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对比真实的状态和期望的状态并尝试合并，然后更新Foo类型实例的状态信息</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Controller)</span> <span class="title">syncHandler</span><span class="params">(key <span class="keyword">string</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">    <span class="comment">// 通过 workqueue 中的 key 解析出 namespace 和 name</span></span><br><span class="line">    namespace, name, err := cache.SplitMetaNamespaceKey(key)</span><br><span class="line">    <span class="comment">// 调用 lister 接口通过 namespace 和 name 获取 Foo 实例</span></span><br><span class="line">    foo, err := c.foosLister.Foos(namespace).Get(name)</span><br><span class="line">    deploymentName := foo.Spec.DeploymentName</span><br><span class="line">    <span class="comment">// 获取 Foo 实例中定义的 deploymentname</span></span><br><span class="line">    deployment, err := c.deploymentsLister.Deployments(foo.Namespace).Get(deploymentName)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 没有发现对应的 deployment，新建一个</span></span><br><span class="line">    <span class="keyword">if</span> errors.IsNotFound(err) &#123;</span><br><span class="line">        deployment, err = c.kubeclientset.AppsV1().Deployments(foo.Namespace).Create(newDeployment(foo))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// OwnerReferences 不是 Foo 实例，warning并返回错误</span></span><br><span class="line">    <span class="keyword">if</span> !metav1.IsControlledBy(deployment, foo) &#123;</span><br><span class="line">        msg := fmt.Sprintf(MessageResourceExists, deployment.Name)</span><br><span class="line">        c.recorder.Event(foo, corev1.EventTypeWarning, ErrResourceExists, msg)</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(msg)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// deployment 中 的配置和 Foo 实例中 Spec 的配置不一致，即更新 deployment</span></span><br><span class="line">    <span class="keyword">if</span> foo.Spec.Replicas != <span class="literal">nil</span> &amp;&amp; *foo.Spec.Replicas != *deployment.Spec.Replicas &#123;</span><br><span class="line">        deployment, err = c.kubeclientset.AppsV1().Deployments(foo.Namespace).Update(newDeployment(foo))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新 Foo 实例状态</span></span><br><span class="line">    err = c.updateFooStatus(foo, deployment)</span><br><span class="line">    c.recorder.Event(foo, corev1.EventTypeNormal, SuccessSynced, MessageResourceSynced)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://blog.csdn.net/boling_cavalry/article/details/88934063" target="_blank" rel="noopener">https://blog.csdn.net/boling_cavalry/article/details/88934063</a>  //编写自定义CRD三部曲， 跟着编写就能实现一个自定义CRD</li>
+<li><a href="http://maoqide.live/post/cloud/sample-controller/" target="_blank" rel="noopener">http://maoqide.live/post/cloud/sample-controller/</a>  //CRD的实现原理， 以及简要代码</li>
+<li><a href="https://jimmysong.io/kubernetes-handbook/concepts/crd.html" target="_blank" rel="noopener">https://jimmysong.io/kubernetes-handbook/concepts/crd.html</a>   //CRD的文档</li>
+<li><a href="https://www.jianshu.com/p/cc7eea6dd1fb" target="_blank" rel="noopener">https://www.jianshu.com/p/cc7eea6dd1fb</a>  //如何定义一个crd</li>
+<li><a href="https://juejin.im/post/5daf8a8d6fb9a04e366a49a8" target="_blank" rel="noopener">https://juejin.im/post/5daf8a8d6fb9a04e366a49a8</a>  //编写crd</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2020/01/31/kubernetes-client-go/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">kubernetes client-go原理解析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/01/31/openvswitch/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">云计算基础-openvswitch技术</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>kubernetes api聚合机制aggregation | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kubernetes">
+    <meta name="description" content="概念​    kubernetes的 Aggregated API是什么呢？API Aggregation 允许k8s的开发人员编写一个自己的服务，可以把这个服务注册到k8s的api里面，这样，就像k8s自己的api一样，你的服务只要运行在k8s集群里面，k8s 的Aggregate通过service名称就可以转发到你写的service里面去了。(另外一种扩展 Kubernetes API 的方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes api聚合机制aggregation">
+<meta property="og:url" content="https://github.com/fafucoder/2021/01/29/kubernetes-aggregator/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概念​    kubernetes的 Aggregated API是什么呢？API Aggregation 允许k8s的开发人员编写一个自己的服务，可以把这个服务注册到k8s的api里面，这样，就像k8s自己的api一样，你的服务只要运行在k8s集群里面，k8s 的Aggregate通过service名称就可以转发到你写的service里面去了。(另外一种扩展 Kubernetes API 的方法">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86kq5rumj319y0c4my6.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86o0k0kqj314q0bwdh7.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86p5w6erj315g0b6t9x.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn85pg2d84j316u070788.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn85u1y817j316406atc7.jpg">
+<meta property="article:published_time" content="2021-01-29T11:11:37.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.333Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86kq5rumj319y0c4my6.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kubernetes api聚合机制aggregation</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kubernetes api聚合机制aggregation</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-01-29T11:11:37.000Z" itemprop="datePublished" class="page-time">
+  2021-01-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-kubernetes-aggregator"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kubernetes api聚合机制aggregation</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-01-29 19:11:37" datetime="2021-01-29T11:11:37.000Z"  itemprop="datePublished">2021-01-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/kubernetes/">kubernetes</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>​    kubernetes的 Aggregated API是什么呢？API Aggregation 允许k8s的开发人员编写一个自己的服务，可以把这个服务注册到k8s的api里面，这样，就像k8s自己的api一样，你的服务只要运行在k8s集群里面，k8s 的Aggregate通过service名称就可以转发到你写的service里面去了。(另外一种扩展 Kubernetes API 的方法是使用<a href="https://feisky.gitbooks.io/kubernetes/content/concepts/customresourcedefinition.html" target="_blank" rel="noopener">CustomResourceDefinition</a>, 编写的自定义CRD, k8s会自动的注册到apiservice上 )</p>
+<p>这个设计理念：</p>
+<ol>
+<li>增加了api的扩展性，这样k8s的开发人员就可以编写自己的API服务器来公开他们想要的API。集群管理员应该能够使用这些服务，而不需要对核心库存储库进行任何更改。</li>
+<li>丰富了APIs，核心kubernetes团队阻止了很多新的API提案。通过允许开发人员将他们的API作为单独的服务器公开，并使集群管理员能够在不对核心库存储库进行任何更改的情况下使用它们，这样就无须社区繁杂的审查了</li>
+<li>开发分阶段实验性API的地方，新的API可以在单独的聚集服务器中开发，当它稳定之后，那么把它们封装起来安装到其他集群就很容易了。</li>
+<li>确保新API遵循kubernetes约定：如果没有这里提出的机制，社区成员可能会被迫推出自己的东西，这可能会或可能不遵循kubernetes约定。</li>
+</ol>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>​    当APIAggregator接收到请求之后，如果发现对应的是一个service的请求，则会直接转发到对应的服务上否则委托给apiserver进行处理，apiserver中根据当前URL来选择对应的REST接口处理，如果未能找到对应的处理，则会交由CRD server处理， CRD server检测是否已经注册对应的CRD资源，如果注册就处理</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn86kq5rumj319y0c4my6.jpg" alt="api aggregation" title="">
+            </p>
+
+<p>​    当在集群中创建了对应的CRD资源的时候，k8s通过内部的controller来感知对应的CRD资源信息，然后为其创建对应的REST处理接口，这样后续接收到对应的资源就可以进行处理</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn86o0k0kqj314q0bwdh7.jpg" alt="crd server" title="">
+            </p>
+
+<p>​    APIAggreagtor中会通过informer 监听后端Service的变化，如果发现有新的服务，就会创建对应的代理转发，从而实现对应的服务注册</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn86p5w6erj315g0b6t9x.jpg" alt="api service" title="">
+            </p>
+
+<h3 id="注册自定义service资源"><a href="#注册自定义service资源" class="headerlink" title="注册自定义service资源"></a>注册自定义service资源</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apiregistration.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">APIService</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">v1beta1.custom.metrics.k8s.io</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">service:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">custom-metrics-server</span></span><br><span class="line">    <span class="attr">namespace:</span> <span class="string">custom-metrics</span></span><br><span class="line">  <span class="attr">group:</span> <span class="string">custom.metrics.k8s.io</span></span><br><span class="line">  <span class="attr">version:</span> <span class="string">v1beta1</span></span><br><span class="line">  <span class="attr">insecureSkipTLSVerify:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">groupPriorityMinimum:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">versionPriority:</span> <span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p> 在这个APIService中设置的API组名为custom.metrics.k8s.io，版本号为v1beta1，这两个字段将作API路径的子目录注册到API路径“/apis/”下。注册成功后，就能通过Master API路径“/apis/custom.metrics.k8s.io/v1beta1”访问自定义的API Server了, API聚合层会代理转发到后端服务custom-metrics-server.custom-metrics.svc上。</p>
+<p>官方提供有一个 <a href="https://github.com/kubernetes/sample-apiserver">自定义api service </a> 样例, 通过官方样例可以创建一个自定义聚合api</p>
+<h3 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h3><ol>
+<li><p>service监听的端口必须是https,否则认证通过不了。(通过<code>kubectl get apiservice</code>能看到是否通过认证)<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn85pg2d84j316u070788.jpg" alt="http报错" title="">
+            </p></p>
+</li>
+<li><p>请求的根路径需要应答请求，否则会报404错误（<code>kubectl get apiservice v1alpha3.demo.com.cn  -o yaml</code> 能拷看到状态）</p>
+<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn85u1y817j316406atc7.jpg" alt="404状态"></p>
+</li>
+<li><p>请求的根路径的应答结果需要包含<code>kind</code>, <code>apiVersion</code>, <code>groupVersion</code>, <code>resources</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">"kind"</span>: <span class="string">"APIResourceList"</span>,</span><br><span class="line"><span class="attr">"apiVersion"</span>: <span class="string">"v1"</span>,</span><br><span class="line"><span class="attr">"groupVersion"</span>: <span class="string">"metrics.k8s.io/v1beta1"</span>,</span><br><span class="line"><span class="attr">"resources"</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://studygolang.com/articles/26970" target="_blank" rel="noopener">图解kubernetes中api聚合机制的实现</a></li>
+<li><a href="https://blog.csdn.net/u010278923/article/details/78890533" target="_blank" rel="noopener">解析kubernetes Aggregated API Servers</a></li>
+<li><a href="https://blog.csdn.net/qq_31136839/article/details/100183026" target="_blank" rel="noopener">Kubernetes之使用API聚合机制扩展API资源</a></li>
+<li><a href="http://www.iceyao.com.cn/2019/06/10/k8s-aggregation-api%E4%BD%93%E9%AA%8C/" target="_blank" rel="noopener">K8s Aggregation API体验</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/" rel="tag">kubernetes</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/02/02/datastruct-hash/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">哈希表： 散列查找</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/01/27/golang-unsafe/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">golang-unsafe</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

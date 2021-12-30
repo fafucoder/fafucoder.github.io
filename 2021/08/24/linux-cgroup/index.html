@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux cgroup资源限制 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="Cgroup简述​        在Docker中，容器使用Linux namespace技术进行资源隔离，使得容器中的进程看不到别的容器的资源，但是容器内的进程仍然可以任意地使用主机的 CPU 内存等资源，如果某一个容器使用的主机资源过多，可能导致主机的资源竞争，进而影响业务。那如果我们想限制一个容器资源的使用（如 CPU、内存等）应该如何做呢？ ​        这里就需要用到 Linux 内">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux cgroup资源限制">
+<meta property="og:url" content="https://github.com/fafucoder/2021/08/24/linux-cgroup/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="Cgroup简述​        在Docker中，容器使用Linux namespace技术进行资源隔离，使得容器中的进程看不到别的容器的资源，但是容器内的进程仍然可以任意地使用主机的 CPU 内存等资源，如果某一个容器使用的主机资源过多，可能导致主机的资源竞争，进而影响业务。那如果我们想限制一个容器资源的使用（如 CPU、内存等）应该如何做呢？ ​        这里就需要用到 Linux 内">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gts1dsuihnj60yc0f2dgn02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gts4tgglopj61au0hotai02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtsuo2k4u5j615k0u07ag02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtsvbodpddj61io0nmdk102.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtsvdt0t6lj61ju0osdjx02.jpg">
+<meta property="article:published_time" content="2021-08-24T07:05:13.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.341Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gts1dsuihnj60yc0f2dgn02.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux cgroup资源限制</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux cgroup资源限制</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-08-24T07:05:13.000Z" itemprop="datePublished" class="page-time">
+  2021-08-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-cgroup"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux cgroup资源限制</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-08-24 15:05:13" datetime="2021-08-24T07:05:13.000Z"  itemprop="datePublished">2021-08-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="Cgroup简述"><a href="#Cgroup简述" class="headerlink" title="Cgroup简述"></a>Cgroup简述</h3><p>​        在Docker中，容器使用Linux namespace技术进行资源隔离，使得容器中的进程看不到别的容器的资源，但是容器内的进程仍然可以任意地使用主机的 CPU 内存等资源，如果某一个容器使用的主机资源过多，可能导致主机的资源竞争，进而影响业务。那如果我们想限制一个容器资源的使用（如 CPU、内存等）应该如何做呢？</p>
+<p>​        这里就需要用到 Linux 内核的另一个核心技术cgroups。那么究竟什么是cgroups？cgroups（全称：Control Groups）是 Linux 内核的一个功能，它可以实现限制进程或者进程组的资源（如 CPU、内存、磁盘 IO 等）。</p>
+<blockquote>
+<p>在 2006 年，Google 的工程师（ Rohit Seth 和 Paul Menage 为主要发起人） 发起了这个项目，起初项目名称并不是cgroups，而被称为进程容器（process containers）。在 2007 年cgroups代码计划合入Linux 内核，但是当时在 Linux 内核中，容器（container）这个词被广泛使用，并且拥有不同的含义。为了避免命名混乱和歧义，进程容器被重名为cgroups，并在 2008 年成功合入 Linux 2.6.24 版本中。cgroups目前已经成为 systemd、Docker、Linux Containers（LXC） 等技术的基础。</p>
+</blockquote>
+<h3 id="Cgroup-功能组件"><a href="#Cgroup-功能组件" class="headerlink" title="Cgroup 功能组件"></a>Cgroup 功能组件</h3><p>cgroups功能的实现依赖于三个核心概念：子系统、控制组、层级树。</p>
+<ul>
+<li><strong>控制组（cgroup）</strong>： 控制组是对进程分组管理的一种机制,一个Cgroup包含一组进程,并可以在上面添加添加Linux Subsystem的各种参数配置,将一组进程和一组Subsystem的系统参数关联起来。</li>
+<li><strong>子系统（subsystem）</strong>：是一个内核的组件，一个子系统代表一类资源调度控制器。例如内存子系统可以限制内存的使用量，CPU 子系统可以限制 CPU 的使用时间。不同版本的Kernel支持的子系统有所偏差,可以通过<code>cat /proc/cgroups</code>查看。</li>
+<li><strong>层级树（hierarchy）</strong>：是由一系列的控制组(Cgroup) 按照树状结构排列组成的。这种排列方式可以使得控制组(Cgroup) 拥有父子关系，子控制组默认拥有父控制组的属性，也就是子控制组会继承于父控制组。比如，系统中定义了一个控制组 c1，限制了 CPU 可以使用 1 核，然后另外一个控制组 c2 想实现既限制 CPU 使用 1 核，同时限制内存使用 2G，那么 c2 就可以直接继承 c1，无须重复定义 CPU 限制。每个 hierarchy<code>在初始化时会有默认的</code>CGroup<code>(</code>Root CGroup)。</li>
+<li><strong>任务（task）</strong>:  进程(<code>process</code>)在cgroups中称为task，<code>taskid</code>就是<code>pid</code>。</li>
+<li><strong>libcgroups</strong>：一个开源软件，提供了一组支持cgroups的应用程序和库，方便用户配置和使用cgroups。目前许多发行版都附带这个软件。</li>
+</ul>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gts1dsuihnj60yc0f2dgn02.jpg" alt="cgroup组件" title="">
+            </p>
+
+<h4 id="linux-支持的子系统"><a href="#linux-支持的子系统" class="headerlink" title="linux 支持的子系统"></a>linux 支持的子系统</h4><p>不同版本的Kernel支持的子系统有所偏差,可以通过<code>cat /proc/cgroups</code>查看。</p>
+<ul>
+<li><code>blkio</code> 对块设备(比如硬盘)的IO进行访问限制</li>
+<li><code>cpu</code> 设置进程的<code>CPU</code>调度的策略, 比如<code>CPU</code>时间片的分配</li>
+<li><code>cpuacct</code> 统计/生成<code>cgroup</code>中的任务占用CPU资源报告</li>
+<li><code>cpuset</code> 在多核机器上分配给任务(<code>task</code>)独立的<code>CPU</code>和内存节点(内存仅使用于<code>NUMA</code>架构)</li>
+<li><code>devices</code> 控制<code>cgroup</code>中对设备的访问</li>
+<li><code>freezer</code> 挂起(suspend) / 恢复 (resume)<code>cgroup</code> 中的进程</li>
+<li><code>memory</code> 用于控制<code>cgroup</code>中进程的占用以及生成内存占用报告</li>
+<li><code>net_cls</code> 使用等级识别符（classid）标记网络数据包，这让 Linux 流量控制器 <strong>tc</strong> (<code>traffic controller</code>) 可以识别来自特定 cgroup 的包并做限流或监控</li>
+<li><code>net_prio</code> 设置<code>cgroup</code>中进程产生的网络流量的优先级</li>
+<li><code>hugetlb</code> 限制使用的内存页数量</li>
+<li><code>pids</code> 限制任务的数量</li>
+<li><code>ns</code> 可以使不同<code>cgroups</code>下面的进程使用不同的<code>namespace</code>. 每个<code>subsystem</code>会关联到定义的<code>cgroup</code>上,并对这个<code>cgoup</code>中的进程做相应的限制和控制.</li>
+</ul>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gts4tgglopj61au0hotai02.jpg" alt="cgroups" title="">
+            </p>
+
+<h3 id="挂载cgroup-文件系统"><a href="#挂载cgroup-文件系统" class="headerlink" title="挂载cgroup 文件系统"></a>挂载cgroup 文件系统</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建目录</span></span><br><span class="line">mkdir mycgroup</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 挂载cgroup</span></span><br><span class="line">mount -t cgroup -o none,name=mycgroup mycgroup `pwd`/mycgroup</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看是否挂载成功</span></span><br><span class="line">mount -t cgroup | grep mycgroup</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建子目录</span></span><br><span class="line">mkdir -p mycgroup/cgroup-1 &amp;&amp; mkdir -p mycgroup/cgroup-2</span><br></pre></td></tr></table></figure>
+
+<p>执行完上面的命令后查看mycgroup目录发现多了几个文件:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 mycgroup]# ls</span><br><span class="line">cgroup-1  cgroup-2  cgroup.clone_children  cgroup.procs  cgroup.sane_behavior  notify_on_release  release_agent  tasks</span><br><span class="line"></span><br><span class="line">[root@node1 mycgroup]# tree .</span><br><span class="line">.</span><br><span class="line">├── cgroup-1</span><br><span class="line">│   ├── cgroup.clone_children</span><br><span class="line">│   ├── cgroup.procs</span><br><span class="line">│   ├── notify_on_release</span><br><span class="line">│   └── tasks</span><br><span class="line">├── cgroup-2</span><br><span class="line">│   ├── cgroup.clone_children</span><br><span class="line">│   ├── cgroup.procs</span><br><span class="line">│   ├── notify_on_release</span><br><span class="line">│   └── tasks</span><br><span class="line">├── cgroup.clone_children</span><br><span class="line">├── cgroup.procs</span><br><span class="line">├── cgroup.sane_behavior</span><br><span class="line">├── notify_on_release</span><br><span class="line">├── release_agent</span><br><span class="line">└── tasks</span><br></pre></td></tr></table></figure>
+
+<p>上面这些文件就是<code>hierarchy</code>中<code>cgroup</code>根节点的配置项,这些文件的含义是:</p>
+<ul>
+<li><p><code>group.clone_children</code> <code>cpuset</code>的<code>subsystem</code>会读取这个配置文件,如果这个值(默认值是0)是 <strong>1</strong> 子<code>cgroup</code>才会继承父<code>cgroup</code>的<code>cpuset</code>的配置</p>
+</li>
+<li><p><code>cgroup.procs</code>是树中当前节点 <code>cgroup</code> 中的进程组ID,现在的位置是根节点,这个文件中会有现在系统中所有进程组的ID (查看目前全部进程PID <code>ps -ef | awk &#39;{print $2}&#39;</code>)</p>
+</li>
+<li><p><code>notify_on_release</code> 标志当这个<code>cgroup</code>最后一个进程退出的时候是否执行了<code>release_agent</code> (<code>notify_on_release</code>和<code>release_agent</code> 会一起使用)</p>
+</li>
+<li><p><code>release_agent</code> 则是一个路径,通常用作进程退出后自动清理不再使用的<code>cgroup</code></p>
+</li>
+<li><p><code>task</code> 标识该<code>cgroup</code>下面进程ID,如果把一个进程ID写到<code>task</code>文件中,便会把相应的进程加入到这个<code>cgroup</code>中</p>
+</li>
+</ul>
+<p>在刚刚创建好的<code>hierarchy</code>上<code>cgroup</code>根节点中扩展出两个子<code>cgroup</code>, 它们会继承父<code>cgroup</code>的属性</p>
+<h4 id="通过subsystem限制cgroup中进程的资源"><a href="#通过subsystem限制cgroup中进程的资源" class="headerlink" title="通过subsystem限制cgroup中进程的资源"></a>通过subsystem限制cgroup中进程的资源</h4><p>在上面创建的 hierarchy<code>并没有关联到任何的</code>subsystem， 需要我们手动创建<code>subsystem</code>挂载上去。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p mycgroup/memory &amp;&amp; mount -t cgroup -o memory mycgroup-memory `pwd`/mycgroup/memory</span><br></pre></td></tr></table></figure>
+
+<p>执行完上面命令后在memory会生成很多文件(这些文件其实是继承至/sys/fs/cgroup/memory), 其实不需要我们手动挂载cgroup，下面将演示如何使用cgroup进行资源限制~</p>
+<h3 id="如何使用cgroup进行资源限制"><a href="#如何使用cgroup进行资源限制" class="headerlink" title="如何使用cgroup进行资源限制"></a>如何使用cgroup进行资源限制</h3><p>cgroups的创建很简单，只需要在相应的子系统下创建目录即可(默认是在/sys/fs/cgroup目录下), 接下来将演示如何限制cpu跟内存使用数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 cgroup]# ls</span><br><span class="line">blkio  cpuacct      cpuset   freezer  memory   net_cls,net_prio  perf_event  rdma</span><br><span class="line">cpu    cpu,cpuacct  devices  hugetlb  net_cls  net_prio          pids        systemd</span><br></pre></td></tr></table></figure>
+
+<h4 id="CPU-子系统"><a href="#CPU-子系统" class="headerlink" title="CPU 子系统"></a>CPU 子系统</h4><p>CPU子系统有两个目录, cpuset和cpu,cpuacct, 其中cpu,cpuacct用于设置cpu配额，cpuset用于设置cpu绑定(设置进程只能在指定的核上), 下面对cpu 子系统的一些字段进行说明：</p>
+<ul>
+<li><p><code>cpu.cfs_period_us</code>: 表示一个cpu带宽，单位为微秒(默认是10000000)。系统总CPU带宽： cpu核心数 * cfs_period_us。</p>
+</li>
+<li><p><code>cpu.cfs_quota_us</code> 文件: 代表在某一个阶段限制的 CPU 时间总量，单位为微秒。cfs_quota_us为-1，表示使用的CPU不受cgroup限制。cfs_quota_us的最小值为1ms(1000)，最大值为1s。 结合cfs_period_us可以限制进程使用的cpu。例如配置cfs_period_us=10000，而cfs_quota_us=20000。那么该进程就可以可以用2个cpu core。</p>
+</li>
+<li><p><code>cpuacct.stat</code>: 记录cgroup的所有任务（包括其子孙层级中的所有任务）使用的用户和系统CPU时间.</p>
+</li>
+<li><p><code>cpuacct.usage</code>: 记录这​​​个​​​cgroup中​​​所​​​有​​​任​​​务​​​（包括其子孙层级中的所有任务）消​​​耗​​​的​​​总​​​CPU时​​​间​​​（纳​​​秒​​​）。</p>
+</li>
+<li><p><code>cpuset.cpus</code>: 指​​​定​​​允​​​许​​​这​​​个​​​ cgroup 中​​​任​​​务​​​(进程)访​​​问​​​的​​​ CPU。​​​这​​​是​​​一​​​个​​​用​​​逗​​​号​​​分​​​开​​​的​​​列​​​表​​​，格​​​式​​​为​​​ ASCII，使​​​用​​​小​​​横​​​线​​​（”-“）代​​​表​​​范​​​围​​​。​​​如下，代​​​表​​​ CPU 0、​​​1、​​​2 和​​​ 16。​​​</p>
+</li>
+<li><p><code>cpuset.mems</code>: 指​​​定​​​允​​​许​​​这​​​个​​​ cgroup 中​​​任​​​务​​​可​​​访​​​问​​​的​​​内​​​存​​​节​​​点​​​。​​​这​​​是​​​一​​​个​​​用​​​逗​​​号​​​分​​​开​​​的​​​列​​​表​​​，格​​​式​​​为​​​ ASCII，使​​​用​​​小​​​横​​​线​​​（”-“）代​​​表​​​范​​​围​​​。​​​如下代​​​表​​​内​​​存​​​节​​​点​​​ 0、​​​1、​​​2 和​​​ 16。</p>
+</li>
+</ul>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtsuo2k4u5j615k0u07ag02.jpg" alt="cpu子系统" title="">
+            </p>
+
+<ol>
+<li><strong>创建CPU Cgroup</strong> </li>
+</ol>
+<p>创建cpu子系统很简单，只需要在cpu子系统下创建一个目录即可。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /sys/fs/cgroup/cpu/mydocker</span><br></pre></td></tr></table></figure>
+
+<p>执行完上述命令后，我们查看一下我们新创建的目录下发生了什么？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 mydocker]# ls -l &#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;cpu&#x2F;mydocker</span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 cgroup.clone_children</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 cgroup.procs</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpuacct.stat</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 cpuacct.usage</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpuacct.usage_all</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpuacct.usage_percpu</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpuacct.usage_percpu_sys</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpuacct.usage_percpu_user</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpuacct.usage_sys</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpuacct.usage_user</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 cpu.cfs_period_us</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 08:52 cpu.cfs_quota_us</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 cpu.rt_period_us</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 cpu.rt_runtime_us</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 cpu.shares</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 10:20 cpu.stat</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 10:20 notify_on_release</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 08:54 tasks</span><br></pre></td></tr></table></figure>
+
+<p>由上可以看到我们新建的目录下被自动创建了很多文件(（这里利用到了继承，子进程会继承父进程的 cgroup）)</p>
+<ol start="2">
+<li><strong>创建进程，加入 cgroup</strong></li>
+</ol>
+<p>这里为了方便演示，我先把当前运行的 shell 进程加入 cgroup，然后在当前 shell 运行 cpu 耗时任务（这里利用到了继承，子进程会继承父进程的 cgroup）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;cpu&#x2F;mydocker</span><br><span class="line"></span><br><span class="line">echo $$ &gt; tasks</span><br><span class="line"></span><br><span class="line">echo $$</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>设置cpu quote配额</strong></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 设置当前shell 可以使用1core cpu</span><br><span class="line">echo 1000000 &gt; cpu.cpu.cfs_period_us</span><br><span class="line">echo 1000000 &gt; cpu.cfs_quota_us</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><strong>观察cgroup是否生效</strong></li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 当前shell</span></span><br><span class="line"></span><br><span class="line">while true; do echo; done;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 另起一个shell</span></span><br><span class="line">top -p pid(刚才的$$的数字)</span><br></pre></td></tr></table></figure>
+
+<p>通过top命令可以看到刚才的shell 进程cpu已经达到了100%，说明cgroup起作用了.</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtsvbodpddj61io0nmdk102.jpg" alt="cgroup" title="">
+            </p>
+
+<p>让我们更近一步，设置bash进程可以使用的cpu为0.5core, 通过<code>echo 500000 &gt; cpu.cfs_quota_us</code> 然后继续观察，发现cpu到达50%后就上不去了。验证完 cgroup 限制 cpu，我们使用相似的方法来验证 cgroup 对内存的限制。</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtsvdt0t6lj61ju0osdjx02.jpg" alt="cgroup" title="">
+            </p>
+
+<h4 id="Memory-子系统"><a href="#Memory-子系统" class="headerlink" title="Memory 子系统"></a>Memory 子系统</h4><p>创建memory子系统的方式跟cpu子系统的方式差不多，只需要在memory子系统下创建一个目录即可。</p>
+<ol>
+<li><strong>在 memory 子系统下创建 cgroup</strong></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir &#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;memory&#x2F;mydocker</span><br></pre></td></tr></table></figure>
+
+<p>执行完上述命令后，我们查看一下我们新创建的目录下发生了什么？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 mydocker]# ls -l &#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;memory&#x2F;mydocker</span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 cgroup.clone_children</span><br><span class="line">--w--w--w-. 1 root root 0 Aug 24 23:34 cgroup.event_control</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 cgroup.procs</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.failcnt</span><br><span class="line">--w-------. 1 root root 0 Aug 24 23:34 memory.force_empty</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.failcnt</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.limit_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.max_usage_in_bytes</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.slabinfo</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.tcp.failcnt</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.tcp.limit_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.tcp.max_usage_in_bytes</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.tcp.usage_in_bytes</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 23:34 memory.kmem.usage_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.limit_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.max_usage_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.memsw.failcnt</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.memsw.limit_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.memsw.max_usage_in_bytes</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 23:34 memory.memsw.usage_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.move_charge_at_immigrate</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 23:34 memory.numa_stat</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.oom_control</span><br><span class="line">----------. 1 root root 0 Aug 24 23:34 memory.pressure_level</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.soft_limit_in_bytes</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 23:34 memory.stat</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.swappiness</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 24 23:34 memory.usage_in_bytes</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 memory.use_hierarchy</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 notify_on_release</span><br><span class="line">-rw-r--r--. 1 root root 0 Aug 24 23:34 tasks</span><br></pre></td></tr></table></figure>
+
+<p>由上可以看到我们新建的目录下被自动创建了很多文件(这里利用到了继承，子进程会继承父进程的 cgroup), 其中 memory.limit_in_bytes 文件代表内存使用总量，单位为 byte。例如，这里我希望对内存使用限制为 1G(1G = 1024<em>1024</em>1024)，则向 memory.limit_in_bytes 文件写入 1073741824即可</p>
+<ol start="2">
+<li><strong>创建进程，加入 cgroup</strong></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;sys&#x2F;fs&#x2F;cgroup&#x2F;memory&#x2F;mydocker</span><br><span class="line"></span><br><span class="line">echo $$ &gt; tasks</span><br><span class="line"></span><br><span class="line">echo $$</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>设置memory 配额</strong></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 设置当前shell 可以使用1G内存</span><br><span class="line">echo 1073741824 &gt; memory.limit_in_bytes</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><strong>观察cgroup是否生效</strong></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 使用stress-ng进行压力测试</span><br><span class="line">stress-ng --vm 5 --vm-bytes 250M</span><br></pre></td></tr></table></figure>
+
+<p>通过运行stress-ng压力测试后，能发现终端会直接被卡死(其实无法说明Cgroup是否生效， 使用pidstat也不好查看内存占用情况)</p>
+<h3 id="pids子系统"><a href="#pids子系统" class="headerlink" title="pids子系统"></a>pids子系统</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://www.jianshu.com/p/66734cde7994" target="_blank" rel="noopener">使用cgroups控制进程cpu配额</a>               //图不错</li>
+<li><a href="https://juejin.cn/post/6844904079076884493" target="_blank" rel="noopener">一文彻底搞懂Linux Cgroup如何限制容器资源</a>      //可以看看</li>
+<li><a href="http://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/%E7%94%B1%E6%B5%85%E5%85%A5%E6%B7%B1%E5%90%83%E9%80%8F%20Docker-%E5%AE%8C/10%20%20%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6%EF%BC%9A%E5%A6%82%E4%BD%95%E9%80%9A%E8%BF%87%20Cgroups%20%E6%9C%BA%E5%88%B6%E5%AE%9E%E7%8E%B0%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6%EF%BC%9F.md" target="_blank" rel="noopener">资源限制：如何通过 Cgroups 机制实现资源限制？</a>       //推荐动手实验</li>
+<li><a href="https://zhuanlan.zhihu.com/p/346050404" target="_blank" rel="noopener">Cgroup中的CPU资源控制</a>       //cgroup各个字段的含义</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/08/24/linux-pagecache/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">linux中的page cache</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/08/23/linux-sharememory/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">linux共享内存和内存零拷贝技术</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

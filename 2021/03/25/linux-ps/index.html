@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux-ps | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="概述ps命令能够给出当前系统中进程的快照。它能捕获系统在某一事件的进程状态。如果你想不断更新查看的这个状态，可以使用top命令。 ps 命令支持的语法风格  UNIX风格: 选项可以组合在一起，并且选项前必须有“-”连字符 BSD风格: 选项可以组合在一起，但是选项前不能有“-”连字符 GNU风格: 选项前有两个“-”连字符                                  参数–">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux-ps">
+<meta property="og:url" content="https://github.com/fafucoder/2021/03/25/linux-ps/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概述ps命令能够给出当前系统中进程的快照。它能捕获系统在某一事件的进程状态。如果你想不断更新查看的这个状态，可以使用top命令。 ps 命令支持的语法风格  UNIX风格: 选项可以组合在一起，并且选项前必须有“-”连字符 BSD风格: 选项可以组合在一起，但是选项前不能有“-”连字符 GNU风格: 选项前有两个“-”连字符                                  参数–">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp1xlxnfb4j31be0u078m.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zdwx9ukj31830u0n6o.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zjd7r6vj31q40u0dp6.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zllvtllj31pm0nuag7.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zoqjad4j31om0tgjwx.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zx2eqygj31x00pi0zs.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp205oxnd6j30v60u0aii.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp206k758dj30us04et9q.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp208117z1j31060amdh6.jpg">
+<meta property="article:published_time" content="2021-03-25T14:50:07.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.350Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gp1xlxnfb4j31be0u078m.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux-ps</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux-ps</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-03-25T14:50:07.000Z" itemprop="datePublished" class="page-time">
+  2021-03-25
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-ps"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux-ps</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-03-25 22:50:07" datetime="2021-03-25T14:50:07.000Z"  itemprop="datePublished">2021-03-25</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>ps命令能够给出当前系统中进程的快照。它能捕获系统在某一事件的进程状态。如果你想不断更新查看的这个状态，可以使用top命令。</p>
+<p>ps 命令支持的语法风格</p>
+<ol>
+<li><strong>UNIX风格</strong>: 选项可以组合在一起，并且选项前必须有“-”连字符</li>
+<li><strong>BSD风格</strong>: 选项可以组合在一起，但是选项前不能有“-”连字符</li>
+<li><strong>GNU风格</strong>: 选项前有两个“-”连字符</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1xlxnfb4j31be0u078m.jpg" alt="example" title="">
+            </p>
+
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><p>–sort: 对结果集进行排序</p>
+<p>-L: 显示指定进程的线程, 例如 ps -L 1234(1234 为pid)</p>
+<p>-o: 控制输入的列数据</p>
+<p>-e: 显示所有进程信息</p>
+<p>-f: 做一个更为完整的输出,通常跟<code>-e</code>参数一块使用</p>
+<p>-u: 以用户为主的进程状态,通常跟-a一块使用</p>
+<p>-a: 显示现行终端机下的所有进程，包括其他用户的进程(这是当前终端的所有进程，通过配合<code>-aux</code>查看所有的进程)</p>
+<p>-x: 显示较完整信息。通常与<code>-a</code>这个参数一起使用</p>
+<p>-A: 列出所有的进程(这是所有进程)</p>
+<p>-C: 根据进程名做筛选, 例如， ps -C nginx</p>
+<p>-j: 以job的格式展示</p>
+<h5 id="ps-aux-与-ps-ef的区别"><a href="#ps-aux-与-ps-ef的区别" class="headerlink" title="ps -aux 与 ps -ef的区别"></a>ps -aux 与 ps -ef的区别</h5><p>输出的格式不一样，ps -aux输出包括进程的cpu跟内存的使用情况，而ps -ef只输出进程的信息(如pid, ppid等)，未输出进程的更详细信息，如果要通过<code>--sort</code>参数做排序的话，通常使用<code>ps -aux</code></p>
+<h5 id="–sort参数详解"><a href="#–sort参数详解" class="headerlink" title="–sort参数详解"></a>–sort参数详解</h5><p>在<code>--sort</code>参数中，<code>-</code>减号是降序，<code>+</code>号表示升序，–sort的排序列跟<code>-o</code> 的列一致，默认是升序格式</p>
+<h5 id="o-格式化的参数"><a href="#o-格式化的参数" class="headerlink" title="-o 格式化的参数"></a>-o 格式化的参数</h5><p>format格式较多，可通过man ps查看，主要的参数有<code>pid, ppid, pgid, cmd(command,agrs), pcpu, pmem, tty</code>等</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zdwx9ukj31830u0n6o.jpg" alt="ps -o" title="">
+            </p>
+
+<h4 id="显示进程树"><a href="#显示进程树" class="headerlink" title="显示进程树"></a>显示进程树</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ejH 或者 ps axjf</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zjd7r6vj31q40u0dp6.jpg" alt="显示进程数" title="">
+            </p>
+
+<h4 id="显示线程"><a href="#显示线程" class="headerlink" title="显示线程"></a>显示线程</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ps -aux | grep container</span><br><span class="line">px -L pid</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zllvtllj31pm0nuag7.jpg" alt="显示线程" title="">
+            </p>
+
+<h4 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -eo pid,ppid,pgid,tty,cmd</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zoqjad4j31om0tgjwx.jpg" alt="格式化输出" title="">
+            </p>
+
+<h4 id="实时输出"><a href="#实时输出" class="headerlink" title="实时输出"></a>实时输出</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch -n 1 'ps -aux --sort -pcpu,-pmem | head -20'</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp1zx2eqygj31x00pi0zs.jpg" alt="实时输出" title="">
+            </p>
+
+<h3 id="pstree"><a href="#pstree" class="headerlink" title="pstree"></a>pstree</h3><p>pstree命令以树状图显示进程间的关系（display a tree of processes）。ps命令可以显示当前正在运行的那些进程的信息，但是对于它们之间的关系却显示得不够清晰。在Linux系统中，系统调用fork可以创建子进程，通过子shell也可以创建子进程，Linux系统中进程之间的关系天生就是一棵树，树的根就是进程PID为1的init进程。</p>
+<h4 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h4><p>-p: 显示pid</p>
+<p>-a: 显示进程参数</p>
+<h5 id="进程树显示进程pid"><a href="#进程树显示进程pid" class="headerlink" title="进程树显示进程pid"></a>进程树显示进程pid</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree -p</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp205oxnd6j30v60u0aii.jpg" alt="pstree -p" title="">
+            </p>
+
+<h5 id="显示指定进程的进程树"><a href="#显示指定进程的进程树" class="headerlink" title="显示指定进程的进程树"></a>显示指定进程的进程树</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree -p 1234</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp206k758dj30us04et9q.jpg" alt="pstree -p" title="">
+            </p>
+
+<h5 id="显示参数"><a href="#显示参数" class="headerlink" title="显示参数"></a>显示参数</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree -ap 1234</span><br></pre></td></tr></table></figure>
+
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gp208117z1j31060amdh6.jpg" alt="pstree -a" title="">
+            </p>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://www.cnblogs.com/huchong/p/10065246.html" target="_blank" rel="noopener">https://www.cnblogs.com/huchong/p/10065246.html</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/93473461" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/93473461</a> </li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/03/25/linux-signal/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">linux中的信号量</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/03/17/docker-dockerfile/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">dockerfile 最佳实践</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>linux top命令 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
+    <meta name="description" content="top命令参数信息在命令top中可以方便的查看系统的cpu和内存信息(如下图所示), 然后你可能不清楚每一个字段代表的含义，现在就一块揭秘top命令中每个字段的含义                                 us：user time，表示 CPU 执行用户进程的时间，包括 nice 时间。通常都是希望用户空间CPU越高越好。 sy：system time，表示 CPU 在内核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux top命令">
+<meta property="og:url" content="https://github.com/fafucoder/2021/09/18/linux-top/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="top命令参数信息在命令top中可以方便的查看系统的cpu和内存信息(如下图所示), 然后你可能不清楚每一个字段代表的含义，现在就一块揭秘top命令中每个字段的含义                                 us：user time，表示 CPU 执行用户进程的时间，包括 nice 时间。通常都是希望用户空间CPU越高越好。 sy：system time，表示 CPU 在内核">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gut64f02osj61h40octfj02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gut6kntlhpj61hc0u0gqf02.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gut7nhnp8kj61hc0u0ac602.jpg">
+<meta property="article:published_time" content="2021-09-18T07:56:48.000Z">
+<meta property="article:modified_time" content="2021-12-17T07:42:48.352Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gut64f02osj61h40octfj02.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">linux top命令</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">linux top命令</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2021-09-18T07:56:48.000Z" itemprop="datePublished" class="page-time">
+  2021-09-18
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linux-top"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">linux top命令</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2021-09-18 15:56:48" datetime="2021-09-18T07:56:48.000Z"  itemprop="datePublished">2021-09-18</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/linux/">linux</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="top命令参数信息"><a href="#top命令参数信息" class="headerlink" title="top命令参数信息"></a>top命令参数信息</h3><p>在命令top中可以方便的查看系统的cpu和内存信息(如下图所示), 然后你可能不清楚每一个字段代表的含义，现在就一块揭秘top命令中每个字段的含义</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gut64f02osj61h40octfj02.jpg" alt="top command" title="">
+            </p>
+
+<p><code>us</code>：user time，表示 CPU 执行用户进程的时间，包括 nice 时间。通常都是希望用户空间CPU越高越好。</p>
+<p><code>sy</code>：system time，表示 CPU 在内核运行的时间，包括 IRQ 和 softirq。系统 CPU 占用越高，表明系统某部分存在瓶颈。通常这个值越低越好。</p>
+<p><code>ni</code>：nice time，具有优先级的用户进程执行时占用的 CPU 利用率百分比。</p>
+<p><code>id</code>：idle time，表示系统处于空闲期，等待进程运行。</p>
+<p><code>wa</code>：waiting time，表示 CPU 在等待 IO 操作完成所花费的时间。系统不应该花费大量的时间来等待 IO 操作，否则就说明 IO 存在瓶颈。</p>
+<p><code>hi</code>：hard IRQ time，表示系统处理硬中断所花费的时间。</p>
+<p><code>si</code>：soft IRQ time，表示系统处理软中断所花费的时间。</p>
+<p><code>st</code>：steal time，被强制等待（involuntary wait）虚拟 CPU 的时间，此时 Hypervisor 在为另一个虚拟处理器服务</p>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gut6kntlhpj61hc0u0gqf02.jpg" alt="top cpu command" title="">
+            </p>
+
+<h4 id="cpu-平均负载Load-Average"><a href="#cpu-平均负载Load-Average" class="headerlink" title="cpu 平均负载Load Average"></a>cpu 平均负载Load Average</h4><p>​    在上面的top命令中跟cpu相关的信息还有一个叫load average, load average这一列中的三个数值分别表示过去一分钟，五分钟，十五分钟这个节点上的load average。那么到底啥是load average呢?</p>
+<p>​    这里的load average表示对CPU资源需求的度量(说的很好，但是等于放屁~)，举个例子你可能就懂了，对于一个单个 CPU 的系统，如果在 1 分钟的时间里，处理器上始终有一个进程在运行，同时操作系统的进程可运行队列中始终都有 9 个进程在等待获取 CPU 资源。那么对于这 1 分钟的时间来说，系统的”load average”就是 1+9=10(这个定义对绝大部分的Unix 系统都适用)。</p>
+<p>总结一句话就是: load average 等于单位时间内正在运行的进程+可运行队列的进程(注意，<strong>这里说的是unix系统</strong>)，因此：</p>
+<ul>
+<li>第一，不论计算机 CPU 是空闲还是满负载，Load Average 都是 Linux 进程调度器中<strong>可运行队列（Running Queue）里的一段时间的平均进程数目。</strong></li>
+<li>第二，计算机上的 CPU 还有空闲的情况下，CPU Usage 可以直接反映到”load average”上，什么是 CPU 还有空闲呢？具体来说就是可运行队列中的进程数目小于 CPU个数，这种情况下，单位时间进程 CPU Usage 相加的平均值应该就是”load average”的值。</li>
+<li>第三，计算机上的 CPU 满负载的情况下，计算机上的 CPU 已经是满负载了，同时还有更多的进程在排队需要 CPU 资源。这时”load average”就不能和 CPU Usage 等同了。比如对于单个 CPU 的系统，CPU Usage 最大只是有 100%，也就 1 个 CPU；而”loadaverage”的值可以远远大于 1，因为”load average”看的是操作系统中可运行队列中进程的个数。</li>
+</ul>
+<p><strong>对于linux系统来说： load average = 可运行队列的进程 + 处于TASK_UNINTERRUPTIBLE状态的进程(D 状态进程)</strong></p>
+<blockquote>
+<p>TASK_UNINTERRUPTIBLE 是 Linux 进程状态的一种，是进程为等待某个系统资源而进入了睡眠的状态，并且这种睡眠的状态是不能被信号打断的。俗称D状态进程</p>
+<p>因此，如果发现系统的load average很高，而CPU还是处于空闲状态，说明有很多进程处于阻塞状态，这时候得检查下代码写的是否有问题啦~(通过 ps 命令可以查阅D状态进程的信息)</p>
+</blockquote>
+<p class="img-lightbox">
+                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gut7nhnp8kj61hc0u0ac602.jpg" alt="load average" title="">
+            </p>
+
+<h3 id="top命令原理"><a href="#top命令原理" class="headerlink" title="top命令原理"></a>top命令原理</h3><p>分析了top命令中cpu字段的含义，你肯定还有疑问top命令中的数值是怎么计算出来的，</p>
+<h3 id="容器中如何查看cpu信息"><a href="#容器中如何查看cpu信息" class="headerlink" title="容器中如何查看cpu信息"></a>容器中如何查看cpu信息</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://github.com/silenceshell/topic">https://github.com/silenceshell/topic</a>  // 容器中正确展示top信息</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2021/10/12/node-require/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">nodejs中require跟import的区别</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2021/09/13/kubernetes-pause/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">kubernetes pause容器解析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2021</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
