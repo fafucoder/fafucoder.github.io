@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://github.com/fafucoder/"/>
-  <updated>2021-12-26T08:13:43.255Z</updated>
+  <updated>2022-01-06T15:10:25.373Z</updated>
   <id>https://github.com/fafucoder/</id>
   
   <author>
@@ -17,11 +17,37 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>内容分发网络(CDN)的相关技术</title>
+    <title>DNS的相关知识</title>
+    <link href="https://github.com/fafucoder/2022/01/06/linux-dns/"/>
+    <id>https://github.com/fafucoder/2022/01/06/linux-dns/</id>
+    <published>2022-01-06T15:03:56.000Z</published>
+    <updated>2022-01-06T15:10:25.373Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="什么DNS解析系统"><a href="#什么DNS解析系统" class="headerlink" title="什么DNS解析系统"></a>什么DNS解析系统</h3><h3 id="相关名词概念"><a href="#相关名词概念" class="headerlink" title="相关名词概念"></a>相关名词概念</h3><h3 id="什么是EDNS"><a href="#什么是EDNS" class="headerlink" title="什么是EDNS"></a>什么是EDNS</h3><h3 id="搭建DNS服务器"><a href="#搭建DNS服务器" class="headerlink" title="搭建DNS服务器"></a>搭建DNS服务器</h3><h3 id="相关文档"><a href="#相关文档" class="headerlink" title="相关文档"></a>相关文档</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;什么DNS解析系统&quot;&gt;&lt;a href=&quot;#什么DNS解析系统&quot; class=&quot;headerlink&quot; title=&quot;什么DNS解析系统&quot;&gt;&lt;/a&gt;什么DNS解析系统&lt;/h3&gt;&lt;h3 id=&quot;相关名词概念&quot;&gt;&lt;a href=&quot;#相关名词概念&quot; class=&quot;head
+      
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
+    
+    
+      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>内容分发网络(CDN)的技术和原理</title>
     <link href="https://github.com/fafucoder/2021/12/26/linux-cdn/"/>
     <id>https://github.com/fafucoder/2021/12/26/linux-cdn/</id>
     <published>2021-12-26T08:07:12.000Z</published>
-    <updated>2021-12-26T08:13:43.255Z</updated>
+    <updated>2022-01-06T15:03:18.098Z</updated>
     
     <content type="html"><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><blockquote><p>本文大部分内容都来源于 <a href="http://product.dangdang.com/605644064.html" target="_blank" rel="noopener">内容分发网络原理与实践</a> 这本书，这本书全面的阐述了CDN的方方面面，感兴趣的可以仔细阅读原文～</p></blockquote><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3>]]></content>
     
@@ -48,9 +74,9 @@
     <link href="https://github.com/fafucoder/2021/12/26/kubernetes-dns1/"/>
     <id>https://github.com/fafucoder/2021/12/26/kubernetes-dns1/</id>
     <published>2021-12-26T03:27:15.000Z</published>
-    <updated>2021-12-26T03:36:34.424Z</updated>
+    <updated>2022-01-17T11:37:33.935Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>在<a href="https://fafucoder.github.io/2020/07/08/kubernetes-dns/" target="_blank" rel="noopener">kubernetes dns解析</a>篇章中讲述了DNS的基本概念，这个篇章让我们深入的了解下DNS协议，以及kubernetes的DNS解析插件coreDNS的相关知识</p><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/lovezbs/p/13701185.html" target="_blank" rel="noopener">https://www.cnblogs.com/lovezbs/p/13701185.html</a></li><li></li></ul>]]></content>
+    <content type="html"><![CDATA[<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>在<a href="https://fafucoder.github.io/2020/07/08/kubernetes-dns/" target="_blank" rel="noopener">kubernetes dns解析</a>篇章中讲述了DNS的基本概念，这个篇章让我们深入的了解下DNS协议，以及kubernetes的DNS解析插件coreDNS的相关知识</p><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/lovezbs/p/13701185.html" target="_blank" rel="noopener">https://www.cnblogs.com/lovezbs/p/13701185.html</a></li></ul>]]></content>
     
     <summary type="html">
     
@@ -503,32 +529,6 @@
       
       
         &lt;h3 id=&quot;进程间通信-IPC&quot;&gt;&lt;a href=&quot;#进程间通信-IPC&quot; class=&quot;headerlink&quot; title=&quot;进程间通信(IPC)&quot;&gt;&lt;/a&gt;进程间通信(IPC)&lt;/h3&gt;&lt;p&gt;每个进程各自有不同的用户地址空间，任何一个进程的全局变量在另一个进程中都看不到，
-      
-    
-    </summary>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用LVM实现linux扩容</title>
-    <link href="https://github.com/fafucoder/2021/08/15/linux-lvm/"/>
-    <id>https://github.com/fafucoder/2021/08/15/linux-lvm/</id>
-    <published>2021-08-15T14:06:47.000Z</published>
-    <updated>2021-12-27T06:23:19.108Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>​    玩过虚拟机的同学肯定遇到过磁盘容量100%而无法安装新的软件这一问题(因为磁盘分配不合理或者磁盘挂载的盘大小太小了导致的)， 磁盘空间不足的通常方法就是挂在一块新的盘到虚拟机，然后把占用磁盘空间多的目录挂载到这块新的盘上去(我之前就都是这么干的^<em>^), 或者使用LVM来实现磁盘的扩容(使用LVM扩容才是正解 _^</em>  ), 下面就来了解下LVM的知识，已经使用lvm如何实现磁盘扩容吧。</p><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.junmajinlong.com/linux/lvm/" target="_blank" rel="noopener">使用LVM</a>   //骏马金龙老师的文章，推荐阅读</li><li><a href="https://www.cnblogs.com/tiantianhappy/p/10143663.html" target="_blank" rel="noopener">https://www.cnblogs.com/tiantianhappy/p/10143663.html</a> centos扩容</li><li><a href="https://aurthurxlc.github.io/Aurthur-2017/Centos-7-extend-lvm-volume.html" target="_blank" rel="noopener">https://aurthurxlc.github.io/Aurthur-2017/Centos-7-extend-lvm-volume.html</a>   扩容</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h3&gt;&lt;p&gt;​    玩过虚拟机的同学肯定遇到过磁盘容量100%而无法安装新的软件这一问题(因为磁盘分配不合理或者磁盘挂载的盘大小太小了导致的)， 磁盘
       
     
     </summary>
