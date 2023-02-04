@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://github.com/fafucoder/"/>
-  <updated>2022-01-06T15:10:25.373Z</updated>
+  <updated>2022-02-08T02:59:01.444Z</updated>
   <id>https://github.com/fafucoder/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>golang中的goroutine死循环</title>
+    <link href="https://github.com/fafucoder/2022/02/08/golang-dead-goroutine/"/>
+    <id>https://github.com/fafucoder/2022/02/08/golang-dead-goroutine/</id>
+    <published>2022-02-08T02:52:47.000Z</published>
+    <updated>2022-02-08T02:59:01.444Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://juejin.cn/post/6969802234179616798" target="_blank" rel="noopener">https://juejin.cn/post/6969802234179616798</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;参考文档&quot;&gt;&lt;a href=&quot;#参考文档&quot; class=&quot;headerlink&quot; title=&quot;参考文档&quot;&gt;&lt;/a&gt;参考文档&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://juejin.cn/post/6969802234179616798&quot; tar
+      
+    
+    </summary>
+    
+    
+      <category term="golang" scheme="https://github.com/fafucoder/categories/golang/"/>
+    
+    
+      <category term="golang" scheme="https://github.com/fafucoder/tags/golang/"/>
+    
+  </entry>
   
   <entry>
     <title>DNS的相关知识</title>
@@ -333,7 +360,7 @@
     <link href="https://github.com/fafucoder/2021/10/12/node-package-json/"/>
     <id>https://github.com/fafucoder/2021/10/12/node-package-json/</id>
     <published>2021-10-12T15:42:34.000Z</published>
-    <updated>2021-12-17T07:42:48.353Z</updated>
+    <updated>2023-01-14T07:39:00.854Z</updated>
     
     <content type="html"><![CDATA[<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://www.cnblogs.com/luowen075/p/10361211.html" target="_blank" rel="noopener">https://www.cnblogs.com/luowen075/p/10361211.html</a></li><li><a href="https://zhuanlan.zhihu.com/p/212832506" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/212832506</a></li><li><a href="https://docs.npmjs.com/cli/v7/configuring-npm/package-json#browser" target="_blank" rel="noopener">https://docs.npmjs.com/cli/v7/configuring-npm/package-json#browser</a></li></ul>]]></content>
     
@@ -503,32 +530,6 @@
       
       
         &lt;h3 id=&quot;Cgroup简述&quot;&gt;&lt;a href=&quot;#Cgroup简述&quot; class=&quot;headerlink&quot; title=&quot;Cgroup简述&quot;&gt;&lt;/a&gt;Cgroup简述&lt;/h3&gt;&lt;p&gt;​        在Docker中，容器使用Linux namespace技术进行资源隔离，
-      
-    
-    </summary>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/categories/linux/"/>
-    
-    
-      <category term="linux" scheme="https://github.com/fafucoder/tags/linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>linux共享内存和内存零拷贝技术</title>
-    <link href="https://github.com/fafucoder/2021/08/23/linux-sharememory/"/>
-    <id>https://github.com/fafucoder/2021/08/23/linux-sharememory/</id>
-    <published>2021-08-23T13:56:16.000Z</published>
-    <updated>2021-12-17T07:42:48.351Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="进程间通信-IPC"><a href="#进程间通信-IPC" class="headerlink" title="进程间通信(IPC)"></a>进程间通信(IPC)</h3><p>每个进程各自有不同的用户地址空间，任何一个进程的全局变量在另一个进程中都看不到，所以进程之间要交换数据必须通过内核，在内核中开辟一块缓冲区，进程1把数据从用户空间拷到内核缓冲区，进程2再从内核缓冲区把数据读走，内核提供的这种机制称为<strong>进程间通信（IPC，InterProcess Communication）</strong></p><p class="img-lightbox">                <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gw3i6es2oqj30z80esq37.jpg" alt="进程间通信" title="">            </p><p>常见的进程间通信的方式有如下：</p><ol><li><strong>管道/匿名管道(pipe)</strong>：管道是一种半双工的通信方式，数据只能单向流动，而且只能在具有亲缘关系的进程间使用。进程的亲缘关系通常是指父子进程关系。例如 <code>ls -l | grep string</code>就是一个管道</li><li><strong>信号量(signal)</strong>： 信号是一种比较复杂的通信方式，用于通知接收进程某个事件已经发生。</li><li><strong>套接字(socket)</strong>: 套接字也是一种进程间通信机制，与其他通信机制不同的是，它可用于不同主机的进程通信。</li><li><strong>消息队列(MessageQueue)</strong>: 消息队列是由消息的链表，存放在内核中并由消息队列标识符标识。消息队列克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点。</li><li><strong>共享内存(shareMemory)</strong>：共享内存就是映射一段能被其他进程所访问的内存，这段共享内存由一个进程创建，但多个进程都可以访问。共享内存是最快的 IPC 方式。</li></ol><h3 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h3><p>共享内存就是允许两个或多个进程共享一定的存储区。就如同 malloc() 函数向不同进程返回了指向同一个物理内存区域的指针。当一个进程改变了这块地址中的内容的时候，其它进程都会察觉到这个更改。因为数据不需要在客户机和服务器端之间复制，数据直接写到内存，不用若干次数据拷贝，所以这是最快的一种IPC(进程间通信)。</p><p class="img-lightbox">                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw3ij1hmmgj31sy0q0jt5.jpg" alt="共享内存" title="">            </p><p>共享内存是IPC通信当中<strong>传输速度最快的通信方式没有之一</strong>，但是共享内存并未提供同步机制，也就是说，在一个服务进程结束对共享内存的写操作之前，并没有自动机制可以阻止另一个进程（客户进程）开始对它进行读取。 因此常用会通过<strong>信号量</strong>来实现对共享内存同步访问控制。</p><h4 id="常见的共享内存函数"><a href="#常见的共享内存函数" class="headerlink" title="常见的共享内存函数"></a>常见的共享内存函数</h4><ol><li>创建共享内存——&gt;shmget() 函数</li><li>操作共享内存———&gt;shmctl()函数</li><li>挂接操作———&gt;shmat()函数</li><li>分离操作———&gt;shmdt()函数 </li></ol><h3 id="内存零拷贝"><a href="#内存零拷贝" class="headerlink" title="内存零拷贝"></a>内存零拷贝</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul><li><a href="https://mp.weixin.qq.com/s/GMCi0tA-syEliTYzjrv6Mw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/GMCi0tA-syEliTYzjrv6Mw</a>     // 分布式实验室</li><li><a href="https://www.cnblogs.com/wuyepeng/p/9748889.html" target="_blank" rel="noopener">https://www.cnblogs.com/wuyepeng/p/9748889.html</a>     // Linux下进程间通信方式——共享内存</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;进程间通信-IPC&quot;&gt;&lt;a href=&quot;#进程间通信-IPC&quot; class=&quot;headerlink&quot; title=&quot;进程间通信(IPC)&quot;&gt;&lt;/a&gt;进程间通信(IPC)&lt;/h3&gt;&lt;p&gt;每个进程各自有不同的用户地址空间，任何一个进程的全局变量在另一个进程中都看不到，
       
     
     </summary>
