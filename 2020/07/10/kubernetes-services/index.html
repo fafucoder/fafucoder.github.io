@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="概念service 是一组具有相同 label pod 集合的抽象，集群内外的各个服务可以通过 service 进行互相通信，当创建一个 service 对象时也会对应创建一个 endpoint 对象，endpoint 是用来做容器发现的，service 只是将多个 pod 进行关联，实际的路由转发都是由 kubernetes  中的 kube-proxy 组件来实现。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtjwpm9yj314i0tete8.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtjwpm9yj314i0tete8.jpg">
 <meta property="og:image" content="https://ask.qcloudimg.com/http-save/474918/nlnaj3ikh6.png?imageView2/2/w/1620">
 <meta property="og:image" content="https://ask.qcloudimg.com/http-save/474918/qbj7uzictn.png?imageView2/2/w/1620">
 <meta property="og:image" content="https://ask.qcloudimg.com/http-save/474918/l0wvn8je7c.png?imageView2/2/w/1620">
 <meta property="og:image" content="https://ask.qcloudimg.com/http-save/474918/qaq773e8bt.png?imageView2/2/w/1620">
 <meta property="article:published_time" content="2020-07-10T07:00:34.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.339Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.744Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtjwpm9yj314i0tete8.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtjwpm9yj314i0tete8.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -180,7 +180,7 @@
         <div class="post-content" id="post-content" itemprop="postContent">
             <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>service 是一组具有相同 label pod 集合的抽象，集群内外的各个服务可以通过 service 进行互相通信，当创建一个 service 对象时也会对应创建一个 endpoint 对象，endpoint 是用来做容器发现的，service 只是将多个 pod 进行关联，实际的路由转发都是由 kubernetes  中的 kube-proxy 组件来实现。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtjwpm9yj314i0tete8.jpg" alt="service原理" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtjwpm9yj314i0tete8.jpg" alt="service原理" title="">
             </p>
 
 <p>endpoints controller 是负责生成和维护所有 endpoints 对象的控制器，监听 service 和对应 pod 的变化，更新对应 service 的 endpoints 对象。当用户创建 service 后 endpoints controller 会监听 pod 的状态，当 pod 处于 running 且准备就绪时，endpoints controller 会将 pod ip 记录到 endpoints 对象中，因此，service 的容器发现是通过 endpoints 来实现的。而 kube-proxy 会监听 service 和 endpoints 的更新并调用其代理模块在主机上刷新路由转发规则。</p>

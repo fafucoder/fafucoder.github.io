@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="概述​    Namespace是对全局系统资源的一种封装隔离，使得处于不同namespace的进程拥有独立的全局系统资源，改变一个namespace中的系统资源只会影响当前namespace里的进程，对其他namespace中的进程没有影响。 linux内核支持的namespace如下所示： 12345678名称        宏定义             隔离内容">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNgy1gslihlpatvj31gm0s2jyw.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtu7oa7m1hj613s0500tb02.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtu8axwk5vj61so08iwh202.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNgy1gslhd4myd7j31g00o40wh.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNgy1gslhmuhvacj31k60tojv7.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNgy1gslihlpatvj31gm0s2jyw.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtu7oa7m1hj613s0500tb02.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtu8axwk5vj61so08iwh202.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNgy1gslhd4myd7j31g00o40wh.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNgy1gslhmuhvacj31k60tojv7.jpg">
 <meta property="article:published_time" content="2020-05-09T14:20:30.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.343Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.754Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNgy1gslihlpatvj31gm0s2jyw.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNgy1gslihlpatvj31gm0s2jyw.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -220,7 +220,7 @@
 
 <p>通过pstree 查看进程树 <code>sshd(28352)---bash(28375)---bash(4146)-+-grep(4434)</code></p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gslihlpatvj31gm0s2jyw.jpg" alt="pstree" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNgy1gslihlpatvj31gm0s2jyw.jpg" alt="pstree" title="">
             </p>
 
 <p>原理: Bash进程(28375)运行在当前namespace中，它将fork一个新进程来运行unshare程序，unshare程序加载完成后，将创建一个新的uts namespace，unshare进程自身将加入到这个uts namespace中，unshare进程内部再exec加载/bin/bash，于是unshare进程被替换为/bin/bash进程，/bin/bash进程也将运行在uts namespace中</p>
@@ -240,7 +240,7 @@
 
 <p>运行截图如下所示， unshare进程会在创建新的namespace后会被改namespace中的第一个进程给替换掉。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtu7oa7m1hj613s0500tb02.jpg" alt="进程关系" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtu7oa7m1hj613s0500tb02.jpg" alt="进程关系" title="">
             </p>
 
 <p>创建新的pid namespace方式：</p>
@@ -248,7 +248,7 @@
 
 <p>使用–fork的操作的结果是(如下图): unshare进程被保留，且保留在原来的pid namespace中，而不是加入到新的pid namespace中。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtu8axwk5vj61so08iwh202.jpg" alt="pid" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtu8axwk5vj61so08iwh202.jpg" alt="pid" title="">
             </p>
 
 <h4 id="pid-namespace-嵌套"><a href="#pid-namespace-嵌套" class="headerlink" title="pid namespace 嵌套"></a>pid namespace 嵌套</h4><p>pid namespace可以存在嵌套关系。所有的子孙pid namespace中的进程信息都会保存在父级以及祖先级namespace中，只不过在不同嵌套层级中，同一个进程对应的PID不同。</p>
@@ -277,12 +277,12 @@
 </blockquote>
 <p>unshare命名就是unshare系统调用的实现，下面将通过unshare命令演示namespace的隔离技术</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gslhd4myd7j31g00o40wh.jpg" alt="unshare 命令" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNgy1gslhd4myd7j31g00o40wh.jpg" alt="unshare 命令" title="">
             </p>
 
 <h3 id="lsns-命令"><a href="#lsns-命令" class="headerlink" title="lsns 命令"></a>lsns 命令</h3><p>lsns命令列举出当前已经创建的namespace</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gslhmuhvacj31k60tojv7.jpg" alt="lsns" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNgy1gslhmuhvacj31k60tojv7.jpg" alt="lsns" title="">
             </p>
 
 <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>

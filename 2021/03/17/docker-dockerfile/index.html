@@ -29,13 +29,13 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="Dockerfile概述1、Docker build 原理概述Docker 可以从 Dockerfile 中读取指令自动构建镜像，Dockerfile是一个包含构建指定镜像所有命令的文本文件。Docker坚持使用特定的格式并且使用特定的命令。你可以在 Dockerfile参考 页面学习基本知识。 Docker 镜像由只读层组成，每个层代表一个 Dockerfile 指令。这些层是堆叠的，每一层都是">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt2peemzakj312w0u0jv1.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gt2peemzakj312w0u0jv1.jpg">
 <meta property="article:published_time" content="2021-03-17T15:19:21.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.323Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.716Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="docker">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gt2peemzakj312w0u0jv1.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gt2peemzakj312w0u0jv1.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -187,7 +187,7 @@
 </ul>
 <p>当运行一个镜像并生成一个容器时，Docker会在底层的顶部添加一个新的<em>可写层</em>（“容器层”）。对正在运行的容器所做的所有更改，例如写入新文件、修改现有文件和删除文件，都将写入此可写容器层。有关镜像层（以及 Docker 如何构建和存储镜像）的更多信息，请参阅 <a href="https://docs.docker.com/storage/storagedriver/" target="_blank" rel="noopener">关于存储驱动程序</a>。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gt2peemzakj312w0u0jv1.jpg" alt="dokerfile" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gt2peemzakj312w0u0jv1.jpg" alt="dokerfile" title="">
             </p>
 
 <h4 id="2、-了解构建上下文"><a href="#2、-了解构建上下文" class="headerlink" title="2、 了解构建上下文"></a>2、 了解构建上下文</h4><p>当发出<code>docker build</code>命令时，当前目录称为构建上下文，默认情况下，Dockerfile位于当前目录中(构建上下文中), 但是可以通过<code>-f</code>参数执行Dockerfile的位置。无论<code>Dockerfile</code>实际位于何处，当前目录中文件和目录的所有内容都将作为构建上下文发送到 Docker 守护进程。</p>

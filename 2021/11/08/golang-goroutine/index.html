@@ -29,18 +29,18 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="概述什么是goroutine? Goroutine 可以看作对 thread 加的一层抽象，它更轻量级，可以单独执行。 goroutine(协程) 跟 线程的区别goroutine跟线程的区别可以从内存消耗、创建与销毀、切换三个维度说明  内存创建： 创建一个 goroutine 的栈内存消耗为 2 KB，实际运行过程中，如果栈空间不够用，会自动进行扩容。创建一个 thread 则需要消耗 1 M">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwagya06l0j312o0swmyq.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwah8kn88jj30y40g0dhm.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwah30rd4dj312u0mm40a.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwah99rsymj30ya0i8goh.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwahbnuyfdj30xy0ho0vb.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwahdhtlrhj30yq0jmjuc.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwagya06l0j312o0swmyq.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwah8kn88jj30y40g0dhm.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwah30rd4dj312u0mm40a.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwah99rsymj30ya0i8goh.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwahbnuyfdj30xy0ho0vb.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwahdhtlrhj30yq0jmjuc.jpg">
 <meta property="article:published_time" content="2021-11-08T14:32:55.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.326Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.724Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwagya06l0j312o0swmyq.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwagya06l0j312o0swmyq.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -188,7 +188,7 @@
 </ul>
 <h3 id="G-P-M模型概述"><a href="#G-P-M模型概述" class="headerlink" title="G-P-M模型概述"></a>G-P-M模型概述</h3><p>在 Go 语言中，每一个 goroutine 是一个独立的执行单元，相较于每个 OS 线程固定分配 2M 内存的模式，goroutine 的栈采取了<strong>动态扩容</strong>方式， 初始时仅为<strong>2KB</strong>，随着任务执行按需增长，最大可达 1GB（64 位机器最大是 1G，32 位机器最大是 256M），且完全由 golang 自己的调度器 Go Scheduler 来调度。此外，GC 还会周期性地将不再使用的内存回收，收缩栈空间。 因此，Go 程序可以同时并发成千上万个 goroutine 是得益于它强劲的调度器和高效的内存模型。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwagya06l0j312o0swmyq.jpg" alt="G-P-M模型" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwagya06l0j312o0swmyq.jpg" alt="G-P-M模型" title="">
             </p>
 
 <p>将 goroutines 调度到线程上执行，仅仅是 runtime 层面的一个概念，在操作系统之上的层面，在golang中有三个基础的结构体来实现 goroutines 的调度。g，m，p， 俗称GPM模型：</p>
@@ -202,7 +202,7 @@
 </ul>
 <p>除了GPM外，还有两个比较重要的组件： 全局可运行队列（GRQ）和本地可运行队列（LRQ）。 LRQ 存储本地（也就是具体的 P）的可运行 goroutine，GRQ 存储全局的可运行 goroutine，这些 goroutine 还没有分配到具体的 P。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwah8kn88jj30y40g0dhm.jpg" alt="LRQ" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwah8kn88jj30y40g0dhm.jpg" alt="LRQ" title="">
             </p>
 
 <h4 id="调度过程"><a href="#调度过程" class="headerlink" title="调度过程"></a>调度过程</h4><ol>
@@ -211,7 +211,7 @@
 <li>执行调度算法：当 M 执行完了当前 P 的 Local 队列里的所有 G 后，P 也不会就这么在那划水啥都不干，它会先尝试从 Global 队列寻找 G 来执行，如果 Global 队列为空，它会随机挑选另外一个 P，从它的队列里中拿走一半的 G 到自己的队列中执行。</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwah30rd4dj312u0mm40a.jpg" alt="G-P-M调度模型" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwah30rd4dj312u0mm40a.jpg" alt="G-P-M调度模型" title="">
             </p>
 
 <h4 id="调度时机"><a href="#调度时机" class="headerlink" title="调度时机"></a>调度时机</h4><p>在四种情形下，goroutine 可能会发生调度，但也并不一定会发生，只是说 Go scheduler 有机会进行调度。</p>
@@ -224,16 +224,16 @@
 <h4 id="同步-异步系统调用"><a href="#同步-异步系统调用" class="headerlink" title="同步/异步系统调用"></a>同步/异步系统调用</h4><p>当 G 需要进行系统调用时，根据调用的类型，它所依附的 M 有两种情况：<code>同步</code>和<code>异步</code>。</p>
 <ul>
 <li><p>对于同步的情况，M 会被阻塞，进而从 P 上调度下来，P 可不养闲人，G 仍然依附于 M。之后，一个新的 M 会被调用到 P 上，接着执行 P 的 LRQ 里嗷嗷待哺的 G 们。一旦系统调用完成，G 还会加入到 P 的 LRQ 里，M 则会被“雪藏”，待到需要时再“放”出来。</p>
-<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gwah99rsymj30ya0i8goh.jpg" alt="异步调用"></p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwah99rsymj30ya0i8goh.jpg" alt="异步调用"></p>
 </li>
 </ul>
 <ul>
 <li><p>对于异步的情况，M 不会被阻塞，G 的异步请求会被“代理人” network poller 接手，G 也会被绑定到 network poller，等到系统调用结束，G 才会重新回到 P 上。M 由于没被阻塞，它因此可以继续执行 LRQ 里的其他 G。</p>
-<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gwahbnuyfdj30xy0ho0vb.jpg" alt="异步"></p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwahbnuyfdj30xy0ho0vb.jpg" alt="异步"></p>
 </li>
 </ul>
 <h3 id="goroutine状态流转"><a href="#goroutine状态流转" class="headerlink" title="goroutine状态流转"></a>goroutine状态流转</h3><p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwahdhtlrhj30yq0jmjuc.jpg" alt="状态流转" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwahdhtlrhj30yq0jmjuc.jpg" alt="状态流转" title="">
             </p>
 
 <h3 id="GPM结构"><a href="#GPM结构" class="headerlink" title="GPM结构"></a>GPM结构</h3><h5 id="G-结构"><a href="#G-结构" class="headerlink" title="G 结构"></a>G 结构</h5><p>g是goroutine的缩写，是goroutine的控制结构，是对goroutine的抽象。看下它内部主要的一些结构：</p>

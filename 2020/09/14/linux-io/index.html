@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="什么是文件描述符FD 阅读文件描述符之前，推荐先看 之前进程，线程，协程的文章  Linux 系统中，把一切都看做是文件，当进程打开现有文件或创建新文件时，内核向进程返回一个文件描述符，文件描述符就是内核为了高效管理已被打开的文件所创建的索引，用来指向被打开的文件，所有执行I&#x2F;O操作的系统调用都会通过文件描述符。文件描述符在形式上是一个非负整数。实际上，它是一个索引值，指向内核为每一个进程所维护的">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwp4eurb76j319y0rwmzj.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwp4dxupoej30u00gat9y.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwp4phqrxcj30xu0gygnx.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwp4rcsj1bj314y0lg40p.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwp608bb6pj30u00uh0ub.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4eurb76j319y0rwmzj.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4dxupoej30u00gat9y.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4phqrxcj30xu0gygnx.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4rcsj1bj314y0lg40p.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp608bb6pj30u00uh0ub.jpg">
 <meta property="article:published_time" content="2020-09-14T12:22:13.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.342Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.750Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwp4eurb76j319y0rwmzj.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4eurb76j319y0rwmzj.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -193,22 +193,22 @@
 <h4 id="文件描述符与文件的详细关系"><a href="#文件描述符与文件的详细关系" class="headerlink" title="文件描述符与文件的详细关系"></a>文件描述符与文件的详细关系</h4><p>files是一个文件指针数组。一般来说，一个进程会从files[0]读取输入，将输出写入files[1]，将错误信息写入files[2]。</p>
 <p>每个进程被创建时，files的前三位被填入默认值，分别指向标准输入流、标准输出流、标准错误流。我们常说的「文件描述符」就是指这个文件指针数组的索引 ，所以程序的文件描述符默认情况下 0 是输入，1 是输出，2 是错误。( 此处你应该查看<a href="https://fafucoder.github.io/2021/03/07/linux-std/" target="_blank" rel="noopener">这篇文章</a> )</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwp4eurb76j319y0rwmzj.jpg" alt="fd" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4eurb76j319y0rwmzj.jpg" alt="fd" title="">
             </p>
 
 <p>如果我们写的程序需要其他资源，比如打开一个文件进行读写，这也很简单，进行系统调用，让内核把文件打开，这个文件就会被放到files的第 4 个位置，对应文件描述符 3：</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwp4dxupoej30u00gat9y.jpg" alt="文件描述符3" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4dxupoej30u00gat9y.jpg" alt="文件描述符3" title="">
             </p>
 
 <p>在操作系统中，为了维护文件描述符，建立了三个表(三个数据结构), 分别为<code>进程级的文件描述符表</code>, <code>系统级的文件描述符表</code>, <code>文件系统的i-node表</code>，不同表的记录内容如下所示：</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwp4phqrxcj30xu0gygnx.jpg" alt="文件描述符" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4phqrxcj30xu0gygnx.jpg" alt="文件描述符" title="">
             </p>
 
 <p>下图展示的是文件描述符与打开的文件和i-node之间的关系:</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwp4rcsj1bj314y0lg40p.jpg" alt="i-node关系" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4rcsj1bj314y0lg40p.jpg" alt="i-node关系" title="">
             </p>
 
 <ol>
@@ -233,7 +233,7 @@
 <p>这里我们看到 fd 7、8 都是一个 socket fd，名字为 socket:[18892]、socket:[18893], 名字中的socket 标识这是一个 socket 类型的 fd， 数字[18892] 表示这个是一个 inode 号，能够唯一标识本机的一条网络连接。</p>
 <p>套接字由 socket() 系统调用创建，但是套接字其实可分为两种类型，监听套接字和普通套接字。而监听套接字是由 listen() 把 socket fd 转化而成。listenfd称为监听套接字（listening socket）描述符，它的生命周期与服务器的生命周期一致且一般一个服务器保有一个listenfd。connfd是已连接套接字（connected socket）描述符，一个连接对应一个connfd，当连接关闭时connfd也会被关闭。值得一提的是connfd是在完成TCP三次握手后被创建。(总结起来就是listenfd是内核维护的，connfd是应用程序自己维护的)</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwp608bb6pj30u00uh0ub.jpg" alt="socket" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp608bb6pj30u00uh0ub.jpg" alt="socket" title="">
             </p>
 
 <h3 id="进程堵塞-概念"><a href="#进程堵塞-概念" class="headerlink" title="进程堵塞 概念"></a>进程堵塞 概念</h3><h3 id="多路复用解决的问题"><a href="#多路复用解决的问题" class="headerlink" title="多路复用解决的问题"></a>多路复用解决的问题</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>

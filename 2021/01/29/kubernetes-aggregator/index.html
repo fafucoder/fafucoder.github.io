@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="概念​    kubernetes的 Aggregated API是什么呢？API Aggregation 允许k8s的开发人员编写一个自己的服务，可以把这个服务注册到k8s的api里面，这样，就像k8s自己的api一样，你的服务只要运行在k8s集群里面，k8s 的Aggregate通过service名称就可以转发到你写的service里面去了。(另外一种扩展 Kubernetes API 的方法">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86kq5rumj319y0c4my6.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86o0k0kqj314q0bwdh7.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86p5w6erj315g0b6t9x.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn85pg2d84j316u070788.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn85u1y817j316406atc7.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn86kq5rumj319y0c4my6.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn86o0k0kqj314q0bwdh7.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn86p5w6erj315g0b6t9x.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn85pg2d84j316u070788.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn85u1y817j316406atc7.jpg">
 <meta property="article:published_time" content="2021-01-29T11:11:37.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.333Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.728Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gn86kq5rumj319y0c4my6.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn86kq5rumj319y0c4my6.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -188,17 +188,17 @@
 </ol>
 <h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>​    当APIAggregator接收到请求之后，如果发现对应的是一个service的请求，则会直接转发到对应的服务上否则委托给apiserver进行处理，apiserver中根据当前URL来选择对应的REST接口处理，如果未能找到对应的处理，则会交由CRD server处理， CRD server检测是否已经注册对应的CRD资源，如果注册就处理</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn86kq5rumj319y0c4my6.jpg" alt="api aggregation" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn86kq5rumj319y0c4my6.jpg" alt="api aggregation" title="">
             </p>
 
 <p>​    当在集群中创建了对应的CRD资源的时候，k8s通过内部的controller来感知对应的CRD资源信息，然后为其创建对应的REST处理接口，这样后续接收到对应的资源就可以进行处理</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn86o0k0kqj314q0bwdh7.jpg" alt="crd server" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn86o0k0kqj314q0bwdh7.jpg" alt="crd server" title="">
             </p>
 
 <p>​    APIAggreagtor中会通过informer 监听后端Service的变化，如果发现有新的服务，就会创建对应的代理转发，从而实现对应的服务注册</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn86p5w6erj315g0b6t9x.jpg" alt="api service" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn86p5w6erj315g0b6t9x.jpg" alt="api service" title="">
             </p>
 
 <h3 id="注册自定义service资源"><a href="#注册自定义service资源" class="headerlink" title="注册自定义service资源"></a>注册自定义service资源</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apiregistration.k8s.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">APIService</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">v1beta1.custom.metrics.k8s.io</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">service:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">custom-metrics-server</span></span><br><span class="line">    <span class="attr">namespace:</span> <span class="string">custom-metrics</span></span><br><span class="line">  <span class="attr">group:</span> <span class="string">custom.metrics.k8s.io</span></span><br><span class="line">  <span class="attr">version:</span> <span class="string">v1beta1</span></span><br><span class="line">  <span class="attr">insecureSkipTLSVerify:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">groupPriorityMinimum:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">versionPriority:</span> <span class="number">100</span></span><br></pre></td></tr></table></figure>
@@ -207,11 +207,11 @@
 <p>官方提供有一个 <a href="https://github.com/kubernetes/sample-apiserver">自定义api service </a> 样例, 通过官方样例可以创建一个自定义聚合api</p>
 <h3 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h3><ol>
 <li><p>service监听的端口必须是https,否则认证通过不了。(通过<code>kubectl get apiservice</code>能看到是否通过认证)<p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn85pg2d84j316u070788.jpg" alt="http报错" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn85pg2d84j316u070788.jpg" alt="http报错" title="">
             </p></p>
 </li>
 <li><p>请求的根路径需要应答请求，否则会报404错误（<code>kubectl get apiservice v1alpha3.demo.com.cn  -o yaml</code> 能拷看到状态）</p>
-<p><img src="https://tva1.sinaimg.cn/large/008eGmZEly1gn85u1y817j316406atc7.jpg" alt="404状态"></p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gn85u1y817j316406atc7.jpg" alt="404状态"></p>
 </li>
 <li><p>请求的根路径的应答结果需要包含<code>kind</code>, <code>apiVersion</code>, <code>groupVersion</code>, <code>resources</code>：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">"kind"</span>: <span class="string">"APIResourceList"</span>,</span><br><span class="line"><span class="attr">"apiVersion"</span>: <span class="string">"v1"</span>,</span><br><span class="line"><span class="attr">"groupVersion"</span>: <span class="string">"metrics.k8s.io/v1beta1"</span>,</span><br><span class="line"><span class="attr">"resources"</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

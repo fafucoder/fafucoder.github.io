@@ -29,16 +29,16 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="veth-pair概念Linux 虚拟网络的背后都是由一个个的虚拟设备构成的。虚拟化技术没出现之前，计算机网络系统都只包含物理的网卡设备，通过网卡适配器，线缆介质，连接外部网络，构成庞大的 Internet。 veth-pair 是成对出现的一种虚拟网络设备，一端连接着协议栈，一端连接着彼此，数据从一端出，从另一端进。它的这个特性常常用来连接不同的虚拟网络组件，构建大规模的虚拟网络拓扑，比如连接">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwjmzkaaslj31g80hc40g.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwjmympfjkj30ye0iamxx.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwjn4rstl3j30yg0imabf.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwjn5b0u3nj30pe0ka759.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjmzkaaslj31g80hc40g.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjmympfjkj30ye0iamxx.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjn4rstl3j30yg0imabf.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjn5b0u3nj30pe0ka759.jpg">
 <meta property="article:published_time" content="2020-06-14T11:56:41.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.352Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.760Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwjmzkaaslj31g80hc40g.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjmzkaaslj31g80hc40g.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -180,26 +180,26 @@
             <h3 id="veth-pair概念"><a href="#veth-pair概念" class="headerlink" title="veth-pair概念"></a>veth-pair概念</h3><p>Linux 虚拟网络的背后都是由一个个的虚拟设备构成的。虚拟化技术没出现之前，计算机网络系统都只包含物理的网卡设备，通过网卡适配器，线缆介质，连接外部网络，构成庞大的 Internet。</p>
 <p>veth-pair 是成对出现的一种虚拟网络设备，一端连接着协议栈，一端连接着彼此，数据从一端出，从另一端进。它的这个特性常常用来连接不同的虚拟网络组件，构建大规模的虚拟网络拓扑，比如连接 Linux Bridge、OVS、LXC 容器等。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwjmzkaaslj31g80hc40g.jpg" alt="veth-pair" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjmzkaaslj31g80hc40g.jpg" alt="veth-pair" title="">
             </p>
 
 <h3 id="创建veth-pair"><a href="#创建veth-pair" class="headerlink" title="创建veth-pair"></a>创建veth-pair</h3><p>通过iproute2包中的ip link跟ip netns可以创建一个完整的veth-pair</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwjmympfjkj30ye0iamxx.jpg" alt="veth-pair互通" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjmympfjkj30ye0iamxx.jpg" alt="veth-pair互通" title="">
             </p>
 
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 创建veth pair</span><br><span class="line">sudo ip link add veth0 type veth peer name veth1</span><br><span class="line"></span><br><span class="line"># 设置命名空间</span><br><span class="line">sudo ip netns add ns1</span><br><span class="line">sudo ip netns add ns2</span><br><span class="line"></span><br><span class="line"># 把veth pair移到命名空间下面</span><br><span class="line">sudo ip link set veth0 netns ns1</span><br><span class="line">sudo ip link set veth1 netns ns2</span><br><span class="line"></span><br><span class="line"># 查看命名空间网卡设备</span><br><span class="line">sudo ip netns exec ns1 ip link show</span><br><span class="line"></span><br><span class="line"># veth-pair设置ip地址</span><br><span class="line">sudo ip netns exec ns1 ip address add 192.168.1.1&#x2F;24 dev veth0</span><br><span class="line">sudo ip netns exec ns2 ip address add 192.168.1.2&#x2F;24 dev veth1</span><br><span class="line"></span><br><span class="line"># 设置网卡为up状态</span><br><span class="line">sudo ip netns exec ns1 ip link set veth0 up</span><br><span class="line">sudo ip netns exec ns2 ip link set veth1 up</span><br></pre></td></tr></table></figure>
 
 <h3 id="通过bridge连接veth-pair"><a href="#通过bridge连接veth-pair" class="headerlink" title="通过bridge连接veth-pair"></a>通过bridge连接veth-pair</h3><p>Linux Bridge 相当于一台交换机，可以中转两个 namespace 的流量</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwjn4rstl3j30yg0imabf.jpg" alt="bridge veth-pair互通" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjn4rstl3j30yg0imabf.jpg" alt="bridge veth-pair互通" title="">
             </p>
 
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"># 创建bridge</span><br><span class="line">sudo ip link add br0 type bridge</span><br><span class="line">sudo ip link set br0 up</span><br><span class="line"></span><br><span class="line"># 创建veth-pair</span><br><span class="line">sudo ip link add veth0 type veth peer name br0-veth0</span><br><span class="line">sudo ip link add veth1 type veth peer name br0-veth1</span><br><span class="line"></span><br><span class="line"># 把peer name 移到bridge中</span><br><span class="line">sudo ip link set br0-veth0 master br0</span><br><span class="line">sudo ip link set br0-veth1 master br0</span><br><span class="line"></span><br><span class="line"># 设置peer name 为up</span><br><span class="line">sudo ip link set br0-veth0 up</span><br><span class="line">sudo ip link set br0-veth1 up</span><br><span class="line"></span><br><span class="line"># 创建namespace</span><br><span class="line">sudo ip netns add ns1</span><br><span class="line">sudo ip netns add ns2</span><br><span class="line"></span><br><span class="line"># 把peer name移到 namespace中</span><br><span class="line">sudo ip link set veth0 netns ns1</span><br><span class="line">sudo ip link set veth1 netns ns2</span><br><span class="line"></span><br><span class="line"># veth-pair设置ip地址</span><br><span class="line">sudo ip netns exec ns1 ip address add 192.168.1.1&#x2F;24 dev veth0</span><br><span class="line">sudo ip netns exec ns2 ip address add 192.168.1.2&#x2F;24 dev veth1</span><br><span class="line"></span><br><span class="line"># 设置网卡为up状态</span><br><span class="line">sudo ip netns exec ns1 ip link set veth0 up</span><br><span class="line">sudo ip netns exec ns2 ip link set veth1 up</span><br></pre></td></tr></table></figure>
 
 <p>经过以上流程，发现还是无法ping通， 原因待查</p>
 <h3 id="ping原理"><a href="#ping原理" class="headerlink" title="ping原理"></a>ping原理</h3><p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwjn5b0u3nj30pe0ka759.jpg" alt="ping原理" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwjn5b0u3nj30pe0ka759.jpg" alt="ping原理" title="">
             </p>
 
 <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>

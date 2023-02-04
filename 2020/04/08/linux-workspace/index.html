@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="Unix&#x2F;Linux的体系架构                                Linux操作系统的体系架构分为用户态和内核态（或者用户空间和内核）。内核从本质上看是一种软件——控制计算机的硬件资源，并提供上层应用程序运行的环境。用户态即上层应用程序的活动空间，应用程序的执行必须依托于内核提供的资源，包括CPU资源、存储资源、I&#x2F;O资源等。为了使上层应用能够访问到这些资源，内核必须为">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqsmldj1dj60v40kawfw02.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqslui0rgj60z60qcacj02.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqsokfmqgj60mi0h8aaj02.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqsq74kt1j60uw0fygmf02.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqsmldj1dj60v40kawfw02.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqslui0rgj60z60qcacj02.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqsokfmqgj60mi0h8aaj02.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqsq74kt1j60uw0fygmf02.jpg">
 <meta property="article:published_time" content="2020-04-08T03:13:04.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.352Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.760Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -179,20 +179,20 @@
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             <h3 id="Unix-Linux的体系架构"><a href="#Unix-Linux的体系架构" class="headerlink" title="Unix/Linux的体系架构"></a>Unix/Linux的体系架构</h3><p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg" alt="linux体系架构" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqst04vm6j60u00u2dhf02.jpg" alt="linux体系架构" title="">
             </p>
 
 <p>Linux操作系统的体系架构分为用户态和内核态（或者用户空间和内核）。内核从本质上看是一种软件——控制计算机的硬件资源，并提供上层应用程序运行的环境。用户态即上层应用程序的活动空间，应用程序的执行必须依托于内核提供的资源，包括CPU资源、存储资源、I/O资源等。为了使上层应用能够访问到这些资源，内核必须为上层应用提供访问的接口：即系统调用</p>
 <p>系统调用是操作系统的最小功能单位，这些系统调用根据不同的应用场景可以进行扩展和裁剪，现在各种版本的Unix实现都提供了不同数量的系统调用，如Linux的不同版本提供了240-260个系统调用，FreeBSD大约提供了320个（reference：UNIX环境高级编程）</p>
 <p>Shell是一个特殊的应用程序，俗称命令行，本质上是一个命令解释器，它下通系统调用，上通各种应用，通常充当着一种“胶水”的角色，来连接各个小功能程序，让不同程序能够以一个清晰的接口协同工作，从而增强各个程序的功能。同时，Shell是可编程的，它可以执行符合Shell语法的文本，这样的文本称为Shell脚本，通常短短的几行Shell脚本就可以实现一个非常大的功能，原因就是这些Shell语句通常都对系统调用做了一层封装。为了方便用户和系统交互，一般，一个Shell对应一个终端，终端是一个硬件设备，呈现给用户的是一个图形化窗口。我们可以通过这个窗口输入或者输出文本。这个文本直接传递给shell进行分析解释，然后执行。</p>
 <h3 id="运行级别"><a href="#运行级别" class="headerlink" title="运行级别"></a>运行级别</h3><p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqsmldj1dj60v40kawfw02.jpg" alt="cpu运行级别" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqsmldj1dj60v40kawfw02.jpg" alt="cpu运行级别" title="">
             </p>
 
 <p>linux的运行级别如上所示， Linux使用了Ring3级别运行用户态，Ring0作为 内核态，没有使用Ring1和Ring2。Ring3状态不能访问Ring0的地址空间，包括代码和数据。</p>
 <p>用户态通过系统调用切换成内核态，cpu通过跳转到系统调用对应的内核代码位置执行， 完成后再由内核态切回用户态</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqslui0rgj60z60qcacj02.jpg" alt="系统调用" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqslui0rgj60z60qcacj02.jpg" alt="系统调用" title="">
             </p>
 
 <p>系统内核 向下控制硬件资源，向内管理操作系统资源：包括进程的调度和管理、内存的管理、文件系统的管理、设备驱动程序的管理以及网络资源的管理，向上则向应用程序提供系统调用的接口。</p>
@@ -204,7 +204,7 @@
 </ol>
 <h4 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h4><p>因为操作系统的资源是有限的，如果访问资源的操作过多，必然会消耗过多的资源，而且如果不对这些操作加以区分，很可能造成资源访问的冲突。所以，为了减少有限资源的访问和使用冲突，Unix/Linux的设计哲学之一就是：对不同的操作赋予不同的执行等级，就是所谓特权的概念。简单说就是有多大能力做多大的事，与系统相关的一些特别关键的操作必须由最高特权的程序来完成。Intel的X86架构的CPU提供了0到3四个特权级，数字越小，特权越高，Linux操作系统中主要采用了0和3两个特权级，分别对应的就是内核态和用户态。运行于用户态的进程可以执行的操作和访问的资源都会受到极大的限制，而运行在内核态的进程则可以执行任何操作并且在资源的使用上没有限制。很多程序开始时运行于用户态，但在执行的过程中，一些操作需要在内核权限下才能执行，这就涉及到一个从用户态切换到内核态的过程。比如C函数库中的内存分配函数malloc()，它具体是使用sbrk()系统调用来分配内存，当malloc调用sbrk()的时候就涉及一次从用户态到内核态的切换，类似的函数还有printf()，调用的是wirte()系统调用来输出字符串，等等。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqsokfmqgj60mi0h8aaj02.jpg" alt="系统调用" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqsokfmqgj60mi0h8aaj02.jpg" alt="系统调用" title="">
             </p>
 
 <h4 id="异常事件"><a href="#异常事件" class="headerlink" title="异常事件"></a>异常事件</h4><p>当CPU正在执行运行在用户态的程序时，突然发生某些预先不可知的异常事件，这个时候就会触发从当前用户态执行的进程转向内核态执行相关的异常事件，典型的如缺页异常</p>
@@ -234,7 +234,7 @@
 <h3 id="用户空间和内核空间"><a href="#用户空间和内核空间" class="headerlink" title="用户空间和内核空间"></a>用户空间和内核空间</h3><p>用户空间就是用户进程所在的内存区域，系统空间就是操作系统占据的内存区域。用户进程和系统进程的所有数据都在内存中。</p>
 <p>在电脑开机之前，内存就是一块原始的物理内存。什么也没有。开机加电，系统启动后，就对物理内存进行了划分。当然，这是系统的规定，物理内存条上并没有划分好的地址和空间范围。这些划分都是操作系统在逻辑上的划分。不同版本的操作系统划分的结果都是不一样的。例如在32位操作系统中，一般将最高的1G字节划分为内核空间，供内核使用，而将较低的3G字节划分为用户空间，供各个进程使用。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gtqsq74kt1j60uw0fygmf02.jpg" alt="用户空间和内核空间" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gtqsq74kt1j60uw0fygmf02.jpg" alt="用户空间和内核空间" title="">
             </p>
 
 <p>其中: </p>

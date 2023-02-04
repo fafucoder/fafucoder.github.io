@@ -29,22 +29,22 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="虚拟网卡解析通过 ip link 命令可以创建多种类型的虚拟网络设备，在 man ip link中可以得知有以下类型的device: 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051bridge - Ethernet Bridge devicebond - Bo">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalist17hj311k0himyy.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalkw01hjj30u00um4hp.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvbza8pj30ke0damz6.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvz30r9j30ki0e8ace.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalwp2p00j30ke0dc0ul.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb07ese2j312m0lm0z2.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb0wbvecj312q0kowkm.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbackzjkej311m0do75k.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbahpub4gj30ww0eqq42.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnbaiuaxxij311g0bqta2.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalist17hj311k0himyy.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalkw01hjj30u00um4hp.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalvbza8pj30ke0damz6.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalvz30r9j30ki0e8ace.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalwp2p00j30ke0dc0ul.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbb07ese2j312m0lm0z2.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbb0wbvecj312q0kowkm.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbackzjkej311m0do75k.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbahpub4gj30ww0eqq42.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbaiuaxxij311g0bqta2.jpg">
 <meta property="article:published_time" content="2021-02-03T11:11:18.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.341Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.749Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnalist17hj311k0himyy.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalist17hj311k0himyy.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -194,28 +194,28 @@
 <p>Macvlan 允许你在主机的一个网络接口上配置多个虚拟的网络接口，这些网络 <code>interface</code> 有自己独立的 MAC 地址，也可以配置上 IP 地址进行通信。Macvlan 下的虚拟机或者容器网络和主机在同一个网段中，共享同一个广播域。Macvlan 和 <code>Bridge</code> 比较相似，但因为它省去了 Bridge 的存在，所以配置和调试起来比较简单，而且效率也相对高。除此之外，Macvlan 自身也完美支持 <code>VLAN</code>。</p>
 <p>macvlan的工作方式如下：</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalist17hj311k0himyy.jpg" alt="macvlan" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalist17hj311k0himyy.jpg" alt="macvlan" title="">
             </p>
 
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalkw01hjj30u00um4hp.jpg" alt="macvlan工作原理" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalkw01hjj30u00um4hp.jpg" alt="macvlan工作原理" title="">
             </p>
 
 <p>在macvlan中，实体网卡称为父接口(parent interface), 创建出来的虚拟网卡称为子接口(sub interface)，其中子接口无法与父接口通讯 (带有子接口 的 VM 或容器无法与 host 直接通讯, 这是因为在macvlan模式设计的时候为了安全而禁止了宿主机和容器直接通信)，如果vm或者容器需要与host通讯，就必须额外建立一个 <code>sub interface</code>给 host 用。</p>
 <h5 id="macvlan-模式"><a href="#macvlan-模式" class="headerlink" title="macvlan 模式"></a>macvlan 模式</h5><p>macvlan支持三种模式，bridge、vepa、private，在创建的时候设置<strong>mode XXX</strong>。</p>
 <p>Bridge模式：属于同一个parent接口的macvlan接口之间挂到同一个bridge上，可以二层互通（macvlan接口都无法与parent 接口互通）。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvbza8pj30ke0damz6.jpg" alt="bridge模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalvbza8pj30ke0damz6.jpg" alt="bridge模式" title="">
             </p>
 
 <p>VPEA模式：所有接口的流量都需要到外部switch才能够到达其他接口。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalvz30r9j30ki0e8ace.jpg" alt="vpea mode" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalvz30r9j30ki0e8ace.jpg" alt="vpea mode" title="">
             </p>
 
 <p>Private模式：接口只接受发送给自己MAC地址的报文。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnalwp2p00j30ke0dc0ul.jpg" alt="private mode" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnalwp2p00j30ke0dc0ul.jpg" alt="private mode" title="">
             </p>
 
 <h4 id="创建macvlan"><a href="#创建macvlan" class="headerlink" title="创建macvlan"></a>创建macvlan</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建macvlan 网卡</span></span><br><span class="line">ip link add link eth0 name mac1@eth0 type macvlan mode bridge</span><br><span class="line">ip link add link eth0 name mac2@eth0 type macvlan mode bridge</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建命名空间</span></span><br><span class="line">ip netns add ns1</span><br><span class="line">ip netns add ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 把虚拟网卡移入到命名空间</span></span><br><span class="line">ip link set mac1@eth0 netns ns1</span><br><span class="line">ip link set mac2@eth0 netns ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 进入netns为虚拟网卡分配ip地址</span></span><br><span class="line">ip netns exec ns1 ip addr add 192.168.0.100/24 dev mac1@eth0</span><br><span class="line">ip netns exec ns2 ip addr add 192.168.0.200/24 dev mac2@eth0</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置虚拟网卡状态为up</span></span><br><span class="line">ip netns exec ns1 ip link set mac1@eth0 up</span><br><span class="line">ip netns exec ns2 ip link set mac2@eth0 up</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建macvlan网卡，不移入到命名空间，并且添加路由</span></span><br><span class="line">ip link add link eth0 name mac3@eth0 type macvlan mode bridge</span><br><span class="line">ip addr add 192.168.0.150/24 dev mac3@eth0</span><br><span class="line">ip link set mac3@eth0 up</span><br><span class="line"></span><br><span class="line">ip route add 192.168.0.100/32 dev mac3@eth0</span><br><span class="line">ip route add 192.168.0.200/32 dev mac3@eth0</span><br></pre></td></tr></table></figure>
@@ -229,12 +229,12 @@
 <p>Ipvlan 是 linux kernel 比较新的特性，linux kernel 3.19 开始支持 ipvlan，但是比较稳定推荐的版本是 &gt;=4.2</p>
 <h5 id="ipvlan模式"><a href="#ipvlan模式" class="headerlink" title="ipvlan模式"></a>ipvlan模式</h5><p>L2模式：ipvlan L2 模式和 macvlan bridge 模式工作原理很相似，父接口作为交换机来转发子接口的数据。同一个网络的子接口可以通过父接口来转发数据，而如果想发送到其他网络，报文则会通过父接口的路由转发出去。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb07ese2j312m0lm0z2.jpg" alt="L2 模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbb07ese2j312m0lm0z2.jpg" alt="L2 模式" title="">
             </p>
 
 <p>L3模式：  ipvlan 有点像路由器的功能，它在各个虚拟网络和主机网络之间进行不同网络报文的路由转发工作。只要父接口相同，即使虚拟机/容器不在同一个网络，也可以互相 ping 通对方，因为 ipvlan 会在中间做报文的转发工作。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbb0wbvecj312q0kowkm.jpg" alt="L3 模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbb0wbvecj312q0kowkm.jpg" alt="L3 模式" title="">
             </p>
 
 <h5 id="创建ipvlan"><a href="#创建ipvlan" class="headerlink" title="创建ipvlan"></a>创建ipvlan</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建 ipvlan 虚拟网卡</span></span><br><span class="line">ip link add link eth0 ipvlan1@eth0 type ipvlan mode l3</span><br><span class="line">ip link add link eth0 ipvlan2@eth0 type ipvlan mode l3</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建命名空间</span></span><br><span class="line">ip netns add ns1</span><br><span class="line">ip netns add ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 把ipvlan 移入到命名空间</span></span><br><span class="line">ip link set ipvlan1@eth0 netns ns1</span><br><span class="line">ip link set ipvlan2@eth0 netns ns2</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置虚拟网卡ip地址</span></span><br><span class="line">ip netns exec ns1 ip addr add 192.168.0.100/24 dev ipvlan1@eth0</span><br><span class="line">ip netns exec ns2 ip addr add 192.168.0.200/24 dev ipvlan2@eth0</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置虚拟网卡为up状态</span></span><br><span class="line">ip netns exec ns1 ip link set ipvlan1@eth0 up</span><br><span class="line">ip netns exec ns2 ip link set ipvlan2@eth0 up</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建虚拟网卡，放置在宿主机</span></span><br><span class="line">ip link add link eth0 ipvlan3@eth0 type ipvlan mode l3</span><br><span class="line">ip addr add 192.168.0.150/24 dev ipvlan3@eth0</span><br><span class="line">ip link set ipvlan3@eth0 up</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 添加路由</span></span><br><span class="line">ip route add 192.168.0.100/32 dev ipvlan3@eth0</span><br><span class="line">ip route add 192.168.0.200/32 dev ipvlan3@eth0</span><br></pre></td></tr></table></figure>
@@ -245,17 +245,17 @@
 
 <h4 id="macvtap"><a href="#macvtap" class="headerlink" title="macvtap"></a>macvtap</h4><p>MACVTAP 是对 MACVLAN的改进，把 MACVLAN 与 TAP 设备的特点综合一下，使用 MACVLAN 的方式收发数据包，但是收到的包不交给 network stack 处理，而是生成一个 /dev/tapX 文件，交给这个文件。由于 MACVLAN 是工作在 MAC 层的，所以 MACVTAP 也只能工作在 MAC 层。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbackzjkej311m0do75k.jpg" alt="macvtap" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbackzjkej311m0do75k.jpg" alt="macvtap" title="">
             </p>
 
 <h4 id="tun"><a href="#tun" class="headerlink" title="tun"></a>tun</h4><p>Tun是Linux系统里的虚拟网络设备, TUN设备模拟网络层设备(network layer)，处理三层报文，IP报文等，用于将报文注入到网络协议栈</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbahpub4gj30ww0eqq42.jpg" alt="tun" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbahpub4gj30ww0eqq42.jpg" alt="tun" title="">
             </p>
 
 <p>应用程序(app)可以从物理网卡上读写报文，经过处理后通过TUN回送，或者从TUN读取报文处理后经物理网卡送出。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnbaiuaxxij311g0bqta2.jpg" alt="tun" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnbaiuaxxij311g0bqta2.jpg" alt="tun" title="">
             </p>
 
 <h4 id="dummy"><a href="#dummy" class="headerlink" title="dummy"></a>dummy</h4><p>dummy网卡是内核虚拟出来的网卡，没有实际的用途，要创建一个dummy类型的网卡只需要通过如下命令:</p>

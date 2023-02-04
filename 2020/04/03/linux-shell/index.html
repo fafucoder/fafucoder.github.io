@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="常见特殊符号 $# 是传给脚本的参数个数 $@ 是传给脚本的所有参数的列表 $* 是以一个单字符串显示所有向脚本传递的参数，与位置变量不同，参数可超过9个 $$ 是脚本运行的当前进程ID号 $? 是显示最后命令的退出状态，0表示没有错误，其他表示有错误 $0 是脚本本身的名字 $1 是传递给该shell脚本的第一个参数 $2 是传递给该shell脚本的第二个参数 $() 和 &#96; &#96; 是命令替换 $">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv90q36bgj30nc064wfp.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8ul89vaj30vi09e0vc.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8vf2h6yj30tu03ywfl.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8wgp2fcj30ka0420tr.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8xabb6bj30qc04075c.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv90q36bgj30nc064wfp.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8ul89vaj30vi09e0vc.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8vf2h6yj30tu03ywfl.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8wgp2fcj30ka0420tr.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8xabb6bj30qc04075c.jpg">
 <meta property="article:published_time" content="2020-04-03T01:29:31.000Z">
-<meta property="article:modified_time" content="2022-04-24T12:17:19.552Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.758Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gnv90q36bgj30nc064wfp.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv90q36bgj30nc064wfp.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -243,28 +243,28 @@
 <p>在控制台下，有一个特殊的环境变量 $?，保存着前一个程序的返回值</p>
 <p>只要返回值是 0，就代表程序执行成功了～</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv90q36bgj30nc064wfp.jpg" alt="$?" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv90q36bgj30nc064wfp.jpg" alt="$?" title="">
             </p>
 
 <h3 id="amp-amp-amp-区别"><a href="#amp-amp-amp-区别" class="headerlink" title="&amp; &amp;&amp; | || 区别"></a>&amp; &amp;&amp; | || 区别</h3><p><code>cmd1 操作符 cmd2 操作符 cmd3</code> 把这一整体称为一个命令</p>
 <p><code>&amp;</code>：除了最后一个cmd，前面的cmd均已后台方式静默执行，执行结果显示在终端上，个别的cmd错误不影响整个命令的执行，全部的cmd同时执行</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8ul89vaj30vi09e0vc.jpg" alt="&" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8ul89vaj30vi09e0vc.jpg" alt="&" title="">
             </p>
 
 <p><code>&amp;&amp;</code>：从左到右顺序执行cmd，个别cmd错误不产生影响</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8vf2h6yj30tu03ywfl.jpg" alt="&&" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8vf2h6yj30tu03ywfl.jpg" alt="&&" title="">
             </p>
 
 <p><code>|</code>：各个cmd同时在前台被执行，但是除最后的cmd之外，其余的执行结果不会被显示在终端上</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8wgp2fcj30ka0420tr.jpg" alt="|" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8wgp2fcj30ka0420tr.jpg" alt="|" title="">
             </p>
 
 <p><code>||</code>：从左到右顺序执行cmd，只有左侧的cmd执行出错，右边的cmd才会被执行，同时一旦有cmd被成功执行，整个命令就会结束，返回终端</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gnv8xabb6bj30qc04075c.jpg" alt="||" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gnv8xabb6bj30qc04075c.jpg" alt="||" title="">
             </p>
 
 <h3 id="参考网址"><a href="#参考网址" class="headerlink" title="参考网址"></a>参考网址</h3><ul>

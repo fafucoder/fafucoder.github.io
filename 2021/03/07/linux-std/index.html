@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="文件描述符对Linux进程来讲，每个打开的文件都是通过文件描述符(File Descriptor)来标识的，内核为每个进程维护了一个文件描述符表，这个表以FD为索引，再进一步指向文件的详细信息。在进程创建时，内核为进程默认创建了0、1、2三个特殊的FD，这就是STDIN、STDOUT和STDERR。                                 I&#x2F;O重定向也就是让已创建的FD指">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gobnjioex4j318c0iyjwp.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gobnkjht9yj31qe0q6n0f.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gobnmgdm7qj31jy0g0aci.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gobnofym2sj316m0kaaf4.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gobo1kab79j31gg04wabi.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnjioex4j318c0iyjwp.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnkjht9yj31qe0q6n0f.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnmgdm7qj31jy0g0aci.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnofym2sj316m0kaaf4.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobo1kab79j31gg04wabi.jpg">
 <meta property="article:published_time" content="2021-03-07T03:45:51.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.351Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.759Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gobnjioex4j318c0iyjwp.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnjioex4j318c0iyjwp.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -180,28 +180,28 @@
         <div class="post-content" id="post-content" itemprop="postContent">
             <h3 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h3><p>对Linux进程来讲，每个打开的文件都是通过文件描述符(File Descriptor)来标识的，内核为每个进程维护了一个文件描述符表，这个表以FD为索引，再进一步指向文件的详细信息。在进程创建时，内核为进程默认创建了0、1、2三个特殊的FD，这就是STDIN、STDOUT和STDERR。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnjioex4j318c0iyjwp.jpg" alt="文件描述符" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnjioex4j318c0iyjwp.jpg" alt="文件描述符" title="">
             </p>
 
 <p>I/O重定向也就是让已创建的FD指向其他文件。比如，下面是对STDOUT重定向到testfile.txt前后内核文件描述符表变化的示意图</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnkjht9yj31qe0q6n0f.jpg" alt="io重定向" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnkjht9yj31qe0q6n0f.jpg" alt="io重定向" title="">
             </p>
 
 <p>在I/O重定向的过程中，不变的是FD 0/1/2代表STDIN/STDOUT/STDERR，变化的是文件描述符表中FD 0/1/2对应的具体文件，  Shell正是通过I/O重定向和管道这种特殊的文件把多个程序的STDIN和STDOUT串联在一起组成更复杂功能的，下面是Shell中通过管道的示意图：</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnmgdm7qj31jy0g0aci.jpg" alt="shell 管道" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnmgdm7qj31jy0g0aci.jpg" alt="shell 管道" title="">
             </p>
 
 <p><strong>示例：</strong></p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobnofym2sj316m0kaaf4.jpg" alt="proc" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobnofym2sj316m0kaaf4.jpg" alt="proc" title="">
             </p>
 
 
 <h4 id="pgrep-命令"><a href="#pgrep-命令" class="headerlink" title="pgrep 命令"></a>pgrep 命令</h4><p>pgrep查看当前正在运行的进程，并将与选择条件匹配的进程ID列出到stdout（屏幕）。当你想要某个进程的PID时，pgrep很方便。(通过<code>ps -ef | grep xxx</code>也能实现)</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gobo1kab79j31gg04wabi.jpg" alt="pgrep" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gobo1kab79j31gg04wabi.jpg" alt="pgrep" title="">
             </p>
 
 <p>选项#</p>

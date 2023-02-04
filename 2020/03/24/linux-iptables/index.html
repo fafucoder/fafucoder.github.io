@@ -29,20 +29,20 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="一、iptables相关概念iptables的底层实现是netfilter，整个流程图如下图所示。                                  当网卡上收到一个包送达协议栈时，最先经过的netfilter钩子是PREROUTING，如果确实有用户埋了这个钩子函数，那么内核将在这里对数据包进行目的地址转换（DNAT）。不管在PREROUTING有没有做过DNAT，内核都会通过查">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtxqi74mj319u0s440y.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbty6c5a9j30vh0u0dq6.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtylky4ej32la0s011q.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtz6uvfcj30u00vajxx.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtznc2uaj319r0u0aj0.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxdfnfni2rj313w03w0ta.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxdfbbvxvjj30o21bsaep.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtxqi74mj319u0s440y.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbty6c5a9j30vh0u0dq6.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtylky4ej32la0s011q.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtz6uvfcj30u00vajxx.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtznc2uaj319r0u0aj0.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxdfnfni2rj313w03w0ta.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxdfbbvxvjj30o21bsaep.jpg">
 <meta property="article:published_time" content="2020-03-24T06:46:05.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.342Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.751Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -183,18 +183,18 @@
         <div class="post-content" id="post-content" itemprop="postContent">
             <h3 id="一、iptables相关概念"><a href="#一、iptables相关概念" class="headerlink" title="一、iptables相关概念"></a>一、iptables相关概念</h3><p>iptables的底层实现是netfilter，整个流程图如下图所示。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg" alt="netfilter流程图" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtrb6agvj317g0u0wlb.jpg" alt="netfilter流程图" title="">
             </p>
 
 
 <p>当网卡上收到一个包送达协议栈时，最先经过的netfilter钩子是PREROUTING，如果确实有用户埋了这个钩子函数，那么内核将在这里对数据包进行目的地址转换（DNAT）。不管在PREROUTING有没有做过DNAT，内核都会通过查本地路由表决定这个数据包是发送给本地进程还是发送给其他机器。如果是发送给其他机器（或其他network namespace），就相当于把本地当作路由器，就会经过netfilter的FORWARD钩子，用户可以在此处设置包过滤钩子函数，例如iptables的reject函数。所有马上要发到协议栈外的包都会经过POSTROUTING钩子，用户可以在这里埋下源地址转换（SNAT）或源地址伪装（Masquerade，简称Masq）的钩子函数。如果经过上面的路由决策，内核决定把包发给本地进程，就会经过INPUT钩子。本地进程收到数据包后，回程报文会先经过OUTPUT钩子，然后经过一次路由决策（例如，决定从机器的哪块网卡出去，下一跳地址是多少等），最后出协议栈的网络包同样会经过POSTROUTING钩子。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtxqi74mj319u0s440y.jpg" alt="数据流向" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtxqi74mj319u0s440y.jpg" alt="数据流向" title="">
             </p>
 
 <h3 id="二、iptables三板斧-table-rule-chain"><a href="#二、iptables三板斧-table-rule-chain" class="headerlink" title="二、iptables三板斧 table, rule, chain"></a>二、iptables三板斧 table, rule, chain</h3><p>iptables的工作流程如下图所示，</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbty6c5a9j30vh0u0dq6.jpg" alt="iptables工作流程" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbty6c5a9j30vh0u0dq6.jpg" alt="iptables工作流程" title="">
             </p>
 
 <h4 id="五张链"><a href="#五张链" class="headerlink" title="五张链"></a>五张链</h4><ul>
@@ -231,11 +231,11 @@
 <li><p>iptables支持用户自定义链， 不支持用户自定义表。</p>
 </li>
 <li><p>不是每个链上都能挂表，关系如下图</p>
-<p><img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtylky4ej32la0s011q.jpg" alt="iptables链表关系"></p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtylky4ej32la0s011q.jpg" alt="iptables链表关系"></p>
 </li>
 <li><p>iptables的每条链下面的规则处理顺序是从上到下逐条遍历的，除非中途碰到DROP，REJECT，RETURN这些内置动作。如果iptables规则前面是自定义链，则意味着这条规则的动作是JUMP，即跳到这条自定义链遍历其下的所有规则，然后跳回来遍历原来那条链后面的规则</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtz6uvfcj30u00vajxx.jpg" alt="iptables遍历规则" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtz6uvfcj30u00vajxx.jpg" alt="iptables遍历规则" title="">
             </p>
 </li>
 <li><p>查询iptables时，默认是filter表</p>
@@ -246,7 +246,7 @@
 <li>DROP动作只是简单的直接丢弃数据，并不反馈任何回应。需要Client等待超时。</li>
 </ol>
 <h4 id="数据经过的流程图"><a href="#数据经过的流程图" class="headerlink" title="数据经过的流程图"></a>数据经过的流程图</h4><p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/0081Kckwly1gkbtznc2uaj319r0u0aj0.jpg" alt="iptables数据经过流程图" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gkbtznc2uaj319r0u0aj0.jpg" alt="iptables数据经过流程图" title="">
             </p>
 
 <h3 id="三、iptables常见命令"><a href="#三、iptables常见命令" class="headerlink" title="三、iptables常见命令"></a>三、iptables常见命令</h3><h4 id="命令格式"><a href="#命令格式" class="headerlink" title="命令格式"></a>命令格式</h4><p>iptables command chain chain_name options</p>
@@ -266,7 +266,7 @@
 <p>32766：匹配任何条件，查询路由表main(ID 254)，该表是一个通常的表，包含所有的无策略路由。系统管理员可以删除或者使用另外的规则覆盖这条规则。</p>
 <p>32767：匹配任何条件，查询路由表default(ID 253)，该表是一个空表，它是后续处理保留。对于前面的策略没有匹配到的数据包，系统使用这个策略进行处理，这个规则也可以删除。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxdfnfni2rj313w03w0ta.jpg" alt="default ip rule" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxdfnfni2rj313w03w0ta.jpg" alt="default ip rule" title="">
             </p>
 
 <h4 id="ip-route路由表"><a href="#ip-route路由表" class="headerlink" title="ip route路由表"></a>ip route路由表</h4><p>所谓路由表，指的是路由器或者其他互联网网络设备上存储的表，该表中存有到达特定网络终端的路径，在某些情况下，还有一些与这些路径相关的度量。路由器的主要工作就是为经过路由器的每个数据包寻找一条最佳的传输路径，并将该数据有效地传送到目的站点。</p>
@@ -279,7 +279,7 @@
 <p>255#表： locale table 保存本地接口地址，广播地址、NAT地址 由系统维护，用户不得更改</p>
 <h4 id="ip-route-与-ip-rule-关系"><a href="#ip-route-与-ip-rule-关系" class="headerlink" title="ip route 与 ip rule 关系"></a>ip route 与 ip rule 关系</h4><p>在Netfilter中，通过路由选择决定把包发送给本地进程还是经过Forward链转发到其他接口上。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxdfbbvxvjj30o21bsaep.jpg" alt="netfilter flow" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxdfbbvxvjj30o21bsaep.jpg" alt="netfilter flow" title="">
             </p>
 
 <p>上图中<strong>routing</strong>就是使用<code>ip rule，ip route</code>设置的规则，<strong>其中ip route配置的路由表服务于ip rule配置的规则。</strong></p>

@@ -29,16 +29,16 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="网卡数据包接收流程 网卡收到数据包。 将数据包从网卡硬件缓存转移到服务器内存中。 通过中断请求，通知内核处理。 经过 TCP&#x2F;IP 协议逐层处理。 应用程序通过 read() 从 socket buffer 读取数据。                                  网卡收到的数据包转移到主机内存（NIC 与驱动交互）NIC(网卡)在接收到数据包之后，首先需要将数据同步到内核中，">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwi3ashxjrj30ha1523zx.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwi3cy7kw7j31320m0tat.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwi3ashxjrj30ha1523zx.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwi3cy7kw7j31320m0tat.jpg">
 <meta property="og:image" content="http://qehtohz1z.bkt.clouddn.com/fafucoder-blog/hk0qi.png">
 <meta property="og:image" content="http://qehtohz1z.bkt.clouddn.com/fafucoder-blog/3orb9.png">
 <meta property="article:published_time" content="2020-07-09T06:55:33.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.348Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.755Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gwi3ashxjrj30ha1523zx.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwi3ashxjrj30ha1523zx.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -185,7 +185,7 @@
 <li>应用程序通过 read() 从 socket buffer 读取数据。</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwi3ashxjrj30ha1523zx.jpg" alt="网卡收包流程" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwi3ashxjrj30ha1523zx.jpg" alt="网卡收包流程" title="">
             </p>
 
 <h3 id="网卡收到的数据包转移到主机内存（NIC-与驱动交互）"><a href="#网卡收到的数据包转移到主机内存（NIC-与驱动交互）" class="headerlink" title="网卡收到的数据包转移到主机内存（NIC 与驱动交互）"></a>网卡收到的数据包转移到主机内存（NIC 与驱动交互）</h3><p>NIC(网卡)在接收到数据包之后，首先需要将数据同步到内核中，这中间的桥梁是 <code>rx ring buffer</code>。它是由 NIC 和驱动程序共享的一片区域，事实上，<code>rx ring buffer</code>存储的并不是实际的 packet 数据，而是一个描述符，这个描述符指向了它真正的存储地址，具体流程如下：</p>
@@ -198,7 +198,7 @@
 <li>网卡将新数据包通过 DMA 直接写到 sk_buffer 中。</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gwi3cy7kw7j31320m0tat.jpg" alt="Nic与驱动交互" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwi3cy7kw7j31320m0tat.jpg" alt="Nic与驱动交互" title="">
             </p>
 
 <p>当驱动处理速度跟不上网卡收包速度时，驱动来不及分配缓冲区，NIC 接收到的数据包无法及时写到 sk_buffer，就会产生堆积，当 NIC 内部缓冲区写满后，就会丢弃部分数据，引起丢包。这部分丢包为 rx_fifo_errors，在 /proc/net/dev 中体现为 fifo 字段增长，在 ifconfig 中体现为 overruns 指标增长。</p>

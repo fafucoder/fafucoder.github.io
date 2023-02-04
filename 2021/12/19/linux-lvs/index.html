@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="前言负载均衡(Load Balance)的职责是将网络请求，或者其他形式的负载“均摊”到不同的机器上，让每台服务器获取到适合自己处理能力的负载。在为高负载服务器分流的同时，还可以避免资源浪费。负载均衡的原理就是当用户的请求到达前端负载均衡器(Director Server)时，通过设置好的调度算法，智能均衡的将请求分发到后端真正服务器上(Real Server)。根据请求类型的不同可以将负载均衡分">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxv0a244zyj30ou0dtmys.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxvmcgh1xwj30oy0dwq57.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxvobeirpcj30p00e340q.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxw0gf5xdlj30lr0ck0tc.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxv0a244zyj30ou0dtmys.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxvmcgh1xwj30oy0dwq57.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxvobeirpcj30p00e340q.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxw0gf5xdlj30lr0ck0tc.jpg">
 <meta property="article:published_time" content="2021-12-19T09:01:20.000Z">
-<meta property="article:modified_time" content="2021-12-30T11:26:08.524Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.754Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -186,7 +186,7 @@
 </ul>
 <h3 id="LVS-基本工作原理"><a href="#LVS-基本工作原理" class="headerlink" title="LVS 基本工作原理"></a>LVS 基本工作原理</h3><p>LVS的底层是利用NETIFILTER的钩子能力：</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg" alt="ipvs工作原理" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxv02bh3vzj30ow0c5dgv.jpg" alt="ipvs工作原理" title="">
             </p>
 
 <ol>
@@ -232,7 +232,7 @@
 <li>Director Server 在响应客户端前，此时会将源 IP 地址修改为自己的 VIP 地址，然后响应给客户端。 此时报文的源 IP 为 VIP，目标 IP 为 CIP</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxv0a244zyj30ou0dtmys.jpg" alt="LVS NAT模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxv0a244zyj30ou0dtmys.jpg" alt="LVS NAT模式" title="">
             </p>
 
 <h5 id="LVS-NAT模式特点"><a href="#LVS-NAT模式特点" class="headerlink" title="LVS NAT模式特点"></a>LVS NAT模式特点</h5><ul>
@@ -258,7 +258,7 @@
 <li>响应报文最终送达至客户端。</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxvmcgh1xwj30oy0dwq57.jpg" alt="LVS DR模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxvmcgh1xwj30oy0dwq57.jpg" alt="LVS DR模式" title="">
             </p>
 
 <h5 id="LVS-DR模式特点"><a href="#LVS-DR模式特点" class="headerlink" title="LVS DR模式特点"></a>LVS DR模式特点</h5><ul>
@@ -308,7 +308,7 @@
 <li>响应报文最终送达至客户端。</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxvobeirpcj30p00e340q.jpg" alt="LVS TUN模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxvobeirpcj30p00e340q.jpg" alt="LVS TUN模式" title="">
             </p>
 
 <h5 id="LVS-TUN模式特点"><a href="#LVS-TUN模式特点" class="headerlink" title="LVS TUN模式特点"></a>LVS TUN模式特点</h5><ul>
@@ -371,7 +371,7 @@
 <li>Director Server 在响应客户端前，此时会将源 IP 地址修改为自己的 VIP 地址，然后响应给客户端。 此时报文的源 IP 为 VIP，目标 IP 为 CIP</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gxw0gf5xdlj30lr0ck0tc.jpg" alt="LVS FULLNAT模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gxw0gf5xdlj30lr0ck0tc.jpg" alt="LVS FULLNAT模式" title="">
             </p>
 
 <h5 id="LVS-FULLNAT模式实践"><a href="#LVS-FULLNAT模式实践" class="headerlink" title="LVS FULLNAT模式实践"></a>LVS FULLNAT模式实践</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 虚拟机4的IP地址为192.168.58.100， 虚拟机2，3的IP地址为192.168.56.102， 192.168.56.104, 在虚拟机上执行：</span></span><br><span class="line">ip addr add 192.168.58.200/32 dev eth1</span><br><span class="line"></span><br><span class="line">ipvsadm -A -t 192.168.58.200:80 -s wrr</span><br><span class="line">ipvsadm -a -t 192.168.58.200:80 -r 192.168.56.102:80 -b -w 2</span><br><span class="line">ipvsadm -a -t 192.168.58.200:80 -r 192.168.56.104:80 -b -w 1</span><br><span class="line">ipvsadm -P -t 192.168.58.200:80 -z 192.168.58.100</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 集群外执行curl, 验证是否成功</span></span><br><span class="line">curl 192.168.56.200</span><br></pre></td></tr></table></figure>

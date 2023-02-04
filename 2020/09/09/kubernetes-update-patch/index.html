@@ -29,13 +29,13 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="概述​    在kubernetes中，对资源进行更新的方式有两种一种是update操作，一种是patch操作。对于update请求,我们需要将整个修改后的对象提交给k8s, 而对于patch请求， 我们只需要将对象中某些字段的修改提交给k8s。 kubernetes update 机制​    在kubernetes的所有资源对象中，都有一个全局唯一的版本号(metadata.resourceV">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gupnvaobq5j60yw0u0gp102.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gupnvaobq5j60yw0u0gp102.jpg">
 <meta property="article:published_time" content="2020-09-09T13:58:47.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.340Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.744Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gupnvaobq5j60yw0u0gp102.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gupnvaobq5j60yw0u0gp102.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -185,7 +185,7 @@
 <li>此时，kube-apiserver 会校验用户 update 请求提交对象中的 resourceVersion 一定要和当前 K8s 中这个对象最新的 resourceVersion 一致，才能接受本次 update。否则，K8s 会拒绝请求，并告诉用户发生了版本冲突（Conflict）。</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gupnvaobq5j60yw0u0gp102.jpg" alt="k8s update" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gupnvaobq5j60yw0u0gp102.jpg" alt="k8s update" title="">
             </p>
 
 <p>上图展示了多个用户同时 update 某一个资源对象时会发生的事情。而如果如果发生了 Conflict 冲突，对于 User A 而言应该做的就是做一次重试，再次获取到最新版本的对象，修改后重新提交 update, 因此：</p>

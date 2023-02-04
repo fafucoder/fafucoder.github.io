@@ -29,18 +29,18 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="Helm 基础概念Helm Chart: Chart 代表Helm包，它包含在 Kubernetes 集群内部运行应用程序，工具或服务所需的所有资源定义。可以把Helm Chart比作Apt dpkg或者yum rpm在linux中的等价位。 Helm Hub: 类似于docker hub 用于存放公共chart的地方 Helm Repository: 是用来存放和共享 charts 的地方(放置">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gpo89yf0pyj31740omdph.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gpo8i9ww6zj31nw0bqwrk.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gpo8tclg3vj314s08wgqj.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gpo9k7yks2j313k0cotae.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gpo9ii92x6j31hm02wwf1.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gpoa7qdls3j31th0u0ncl.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo89yf0pyj31740omdph.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo8i9ww6zj31nw0bqwrk.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo8tclg3vj314s08wgqj.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo9k7yks2j313k0cotae.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo9ii92x6j31hm02wwf1.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpoa7qdls3j31th0u0ncl.jpg">
 <meta property="article:published_time" content="2020-04-13T04:41:47.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.335Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.739Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008eGmZEly1gpo89yf0pyj31740omdph.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo89yf0pyj31740omdph.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -184,13 +184,13 @@
 <p>Helm Repository: 是用来存放和共享 charts 的地方(放置在本地)</p>
 <p>Helm Release: Release 是运行在 Kubernetes 集群中的 chart 的实例。一个 chart 通常可以在同一个集群中安装多次。每一次安装都会创建一个新的 release。以 MySQL chart为例，如果你想在你的集群中运行两个数据库，你可以安装该chart两次。每一个数据库都会拥有它自己的 release 和 release name。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gpo89yf0pyj31740omdph.jpg" alt="helm 基础概念" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo89yf0pyj31740omdph.jpg" alt="helm 基础概念" title="">
             </p>
 
 <h3 id="Helm-命令-详细参数查阅官方文档"><a href="#Helm-命令-详细参数查阅官方文档" class="headerlink" title="Helm 命令(详细参数查阅官方文档)"></a>Helm 命令(详细参数查阅官方文档)</h3><p><strong>helm search hub</strong>: 从 <a href="https://artifacthub.io/" target="_blank" rel="noopener">Artifact Hub</a> 中查找并列出 helm charts。 Artifact Hub中存放了大量不同的仓库。</p>
 <p><strong>helm search repo</strong>: 从你添加（使用 helm repo add）到本地 helm 客户端中的仓库中进行查找。该命令基于本地数据进行搜索，无需连接互联网。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gpo8i9ww6zj31nw0bqwrk.jpg" alt="helm search" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo8i9ww6zj31nw0bqwrk.jpg" alt="helm search" title="">
             </p>
 
 <p><strong>helm repo list</strong>: 列出所有本地已经添加的repo</p>
@@ -198,14 +198,14 @@
 <p><strong>helm repo remove</strong>: 从本地repo中移除chart</p>
 <p><strong>helm repo update</strong>: 更新本地repo charts</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gpo8tclg3vj314s08wgqj.jpg" alt="helm repo" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo8tclg3vj314s08wgqj.jpg" alt="helm repo" title="">
             </p>
 
 <p><strong>helm list</strong>: 列出所有的release chart</p>
 <p><strong>helm uninstall</strong>: 删除一个release</p>
 <p><strong>helm status</strong>: 查看release状态(可以通过helm status 查看helm的输出信息，比如默认用户名密码可能通过helm status 来查看)</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gpo9k7yks2j313k0cotae.jpg" alt="helm status" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo9k7yks2j313k0cotae.jpg" alt="helm status" title="">
             </p>
 
 <p><strong>helm install</strong>: 安装一个chart</p>
@@ -214,13 +214,13 @@
 <p><strong>helm get values</strong>: 查看release 的values(也就是说可以查看哪些自定义的值作了修改)</p>
 <p><strong>helm history</strong>: 查看 release 的历史版本</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gpo9ii92x6j31hm02wwf1.jpg" alt="helm history" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpo9ii92x6j31hm02wwf1.jpg" alt="helm history" title="">
             </p>
 
 <p><strong>helm pull(fetch)</strong>: 从包仓库(hub or repo)中检索包，并在本地下载它。</p>
 <p><strong>helm template</strong>: 本地渲染模板(也就是说把默认的信息转化成yaml)</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008eGmZEly1gpoa7qdls3j31th0u0ncl.jpg" alt="helm pull/template" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008eGmZEly1gpoa7qdls3j31th0u0ncl.jpg" alt="helm pull/template" title="">
             </p>
 
 <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>

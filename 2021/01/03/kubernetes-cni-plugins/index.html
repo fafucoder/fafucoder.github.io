@@ -29,19 +29,19 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="概述常见的容器网络方案可以从协议栈层级、穿越形态、隔离方式这三种形式进行划分。 协议栈层级:  第一种：协议栈二层。 第二种：协议栈三层（纯路由转发）。 第三种：协议栈二层加三层。  穿越形态： 按穿越的形态划分，这个与实际部署环境十分相关。穿越形态分为两种：Underlay、Overlay。  Underlay：在一个较好的一个可控的网络场景下，我们一般利用 Underlay。可以这样通俗的理解">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23bwzmruj31i70u0tc1.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23h7ejwij31910u0wg3.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23vi1k3jj314q0mcabk.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23xvdpxoj314u0mojt9.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw24xtymjmj314q0nqwg1.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw253xcpa9j311y0ny75q.jpg">
-<meta property="og:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw26386mtij30zo0lkdh5.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23bwzmruj31i70u0tc1.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23h7ejwij31910u0wg3.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23vi1k3jj314q0mcabk.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23xvdpxoj314u0mojt9.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw24xtymjmj314q0nqwg1.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw253xcpa9j311y0ny75q.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw26386mtij30zo0lkdh5.jpg">
 <meta property="article:published_time" content="2021-01-03T06:02:52.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.334Z">
+<meta property="article:modified_time" content="2023-02-04T13:33:00.732Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/008i3skNly1gw23bwzmruj31i70u0tc1.jpg">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23bwzmruj31i70u0tc1.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -217,7 +217,7 @@
 <li>Node02收到包后，就会直接将其转发给flannel0设备，然后进行解包，匹配本地路由规则转发给docker0网桥，然后docker0网桥就扮演二层交换机的功能，将包转发到最终的目的地；</li>
 </ol>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23bwzmruj31i70u0tc1.jpg" alt="udp模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23bwzmruj31i70u0tc1.jpg" alt="udp模式" title="">
             </p>
 
 <blockquote>
@@ -225,14 +225,14 @@
 </blockquote>
 <p>UDP之所以被废弃是主要是由于其仅在发包的过程中就在用户态和内核态进行来回的数据交换，这样的性能代价是很高的.</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23h7ejwij31910u0wg3.jpg" alt="udp模式缺陷" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23h7ejwij31910u0wg3.jpg" alt="udp模式缺陷" title="">
             </p>
 
 <h4 id="vxlan-模式"><a href="#vxlan-模式" class="headerlink" title="vxlan 模式"></a>vxlan 模式</h4><p>VXLAN：Virtual Extensible LAN（虚拟可扩展局域网），是Linux内核本身就支持的一种虚拟化网络技术，它可以完全在内核态实现上述的封装和解封装过程，减少用户态到内核态的切换次数，把核心的处理逻辑都放到内核态，其通过与前面相似的隧道技术，构建出覆盖网络或者叠加网络（Overlay Network）。</p>
 <p>其设计思想为在现有的三层网络下，叠加一层虚拟的并由内核VXLAN维护的二层网络，使得连接在这个二层网络上的主机可以像在局域网一样通信。</p>
 <p>为了能够在二层网络中打通隧道，VXLAN会在宿主机上设置一个特殊的网络设备作为隧道的两端，这个隧道就叫VTEP（Virtual Tunnel End Point 虚拟隧道端点）。而VTEP的作用跟上面的flanneld进程非常相似，只不过它进行封装和解封的对象是二层的数据帧，而且这个工作的执行流程全部在内核中完成。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23vi1k3jj314q0mcabk.jpg" alt="" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23vi1k3jj314q0mcabk.jpg" alt="" title="">
             </p>
 
 <p>我们可以看到每台Node上都有一个flannel.1的网卡，它就是VXLAN所需要的VTEP设备，它既有IP地址，也有MAC地址。 现在我们nginx01要访问nginx02，其流程如下：</p>
@@ -247,7 +247,7 @@
 <p>在这种场景下，flannel.1设备实际扮演的是一个网桥的角色，在二层网络进行UDP包的转发，在Linux内核中，网桥设备进行转发的依据是一个叫做FDB（Foewarding Database）的转发<a href="https://cloud.tencent.com/solution/database?from=10680" target="_blank" rel="noopener">数据库</a>，它的内容可以通过bridge fdb命令可以查看。</p>
 <h4 id="host-gw模式"><a href="#host-gw模式" class="headerlink" title="host-gw模式"></a>host-gw模式</h4><p>前面的两种模式都是二层网络的解决方案，对于三层网络，Flannel提供host-gw解决方案。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw23xvdpxoj314u0mojt9.jpg" alt="host-gw模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw23xvdpxoj314u0mojt9.jpg" alt="host-gw模式" title="">
             </p>
 
 <p>如上所示，如果我nginx01要访问nginx02，流程如下：</p>
@@ -261,12 +261,12 @@
 <p>从上面可以知道，host-gw的工作核心为IP包在封装成帧发送出去的时候会在使用路由表中写下一跳来设置目的的MAC地址，这样它就会经过二层转发到达目的宿主机。这就要求集群宿主机必须是二层连通的。</p>
 <h3 id="calico"><a href="#calico" class="headerlink" title="calico"></a>calico</h3><p>Calico是Kubernetes生态系统中另一种流行的网络选择。虽然Flannel被公认为是最简单的选择，但Calico以其性能、灵活性而闻名。Calico的功能更为全面，不仅提供主机和pod之间的网络连接，还涉及<a href="https://cloud.tencent.com/product/ns?from=10680" target="_blank" rel="noopener">网络安全</a>和管理。在现有的calico插件中，也提供的三种模式，分别是BGP模式，RR模式和IPIP模式。下面主要说明BGP模式和IPIP模式。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw24xtymjmj314q0nqwg1.jpg" alt="calico" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw24xtymjmj314q0nqwg1.jpg" alt="calico" title="">
             </p>
 
 <h4 id="IPIP模式"><a href="#IPIP模式" class="headerlink" title="IPIP模式"></a>IPIP模式</h4><p>Calico 的ipip模式和flannel的vxlan差不多，也是基于二层数据的封装和解封；也会创建一个虚拟网卡 <strong>tunl0</strong>。在前面提到过，Flannel host-gw 模式最主要的限制，就是要求集群宿主机之间是二层连通的。而这个限制对于 Calico 来说，也同样存在。</p>
 <p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw253xcpa9j311y0ny75q.jpg" alt="ipip模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw253xcpa9j311y0ny75q.jpg" alt="ipip模式" title="">
             </p>
 
 <p>如上所示, Pod 1 访问 Pod 2大致流程如下：</p>
@@ -278,7 +278,7 @@
 <li>然后根据路由规则，根据路由规则将数据包转发给cali设备，从而到达容器2。</li>
 </ol>
 <h4 id="BGP模式"><a href="#BGP模式" class="headerlink" title="BGP模式"></a>BGP模式</h4><p class="img-lightbox">
-                <img src="https://tva1.sinaimg.cn/large/008i3skNly1gw26386mtij30zo0lkdh5.jpg" alt="bgp模式" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gw26386mtij30zo0lkdh5.jpg" alt="bgp模式" title="">
             </p>
 
 <p>如上所示，Pod 1 访问 Pod 2大致流程如下：</p>
