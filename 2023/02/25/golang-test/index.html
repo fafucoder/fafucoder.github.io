@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    <meta name="referrer" content="never">
+    
+    
+    
+    
+    <title>golang代码测试方法论 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="golang">
+    <meta name="description" content="概述在项目开发中，正对项目的测试分为多个分类，比如单元测试、集成测试、端到端测试等，按照Mike Cohn提出的“测试金字塔”概念，测试分为4个层次：                                 最下面的是单元测试，单元测试针对的是代码进行测试，针对的是局部代码功能；再而之上是集成测试，它针对的是服务的接口进行测试；接着网上是端到端的测试，也就是我们所说的链路测试，它针对的是服">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang代码测试方法论">
+<meta property="og:url" content="https://github.com/fafucoder/2023/02/25/golang-test/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概述在项目开发中，正对项目的测试分为多个分类，比如单元测试、集成测试、端到端测试等，按照Mike Cohn提出的“测试金字塔”概念，测试分为4个层次：                                 最下面的是单元测试，单元测试针对的是代码进行测试，针对的是局部代码功能；再而之上是集成测试，它针对的是服务的接口进行测试；接着网上是端到端的测试，也就是我们所说的链路测试，它针对的是服">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2019/05/21/5ce34ea15584577479.png">
+<meta property="article:published_time" content="2023-02-25T10:45:20.000Z">
+<meta property="article:modified_time" content="2023-02-26T13:42:49.689Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="golang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2019/05/21/5ce34ea15584577479.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">golang代码测试方法论</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">golang代码测试方法论</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2023-02-25T10:45:20.000Z" itemprop="datePublished" class="page-time">
+  2023-02-25
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-golang-test"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">golang代码测试方法论</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2023-02-25 18:45:20" datetime="2023-02-25T10:45:20.000Z"  itemprop="datePublished">2023-02-25</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/golang/">golang</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>在项目开发中，正对项目的测试分为多个分类，比如单元测试、集成测试、端到端测试等，按照Mike Cohn提出的“测试金字塔”概念，测试分为4个层次：</p>
+<p class="img-lightbox">
+                <img src="https://i.loli.net/2019/05/21/5ce34ea15584577479.png" alt="test" title="">
+            </p>
+
+<p>最下面的是单元测试，单元测试针对的是代码进行测试，针对的是局部代码功能；再而之上是集成测试，它针对的是服务的接口进行测试；接着网上是端到端的测试，也就是我们所说的链路测试，它针对的是服务的功能进行测试，负责从一个链路的入口输入测试用例，验证输出的系统的结果；再上一层是我们最常用的UI测试，就是测试人员在UI界面上根据功能进行点击测试。</p>
+<p>测试金字塔建议我们：</p>
+<p>（1）<strong>尽可能地多做单元测试 和 集成测试</strong>，因为他们的执行速度相较于上层的几个测试类型来说快很多且相对稳定，可以一天多次执行。</p>
+<p>（2）<strong>尽可能地少做 组件测试、端到端测试 和 探索性测试</strong>，因为他们的执行速度相较单元测试 和 集成测试 会慢很多，且不够稳定，无法做到一天多次执行，每次执行都要等很久才能获得反馈结果。</p>
+<blockquote>
+<p>画外音：金字塔里，越往下速度越快且越稳定，那么就可以频繁执行，反正执行一次也花不了多久时间，开发人员还可以知道我的代码有没有影响到其他模块。越往上则速度越慢且越不稳定，跑一次要N久，开发人员往往会觉得还是先继续开发吧，到时候出了bug再说，我可不想加班等测试结果。</p>
+</blockquote>
+<h3 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h3><h4 id="什么是单元你测试"><a href="#什么是单元你测试" class="headerlink" title="什么是单元你测试"></a>什么是单元你测试</h4><p>单元是应用的最小可测试部件。在过程化编程中，一个单元就是单个程序、函数、过程等；对于面向对象编程，最小单元就是方法，包括基类、超类、抽象类等中的方法。单元测试就是软件开发中对最小单位进行正确性检验的测试工作。</p>
+<p>不同地方对单元测试有的定义可能会有所不同，但有一些基本共识：</p>
+<ul>
+<li>单元测试是比较<strong>底层</strong>的，关注代码的<strong>局部</strong>而不是整体。</li>
+<li>单元测试是开发人员在写代码时候写的。</li>
+<li>单元测试需要比其他测试运行得<strong>快</strong>。</li>
+</ul>
+<h4 id="单元测试的意义"><a href="#单元测试的意义" class="headerlink" title="单元测试的意义"></a>单元测试的意义</h4><ul>
+<li><strong>提高代码质量</strong>: 代码测试都是为了帮助开发人员发现问题从而解决问题，提高代码质量。</li>
+<li><strong>尽早发现问题</strong>: 问题越早发现，解决的难度和成本就越低。</li>
+<li><strong>保证重构正确性</strong>: 随着功能的增加，重构（修改老代码）几乎是无法避免的。很多时候我们不敢重构的原因，就是担心其它模块因为依赖它而不工作。有了单元测试，只要在改完代码后运行一下单测就知道改动对整个系统的影响了，从而可以让我们放心的重构代码。</li>
+<li><strong>简化调试过程</strong>: 单元测试让我们可以轻松地知道是哪一部分代码出了问题。</li>
+<li><strong>简化集成过程</strong>: 由于各个单元已经被测试，在集成过程中进行的后续测试会更加容易。</li>
+<li><strong>优化代码设计</strong>: 编写测试用例会迫使开发人员仔细思考代码的设计和必须完成的工作，有利于开发人员加深对代码功能的理解，从而形成更合理的设计和结构。</li>
+<li><strong>单元测试是最好的文档</strong>: 单元测试覆盖了接口的所有使用方法，是最好的示例代码。而真正的文档包括注释很有可能和代码不同步，并且看不懂。</li>
+</ul>
+<h4 id="单元测试基本原则"><a href="#单元测试基本原则" class="headerlink" title="单元测试基本原则"></a>单元测试基本原则</h4><ol>
+<li>单元测试文件名以xxx_test.go命名，测试文件跟被测试文件处于同个包中;</li>
+<li>测试用例以Test开头, 测试函数为TestXxx,  整体风格保持一致;</li>
+<li>测试用例应该完备，应考虑到各个边界情况，推荐使用table-driven的方式实现;</li>
+<li>单元测试的结果是确定且一致的，跟环境无关的;</li>
+<li>测试用例是独立的，不同的测试用例之间不能有互相依赖;</li>
+<li>单元测试程序不应该有用户输入，测试结果应该能直接被电脑获取，不应该由人来判断;</li>
+<li>函数中通过调用testing.T的Error, Errorf, FailNow, Fatal, FatalIf等方法记录测试的信息;</li>
+<li>可以通过benchmark做并发测试，验证代码性能;</li>
+</ol>
+<h4 id="常见的测试框架"><a href="#常见的测试框架" class="headerlink" title="常见的测试框架"></a>常见的测试框架</h4><p>golang自带的testing包已经可以完美支持单元测试，我们在写一个文件，函数的时候，可以直接在需要单元测试的文件旁边增加一个_test.go的文件。而后直接使用 <code>go test</code> 直接跑测试用例就可以了。但是因为单元测试是与环境无关的，因此在编写测试用例时总是需要把一些第三发依赖给mock掉，因此需要借助其他的测试组件来完成，下面是一些常见的mock框架：</p>
+<ol>
+<li>基于接口的Mock框架-goMock  </li>
+<li>全局变量、函数、过程打桩框架-goStub</li>
+<li>动态打桩框架(非并发安全)-goMonkey</li>
+<li>数据库和缓存等中间件mock框架(sqlMock, redisMock)</li>
+<li>http请求mock框架-httpmock</li>
+</ol>
+<h5 id="goMonkey"><a href="#goMonkey" class="headerlink" title="goMonkey"></a>goMonkey</h5><p><a href="https://github.com/agiledragon/gomonkey">go monkey</a> 可以动态的执行打桩，目标是让用户在单元测试中低成本的完成打桩，从而将精力聚焦于业务功能的开发。gomonkey支持多种打桩方式，可以无入侵的实现打桩，但是需要注意的是：</p>
+<ol>
+<li><p>运行 monkey需要关闭 Go 语言的内联优化才能生效，也就是编译时需要添加 <code>-gcflags=all=-l</code> 参数才行</p>
+<blockquote>
+<p>注意：</p>
+<ol>
+<li>如果是 M1 系统，编译需要指定 goarch 为 amd64<br>@MAC-M1#  GOARCH=amd64 go build -gcflags=all=-l  -o xxx  main.go<br>@MAC-INTEL# go build -gcflags=all=-l  -o xxx  main.go<br>解决的问题：monkey mac m1 execute syscall.Mprotect error：panic: permission denied [recovered]<br>ref: <a href="https://github.com/agiledragon/gomonkey/issues/57">https://github.com/agiledragon/gomonkey/issues/57</a><br>ref: <a href="https://blog.csdn.net/qw790707988/article/details/119710144" target="_blank" rel="noopener">https://blog.csdn.net/qw790707988/article/details/119710144</a></li>
+<li>monkey不应该用于生产系统, 否则可能引发未知事故</li>
+<li>monkey 需要在运行的时候修改内存代码段，因而无法在一些对安全性要求比较高的系统上工作</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<h3 id="集成测试与E2E测试"><a href="#集成测试与E2E测试" class="headerlink" title="集成测试与E2E测试"></a>集成测试与E2E测试</h3><p>go开发者一般使用Ginkgo + Gomega 实现集成测试与E2E测试。Ginkgo /ˈɡɪŋkoʊ / 是Go语言的一个行为驱动开发（BDD， Behavior-Driven Development）风格的测试框架，通常和库Gomega一起使用。Ginkgo在一系列的“Specs”中描述期望的程序行为。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://www.cnblogs.com/yjf512/p/10905352.html" target="_blank" rel="noopener">golang项目的测试实践</a></li>
+<li><a href="https://blog.csdn.net/sd7o95o/article/details/107804441" target="_blank" rel="noopener">What Is 测试金字塔？</a></li>
+<li><a href="https://blog.csdn.net/u013276277/article/details/104993370" target="_blank" rel="noopener">gomonkey调研文档和学习</a></li>
+<li><a href="https://blog.gmem.cc/ginkgo-study-note" target="_blank" rel="noopener">ginkgo学习笔记</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2023/02/25/golang-etcd/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">etcd使用手记</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2023</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
