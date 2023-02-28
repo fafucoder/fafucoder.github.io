@@ -29,11 +29,13 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="build 参数使用方法usage: go build [-o output] [-i] [build flags] [packages] go build的使用比较简洁，所有的参数都可以忽略，直到只有go build，这个时候意味着使用当前目录进行编译, 因此: go build &#x3D; go build . &#x3D; go build main.go go build 主要参数是 -o output 指">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gl66qxf5wzj31fa0dwq7d.jpg">
 <meta property="article:published_time" content="2020-07-07T04:24:32.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.325Z">
+<meta property="article:modified_time" content="2023-02-28T03:44:41.473Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gl66qxf5wzj31fa0dwq7d.jpg">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -203,11 +205,25 @@
 <p>可以在mac系统中编译成linux跟windows的可执行文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED&#x3D;0 GOOS&#x3D;windows GOARCH&#x3D;amd64 go build main.go</span><br><span class="line">CGO_ENABLED&#x3D;0 GOOS&#x3D;linux GOARCH&#x3D;amd64 go build main.go</span><br></pre></td></tr></table></figure>
 
+<h3 id="编译技巧"><a href="#编译技巧" class="headerlink" title="编译技巧"></a>编译技巧</h3><h4 id="go-build-mod"><a href="#go-build-mod" class="headerlink" title="go build mod"></a>go build mod</h4><p>使用 <code>go build -mod=vendor</code> 来构建项目，因为在 <code>go modules</code> 模式下 <code>go build</code> 是屏蔽 vendor 机制的，所以需要特定参数重新开启 vendor 机制, 这样子断点调试的时候，就能够在vendor文件夹下断点了。如果golang的版本大于等于1.14, 则默认使用-mod=vendor</p>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/0081Kckwly1gl66qxf5wzj31fa0dwq7d.jpg" alt="go mod" title="">
+            </p>
+
+<h4 id="go-build-tag"><a href="#go-build-tag" class="headerlink" title="go build tag"></a>go build tag</h4><p>-ldflags 可以传递指令,也可以通过<code>// +build</code> 标记去做，如下所示：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// +build release</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> version = <span class="string">"RELEASE"</span></span><br></pre></td></tr></table></figure>
+
+<p>上面代码的关键是 <code>// +build release</code>这行代码，注意这行代码前后须有一个空行隔开，例如在第一行时，接下来要空出一行。这个文件只会被go bulid识别到，而go run等命令不会去识别这个文件，而且vscode, golang等编辑器也会略过这个文件。</p>
+<p>通过引入 //  +build的好处就是可以作为文件包， 比如main包要引入其他main 包的方案中，可以创建一个空的文件,然后引入文件。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// +build tools</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> lib</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	_ <span class="string">"k8s.io/kube-openapi/cmd/openapi-gen"</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
 <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
 <li><a href="https://cloud.tencent.com/developer/article/1410259" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1410259</a></li>
 <li><a href="https://www.cnblogs.com/Dong-Ge/articles/11276862.html" target="_blank" rel="noopener">https://www.cnblogs.com/Dong-Ge/articles/11276862.html</a></li>
 <li><a href="https://blog.csdn.net/u013870094/article/details/78500478" target="_blank" rel="noopener">https://blog.csdn.net/u013870094/article/details/78500478</a></li>
 <li><a href="https://blog.csdn.net/zl1zl2zl3/article/details/83374131" target="_blank" rel="noopener">https://blog.csdn.net/zl1zl2zl3/article/details/83374131</a></li>
+<li><a href="https://golang.org/ref/mod" target="_blank" rel="noopener">go mod refer</a></li>
+<li><a href="https://www.cnblogs.com/linyihai/p/10859945.html" target="_blank" rel="noopener">go build -tags 使用</a></li>
 </ul>
 
         </div>

@@ -30,7 +30,7 @@
 <meta property="og:description" content="request 容器使用的最小资源需求， 作为容器调度时资源分配的判断依据 只有当前节点上可分配的资源 &gt;&#x3D; request 才允许将容器调度到该节点 request参数不限制容器的最大可用资源  limit 容器能使用资源的最大值 设置为0表示对使用的资源不做限制，可无限的使用  request 跟 limit 的关系request能保证pod有足够的资源来运行, 而limit则是防止某个">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-11-05T11:46:27.000Z">
-<meta property="article:modified_time" content="2021-12-17T07:42:48.338Z">
+<meta property="article:modified_time" content="2023-02-28T08:33:12.543Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
@@ -197,8 +197,6 @@
 
 <h3 id="Best-Effort"><a href="#Best-Effort" class="headerlink" title="Best-Effort"></a>Best-Effort</h3><p>所有的容器的<code>limit</code>和<code>request</code>值都没有配置。</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">containers:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">foo</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">bar</span></span><br><span class="line">    <span class="attr">resources:</span></span><br></pre></td></tr></table></figure>
-
-
 
 <h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
 <li><a href="https://cloud.tencent.com/developer/article/1004976" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1004976</a></li>
