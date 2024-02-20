@@ -34,8 +34,10 @@
 <meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4phqrxcj30xu0gygnx.jpg">
 <meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp4rcsj1bj314y0lg40p.jpg">
 <meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp608bb6pj30u00uh0ub.jpg">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202401172017128.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202401172045208.png">
 <meta property="article:published_time" content="2020-09-14T12:22:13.000Z">
-<meta property="article:modified_time" content="2023-02-04T13:33:00.750Z">
+<meta property="article:modified_time" content="2024-01-17T13:09:26.016Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
@@ -227,16 +229,35 @@
 <p>查看系统级别的最大打开文件数可以使用<code>sysctl -a | grep fs.file-max</code>命令查看；<br>查看用户级别的最大打开文件数可以使用使用 <code>ulimit -n</code>命令查看；</p>
 </blockquote>
 <h3 id="socket-概念"><a href="#socket-概念" class="headerlink" title="socket 概念"></a>socket 概念</h3><p>socket这个词可以表示很多概念，在TCP/IP协议中“IP地址 + TCP或UDP端口号”唯一标识网络通讯中的一个进程，“IP + 端口号”就称为socket。在TCP协议中，建立连接的两个进程各自有一个socket来标识，那么两个socket组成的socket pair就唯一标识一个连接。</p>
-<p>在Unix/Linux系统下，一个socket句柄，可以看做是一个文件，在socket上收发数据，相当于对一个文件进行读写，所以一个socket句柄，通常也用表示文件句柄的fd来表示。在linux中，一个socket fd 可能如下表示：</p>
+<p>在Unix/Linux系统下，一个socket句柄，可以看做是一个文件，在socket上收发数据，相当于对一个文件进行读写，所以一个socket句柄，通常也用文件句柄的fd来表示。在linux中，一个socket fd 可能如下表示：</p>
 <figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:~<span class="comment"># ll /proc/1583/fd  </span></span><br><span class="line">total <span class="number">0</span>  </span><br><span class="line">lrwx------ <span class="number">1</span> root root <span class="number">64</span> Jul <span class="number">19</span> <span class="number">12</span>:<span class="number">37</span> <span class="number">7</span><span class="function"> -&gt;</span> socket:[<span class="number">18892</span>]  </span><br><span class="line">lrwx------ <span class="number">1</span> root root <span class="number">64</span> Jul <span class="number">19</span> <span class="number">12</span>:<span class="number">37</span> <span class="number">8</span><span class="function"> -&gt;</span> socket:[<span class="number">18893</span>]</span><br></pre></td></tr></table></figure>
 
 <p>这里我们看到 fd 7、8 都是一个 socket fd，名字为 socket:[18892]、socket:[18893], 名字中的socket 标识这是一个 socket 类型的 fd， 数字[18892] 表示这个是一个 inode 号，能够唯一标识本机的一条网络连接。</p>
-<p>套接字由 socket() 系统调用创建，但是套接字其实可分为两种类型，监听套接字和普通套接字。而监听套接字是由 listen() 把 socket fd 转化而成。listenfd称为监听套接字（listening socket）描述符，它的生命周期与服务器的生命周期一致且一般一个服务器保有一个listenfd。connfd是已连接套接字（connected socket）描述符，一个连接对应一个connfd，当连接关闭时connfd也会被关闭。值得一提的是connfd是在完成TCP三次握手后被创建。(总结起来就是listenfd是内核维护的，connfd是应用程序自己维护的)</p>
+<p>套接字由 socket() 系统调用创建，但是套接字其实可分为两种类型，监听套接字和普通套接字。</p>
+<p>对于监听套接字，不走数据流，只管理连接的建立。<code>accept</code> 将从全连接队列获取一个创建好的 socket（ 3 次握手完成），对于监听套接字的可读事件就是全连接队列非空。对于监听套接字，我们只在乎可读事件。</p>
+<p>普通套接字就是走数据流的，也就是网络 IO，针对普通套接字我们关注可读可写事件。</p>
+<p>监听套接字是由 listen() 把 socket fd 转化而成。listenfd称为监听套接字（listening socket）描述符，它的生命周期与服务器的生命周期一致且一般一个服务器保有一个listenfd。connfd是已连接套接字（connected socket）描述符，一个连接对应一个connfd，当连接关闭时connfd也会被关闭。值得一提的是connfd是在完成TCP三次握手后被创建。(总结起来就是listenfd是内核维护的，connfd是应用程序自己维护的)</p>
 <p class="img-lightbox">
                 <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/008i3skNly1gwp608bb6pj30u00uh0ub.jpg" alt="socket" title="">
             </p>
 
-<h3 id="进程堵塞-概念"><a href="#进程堵塞-概念" class="headerlink" title="进程堵塞 概念"></a>进程堵塞 概念</h3><h3 id="多路复用解决的问题"><a href="#多路复用解决的问题" class="headerlink" title="多路复用解决的问题"></a>多路复用解决的问题</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<h3 id="全连接和半连接队列"><a href="#全连接和半连接队列" class="headerlink" title="全连接和半连接队列"></a>全连接和半连接队列</h3><p>上面提到过全连接队列和半连接队列，什么是全连接队列，什么是半连接队列呢，在说这个概念之前，我们先说TCP的三次握手如下：</p>
+<ol>
+<li>client 发送 SYN 到server 发起握手；</li>
+<li>server 收到 SYN后回复SYN+ACK给client；</li>
+<li>client 收到SYN+ACK后，回复server一个ACK表示收到了server的SYN+ACK，这时表示连接建立完成。</li>
+</ol>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202401172017128.png" alt="TCP三次握手" title="">
+            </p>
+
+<p>全连接队列和半连接队列其实就是三次握手中连接的状态流转半连接队列，也称 SYN 队列；全连接队列，也称 accept 队列）</p>
+<p>服务端收到客户端发起的 SYN 请求后，<strong>内核会把该连接存储到半连接队列</strong>，并向客户端响应 SYN+ACK，接着客户端会返回 ACK，服务端收到第三次握手的 ACK 后，<strong>内核会把连接从半连接队列移除，然后创建新的完全的连接，并将其添加到 accept 队列，等待进程调用 accept 函数时把连接取出来。</strong></p>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202401172045208.png" alt="全连接队列与半连接队列" title="">
+            </p>
+
+<h3 id="进程堵塞概念"><a href="#进程堵塞概念" class="headerlink" title="进程堵塞概念"></a>进程堵塞概念</h3><h3 id="多路复用解决的问题"><a href="#多路复用解决的问题" class="headerlink" title="多路复用解决的问题"></a>多路复用解决的问题</h3><h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
 <li><a href="https://wumingx.com/performance/io-epoll.html" target="_blank" rel="noopener">https://wumingx.com/performance/io-epoll.html</a></li>
 <li><a href="https://xie.infoq.cn/article/5241a48ffdb62ec3ba0235733" target="_blank" rel="noopener">https://xie.infoq.cn/article/5241a48ffdb62ec3ba0235733</a></li>
 <li><a href="https://colobu.com/2019/02/23/1m-go-tcp-connection/" target="_blank" rel="noopener">百万 Go TCP 连接的思考: epoll方式减少资源占用</a>  // 鸟窝大神</li>
@@ -333,7 +354,7 @@
         </p>
     </div>
     <div class="bottom">
-        <p><span>Dawn &copy; 2015 - 2023</span>
+        <p><span>Dawn &copy; 2015 - 2024</span>
             <span>
                 
                 Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
