@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    <meta name="referrer" content="never">
+    
+    
+    
+    
+    <title>elasticsearch lucene存储引擎相关知识 | 好记忆不如烂笔头 | 问题记录，学习笔记</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="elasticsearch">
+    <meta name="description" content="概述Elasticsearch是一个基于Apache Lucene的开源搜索引擎，其依靠Lucene完成索引创建和搜索功能，可以将ElstaicSearch理解为是一个Lucene的分布式封装的搜索引擎。 前置知识倒排索引搜索的核心需求是全文检索，全文检索简单来说就是要在大量文档中找到包含某个单词出现的位置，在传统关系型数据库中，数据检索只能通过 like 来实现，例如需要在手机数据中查询名称包含">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch lucene存储引擎相关知识">
+<meta property="og:url" content="https://github.com/fafucoder/2024/02/20/elasticsearch-lucene/index.html">
+<meta property="og:site_name" content="好记忆不如烂笔头">
+<meta property="og:description" content="概述Elasticsearch是一个基于Apache Lucene的开源搜索引擎，其依靠Lucene完成索引创建和搜索功能，可以将ElstaicSearch理解为是一个Lucene的分布式封装的搜索引擎。 前置知识倒排索引搜索的核心需求是全文检索，全文检索简单来说就是要在大量文档中找到包含某个单词出现的位置，在传统关系型数据库中，数据检索只能通过 like 来实现，例如需要在手机数据中查询名称包含">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202402211646164.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041545936.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041547077.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041548288.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041549483.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041552844.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181603729.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181408110.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181557104.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181442646.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181445503.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181552883.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181611084.png">
+<meta property="article:published_time" content="2024-02-20T11:29:49.000Z">
+<meta property="article:modified_time" content="2024-03-18T08:20:11.233Z">
+<meta property="article:author" content="Dawn">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202402211646164.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.7.2">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpeg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Dawn</h5>
+          <a href="mailto:2024349250@qq.com" title="2024349250@qq.com" class="mail">2024349250@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fafucoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">elasticsearch lucene存储引擎相关知识</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">elasticsearch lucene存储引擎相关知识</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2024-02-20T11:29:49.000Z" itemprop="datePublished" class="page-time">
+  2024-02-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/elasticsearch/">elasticsearch</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-elasticsearch-lucene"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">elasticsearch lucene存储引擎相关知识</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2024-02-20 19:29:49" datetime="2024-02-20T11:29:49.000Z"  itemprop="datePublished">2024-02-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/elasticsearch/">elasticsearch</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>Elasticsearch是一个基于Apache Lucene的开源搜索引擎，其依靠Lucene完成索引创建和搜索功能，可以将ElstaicSearch理解为是一个Lucene的分布式封装的搜索引擎。</p>
+<h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><h4 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h4><p>搜索的核心需求是全文检索，全文检索简单来说就是要在大量文档中找到包含某个单词出现的位置，在传统关系型数据库中，数据检索只能通过 like 来实现，例如需要在手机数据中查询名称包含苹果的手机，需要通过如下 sql 实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from phone_table where phone_brand like &#39;%苹果手机%&#39;;</span><br></pre></td></tr></table></figure>
+
+<p>这种实现方式实际会存在很多问题，例如需要全表扫描，性能差，无法得内容与搜索条件的相关性等，为了高效的实现全文检索，我们可以通过倒排索引来解决</p>
+<p>倒排索引是区别于正排索引的概念</p>
+<ul>
+<li>正排索引：是以文档对象的唯一 ID 作为索引，以文档内容作为记录的结构。</li>
+<li>倒排索引：Inverted index，指的是将文档内容中的单词作为索引，将包含该词的文档 ID 作为记录的结构。</li>
+</ul>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202402211646164.png" alt="倒排索引" title="">
+            </p>
+
+<h4 id="FST算法"><a href="#FST算法" class="headerlink" title="FST算法"></a>FST算法</h4><p>FST全程Finite State Transducer 全称有穷状态转换器；FST是一种类似于字典的数据结构，但是它是k:v结构的，使用FST有两个优先</p>
+<ul>
+<li>空间占用小：通过对字典中单词前缀和后缀的重复利用，压缩了存储空间</li>
+<li>查询效率快：查询速度不会超过 <code>O(len(str))</code> </li>
+</ul>
+<p>如果我们要对 <code>cat、 deep、 do、 dog、dogs</code>这五个单词进行插入构建FST（工具演示：<a href="http://examples.mikemccandless.com/fst.py?terms=&cmd=Build+it!" target="_blank" rel="noopener">http://examples.mikemccandless.com/fst.py?terms=&amp;cmd=Build+it%21</a>），执行过程如下：</p>
+<ol>
+<li><p>插入cat, 每个字母一条边，其中t边指向终点</p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041545936.png" alt="插入cat"></p>
+</li>
+<li><p>插入deep, 与前一个单词 cat 进行最大前缀匹配，发现没有匹配则直接插入，P边指向终点</p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041547077.png" alt="插入deep"></p>
+</li>
+<li><p>插入do, 与前一个单词deep进行最大前缀匹配，发现是 d，则在d边后增加新边o，o边指向终点</p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041548288.png" alt="插入do"></p>
+</li>
+<li><p>插入dog, 与前一个单词 do 进行最大前缀匹配，发现是 do，则在o边后增加新边g，g边指向终点</p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041549483.png" alt="插入dog"></p>
+</li>
+<li><p>插入dogs, 与前一个单词 dog 进行最大前缀匹配，发现是dog，则在g后增加新边s，s边指向终点。</p>
+<p><img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403041552844.png" alt="插入dogs"></p>
+</li>
+</ol>
+<h3 id="Lucene写入原理"><a href="#Lucene写入原理" class="headerlink" title="Lucene写入原理"></a>Lucene写入原理</h3><h4 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h4><p>​        在Lucene中，写入数据的基本单元称之为Document，一个Document是由Field构成，Field是Term的集合，Segment是最小的独立索引单元，由多个Documents构成；在每个Segment范畴内，每个Document都被分配到了一个唯一的数字ID, 称之为DocID, 同时根据每个Field的名字定一个唯一的FieldNaming，对于索引字段进到Postings之前也会被分配一个唯一的TermID。Field除了FieldNaming之外也有一个FieldNumber，与DocID和TermID一样都是一个自增的数值。</p>
+<p>​        倒排索引需要将 terms 映射到包含该单词 （term） 的文档列表，这样的映射列表我们称之为：<strong>倒排列表（postings list）</strong>。具体某一条映射数据称之为：<strong>倒排索引项（Posting）</strong>。</p>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181603729.png" alt="倒排索引" title="">
+            </p>
+
+<h4 id="Lucene中倒排索引的结构"><a href="#Lucene中倒排索引的结构" class="headerlink" title="Lucene中倒排索引的结构"></a>Lucene中倒排索引的结构</h4><p>根据倒排索引的概念，最简单的我们可以用一个Map来描述这个结构， Map 的 Key 存储分词后的单词（也叫Term），Map的Value存储一些列的文档ID的集合，但是全文搜索引擎在海量数据的情况下需要存储大量的文本，如果是用Map存储Directory的话有这样几个明显的缺点:</p>
+<ol>
+<li>Dictionary 是非常大的（比如我们搜索中的一个字段在Directory里可能有上千万个Term）因此存储所有的Term需要大量的内存</li>
+<li>Postings 也可能会占据大量的存储空间（一个Term多的有几百万个doc）</li>
+<li>Posting List 不仅仅需要包含文档的id，为了加快搜索的速度还需要包含更多信息，比如下面这些<ul>
+<li>文档 id（DocId, Document Id），包含单词的所有文档唯一id，用于去正排索引中查询原始数据</li>
+<li>词频（TF，Term Frequency），记录 Term 在每篇文档中出现的次数，用于后续相关性算分</li>
+<li>位置（Position），记录 Term 在每篇文档中的分词位置（多个），用于做词语搜索（Phrase Query）</li>
+<li>偏移（Offset），记录 Term 在每篇文档的开始和结束位置，用于高亮显示等</li>
+</ul>
+</li>
+</ol>
+<p>因此上面说的基于 Map 的实现方式几乎是不可行的。在海量数据背景下，倒排索引的实现直接关系到存储成本以及搜索性能，为此，Lucene 引入了多种巧妙的数据结构和算法，同时也把倒排索引的结构组织成如下图所示:</p>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181408110.png" alt="倒排索引" title="">
+            </p>
+
+<ol>
+<li>Lucene把用于存储Term的索引文件叫Terms Index，它的后缀是<code>.tip</code></li>
+<li>把Postings信息分别存储在<code>.doc</code>、<code>.pay</code>、<code>.pox</code>，分别记录Postings的DocId信息和Term的词频、Payload信息、pox是记录位置信息</li>
+<li>Terms Dictionary的文件后缀称为<code>.tim</code>，它是Term与Postings的关系纽带，存储了Term和其对应的Postings文件指针。</li>
+</ol>
+<p>通过Terms Index(.tip) 能够快速地在Terms Dictionary(.tim) 中找到你的想要的Term，以及它对应的Postings文件指针与Term在Segment作用域上的统计信息。</p>
+<blockquote>
+<p><em>postings: 实际上Postings包含的东西并不仅仅是DocIDs（我们通常把这一个有序文档编号系列叫DocIDs），它还包括文档编号、以及词频、Term在文档中的位置信息、还有Payload数据。</em></p>
+</blockquote>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181557104.png" alt="倒排索引" title="">
+            </p>
+
+<h4 id="什么是Term-Index"><a href="#什么是Term-Index" class="headerlink" title="什么是Term Index"></a>什么是Term Index</h4><p>Terms Index存储在<code>.tip</code>文件中，实际张是有一个或者多个FST组成的，Segment上每个字段都有自己的一个FST（FST Index）记录在<code>.tip</code>上，所以图中FST Index的个数即是Segment拥有字段的个数。</p>
+<h4 id=""><a href="#" class="headerlink" title=""></a><p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181442646.png" alt="Term Directory" title="">
+            </p></h4><h4 id="什么是Term-Directory"><a href="#什么是Term-Directory" class="headerlink" title="什么是Term Directory"></a>什么是Term Directory</h4><p>Term Directory存储了Index field 经过去重、时态统一、大小写统一、近义词处理等操作后的词项数据，最后存储在.tim文件中（也就是Term Directory 存储所有的Term数据），同时它也是 Term 与 Postings 的关系纽带，存储了每个 Term 和其对应的 Postings 文件位置指针。通过Term Directory可以知道Term的统计信息，包括Term在Segment中出现的频率等。</p>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181445503.png" alt="Term Directory" title="">
+            </p>
+
+<p>Terms Dictionary 内部采用 NodeBlock 这种结构对 Term 进行压缩存储，处理过程会将相同前缀的 Term 压缩为一个 NodeBlock，然后将每个 Term 的后缀以及对应 Term 的 Posting 关联信息处理为一个 Entry 保存到 Block，如下图所示:</p>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181552883.png" alt="term directory" title="">
+            </p>
+
+<h4 id="什么是PostingList"><a href="#什么是PostingList" class="headerlink" title="什么是PostingList"></a>什么是PostingList</h4><p>PostingList 包含文档 id、词频、位置等多个信息，这些数据之间本身是相对独立的，因此 Lucene 将 Postings List 拆成三个文件存储：</p>
+<ul>
+<li>.doc文件：记录 Postings 的 docId 信息和 Term 的词频</li>
+<li>.pay文件：记录 Payload 信息和偏移量信息</li>
+<li>.pos文件：记录位置信息</li>
+</ul>
+<p>这个做法有没有点列式存储的味道？其好处也很明显：一来可以提高读取效率，因为基本所有的查询都会用 .doc 文件获取文档 id，但一般的查询仅需要用到 .doc 文件就足够了，只有对于近似查询等位置相关的查询才需要用位置相关数据， 二来这样存储数据很方便对数据进行压缩</p>
+<p>三个文件整体实现差不太多，这里仅介绍.doc 文件，.doc 文件存储的是每个 Term 对应的文档 Id 和词频。每个 Term 都包含一对 TermFreqs 和 SkipData 结构，其中 TermFreqs 存放 docId 和词频信息，SkipData 为跳表结构，用于实现 TermFreqs 内部的快速跳转</p>
+<p>Posting List 采用多个文件进行存储，最终我们可以得到每个 Term 的如下信息：</p>
+<ul>
+<li>SkipOffset：用来描述当前 term 信息在 .doc 文件中跳表信息的起始位置。</li>
+<li>DocStartFP：是当前 term 信息在 .doc 文件中的文档 ID 与词频信息的起始位置。</li>
+<li>PosStartFP：是当前 term 信息在 .pos 文件中的起始位置。</li>
+<li>PayStartFP：是当前 term 信息在 .pay 文件中的起始位置。</li>
+</ul>
+<p>为了压缩Posting List的存储空间，需要对Posting List进行压缩，Lucene采用的压缩算法是: FOR  + RBM</p>
+<h3 id="Lucene的搜索过程"><a href="#Lucene的搜索过程" class="headerlink" title="Lucene的搜索过程"></a>Lucene的搜索过程</h3><p>lucene的搜索过程如下：</p>
+<ul>
+<li>通过 Term Index 数据（.tip文件）中的 StartFP 获取指定字段的 FST</li>
+<li>通过 FST 找到指定 Term 在 Term Dictionary（.tim 文件）可能存在的 Block</li>
+<li>将对应 Block 加载内存，遍历 Block 中的 Entry，通过后缀（Suffix）判断是否存在指定 Term</li>
+<li>存在则通过 Entry 的 TermStat 数据中各个文件的 FP 获取 Posting 数据</li>
+<li>如果需要获取 Term 对应的所有 DocId 则直接遍历 TermFreqs，如果获取指定 DocId 数据则通过 SkipData快速跳转</li>
+</ul>
+<p class="img-lightbox">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403181611084.png" alt="Lucene搜索过程" title="">
+            </p>
+
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://neteric.top/posts/elasticsearch_principle_four/" target="_blank" rel="noopener">捋一捋ElasticSearch（三）| Lucene存储引擎</a>  — 推荐阅读</li>
+<li><a href="https://www.nasuiyile.cn/463.html" target="_blank" rel="noopener">ES的FST原理</a> — 推荐阅读</li>
+<li><a href="https://www.cnblogs.com/lavender-pansy/p/16620974.html" target="_blank" rel="noopener">ElasticSearch倒排索引使用算法FST</a> — 可以看看~</li>
+<li><a href="https://www.cnblogs.com/bonelee/p/6226185.html" target="_blank" rel="noopener">lucene字典实现原理——FST </a>  – 也可以看看~</li>
+<li><a href="https://www.cnblogs.com/wuzhenzhao/p/13842858.html" target="_blank" rel="noopener">ElasticSearch索引核心原理</a></li>
+<li><a href="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/Lucene.pdf" target="_blank" rel="noopener">Lucene 3.0 原理与代码分析完整版</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <footer>
+        <a href="https://github.com/fafucoder">
+            <img src="/img/avatar.jpeg" alt="Dawn">
+            Dawn
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/" rel="tag">elasticsearch</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2024/03/04/flink-basic/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Flink 基础概念</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2023/02/25/golang-test/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">golang代码测试方法论</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Dawn &copy; 2015 - 2024</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.7.2" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'Down Blog';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'Just For Fun';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
