@@ -29,14 +29,14 @@
 <meta property="og:site_name" content="好记忆不如烂笔头">
 <meta property="og:description" content="概述Go 语言作为一个原生支持用户态进程（Goroutine）的语言，当提到并发编程、多线程编程时，往往都离不开锁这一概念。锁是一种并发编程中的同步原语（Synchronization Primitives），它能保证多个 Goroutine 在访问同一片内存时不会出现竞争条件（Race condition）等问题。go语言在Sync包中提供了用于同步的一些基本原语，包括常见的sync.Mutex">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://img.draveness.me/2020-01-23-15797104327981-golang-basic-sync-primitives.png">
-<meta property="og:image" content="https://img.draveness.me/2020-01-23-15797104328010-golang-mutex-state.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403200018101.png">
+<meta property="og:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403200018662.png">
 <meta property="article:published_time" content="2021-11-22T13:35:17.000Z">
-<meta property="article:modified_time" content="2023-02-26T14:19:09.096Z">
+<meta property="article:modified_time" content="2024-03-19T16:18:48.417Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://img.draveness.me/2020-01-23-15797104327981-golang-basic-sync-primitives.png">
+<meta name="twitter:image" content="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403200018101.png">
     
         <link rel="alternate" type="application/atom+xml" title="好记忆不如烂笔头" href="/atom.xml">
     
@@ -177,7 +177,7 @@
         <div class="post-content" id="post-content" itemprop="postContent">
             <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>Go 语言作为一个原生支持用户态进程（Goroutine）的语言，当提到并发编程、多线程编程时，往往都离不开锁这一概念。锁是一种并发编程中的同步原语（Synchronization Primitives），它能保证多个 Goroutine 在访问同一片内存时不会出现竞争条件（Race condition）等问题。go语言在Sync包中提供了用于同步的一些基本原语，包括常见的<a href="https://draveness.me/golang/tree/sync.Mutex" target="_blank" rel="noopener"><code>sync.Mutex</code></a>、<a href="https://draveness.me/golang/tree/sync.RWMutex" target="_blank" rel="noopener"><code>sync.RWMutex</code></a>、<a href="https://draveness.me/golang/tree/sync.WaitGroup" target="_blank" rel="noopener"><code>sync.WaitGroup</code></a>、<a href="https://draveness.me/golang/tree/sync.Once" target="_blank" rel="noopener"><code>sync.Once</code></a> 和 <a href="https://draveness.me/golang/tree/sync.Cond" target="_blank" rel="noopener"><code>sync.Cond</code></a>：</p>
 <p class="img-lightbox">
-                <img src="https://img.draveness.me/2020-01-23-15797104327981-golang-basic-sync-primitives.png" alt="golang-basic-sync-primitives" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403200018101.png" alt="golang-basic-sync-primitives" title="">
             </p>
 
 <h3 id="前提知识"><a href="#前提知识" class="headerlink" title="前提知识"></a>前提知识</h3><h5 id="悲观锁与乐观锁"><a href="#悲观锁与乐观锁" class="headerlink" title="悲观锁与乐观锁"></a>悲观锁与乐观锁</h5><p>悲观锁是一种悲观思想，它总认为最坏的情况可能会出现，它认为数据很可能会被其他人所修改，不管读还是写，悲观锁在执行操作之前都先上锁。</p>
@@ -205,7 +205,7 @@
 <li><code>waitersCount</code> — 当前互斥锁上等待的 Goroutine 个数；</li>
 </ul>
 <p class="img-lightbox">
-                <img src="https://img.draveness.me/2020-01-23-15797104328010-golang-mutex-state.png" alt="golang-mutex-state" title="">
+                <img src="https://fafucoder-1252756369.cos.ap-nanjing.myqcloud.com/202403200018662.png" alt="golang-mutex-state" title="">
             </p>
 
 <p>互斥锁的加锁过程比较复杂，它涉及自旋、信号量以及调度等概念：</p>
