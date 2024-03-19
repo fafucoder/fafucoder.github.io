@@ -30,7 +30,7 @@
 <meta property="og:description" content="概述kubernetes提供了一种pod优雅退出机制，使得pod在退出之前可以完成一些资源清理等工作（pod在退出前完成处理正在请求的连接数据等） Pod终止流程 当pod被删除时，首先K8S会给旧POD发送SIGTERM信号；将 pod 标记为“Terminating”状态； 于此同时，kube-proxy会更新转发规则，将 Pod 从 service 的 endpoint 列表中摘除掉，新的流">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-11T13:03:13.000Z">
-<meta property="article:modified_time" content="2024-03-19T14:46:13.218Z">
+<meta property="article:modified_time" content="2024-03-19T15:04:46.292Z">
 <meta property="article:author" content="Dawn">
 <meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
@@ -176,13 +176,12 @@
 <h3 id="Pod终止流程"><a href="#Pod终止流程" class="headerlink" title="Pod终止流程"></a>Pod终止流程</h3><ol>
 <li>当pod被删除时，首先K8S会给旧POD发送SIGTERM信号；将 pod 标记为“Terminating”状态；</li>
 <li>于此同时，kube-proxy会更新转发规则，将 Pod 从 service 的 endpoint 列表中摘除掉，新的流量不再转发到该 Pod。</li>
-<li>于此同时，如果pod中（的容器）定义了preStop处理程序，kubelet 会调用preStop hook处理程序，假如 preStop hook 的运行时间超出了 grace period（默认30s），kubelet 会发送 SIGTERM 信号并再等 2 秒。</li>
-<li><code>kubelet</code> 接下来触发容器运行时发送 SIGTERM 信号给每个容器中的init进程。</li>
+<li>于此同时，如果pod中（的容器）定义了preStop处理程序，kubelet 会调用preStop hook处理程序，假如 preStop hook 的运行时间超出了 grace period，kubelet 会额外等待2秒的宽限期(最后的宽限期）。</li>
 <li>宽限期结束（grace period）之后，若存在任何一个运行的进程，pod 会收到 SIGKILL 信号。</li>
 <li>Kubelet 请求 API Server 将此 Pod 资源宽限期设置为0从而完成删除操作。</li>
 </ol>
 <blockquote>
-<p>这里注意：当POD被标记为Terminating状态时, preStop和宽限以同步的方式执行；若宽限期结束后，preStop 仍未执行结束，第二步会重新执行并额外获得一个2秒的小宽限期(最后的宽限期)，所以prestop的执行时间注意和terminationGracePeriodSeconds参数配合使用)</p>
+<p>当pod被标记为Terminating状态时, preStop和宽限以同步的方式执行；若宽限期结束后，preStop 仍未执行结束，会重新执行并额外获得一个2秒的小宽限期(最后的宽限期)，所以prestop的执行时间注意和terminationGracePeriodSeconds参数配合使用)</p>
 </blockquote>
 <h3 id="如何实现pod优雅退出"><a href="#如何实现pod优雅退出" class="headerlink" title="如何实现pod优雅退出"></a>如何实现pod优雅退出</h3><ol>
 <li>pod可以配置pre_stop钩子（适用于业务进程不处理SIGTERM信号的情况）；</li>
@@ -196,6 +195,7 @@
 <li><a href="https://zhuanlan.zhihu.com/p/59544387" target="_blank" rel="noopener">Kubernetes 中如何保证优雅地停止 Pod</a></li>
 <li><a href="https://juejin.cn/post/7109292383753699336" target="_blank" rel="noopener">Kubernetes 中 Pod 的优雅退出机制</a></li>
 <li><a href="https://kubernetes.io/zh-cn/docs/concepts/workloads/pods/pod-lifecycle/" target="_blank" rel="noopener">Pod 的生命周期</a></li>
+<li><a href="https://www.cnblogs.com/chuyiwang/p/16467963.html" target="_blank" rel="noopener">Kubernetes-Pod退出流程</a> — 推荐阅读</li>
 </ul>
 
         </div>
